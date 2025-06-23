@@ -753,7 +753,26 @@ export class AIReminderApp {
     // Logout
     this.app.post('/api/auth/logout', async (req: Request, res: Response) => {
       try {
+        // Log the logout attempt
+        console.log('🚪 Logout attempt for session:', req.session.sessionId || 'unknown');
+        
+        // Clear session server-side
         await this.authService.invalidateSession(req);
+        
+        // Clear the session cookie on client-side
+        res.clearCookie('ai-reminder-session', {
+          path: '/',
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax'
+        });
+        
+        // Set cache headers to prevent cached access
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+        
+        console.log('✅ Logout successful - session destroyed and cookie cleared');
         res.json({ success: true, message: 'Logged out successfully' });
       } catch (error) {
         console.error('Logout error:', error);
@@ -771,6 +790,19 @@ export class AIReminderApp {
 
     // Calendar app (requires authentication)
     this.app.get('/app', legacyAuth, (req: Request, res: Response) => {
+      console.log('🔍 App access attempt - Session status:', {
+        userEmail: req.session.userEmail,
+        userId: req.session.userId,
+        sessionID: req.session.sessionId || req.sessionID,
+        hasTokens: !!req.session.tokens
+      });
+      
+      // Add cache headers to prevent cached access after logout
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      
+      console.log('✅ App access granted');
       res.sendFile(path.join(__dirname, '..', 'public', 'app.html'));
     });
 
@@ -1115,6 +1147,7 @@ export class AIReminderApp {
   // Legacy auth method for compatibility
   private requireAuth(req: Request, res: Response, next: any) {
     if (!req.session.userEmail || !req.session.userId) {
+      console.log('❌ App access denied - no session');
       return res.status(401).json({ success: false, error: 'Authentication required' });
     }
     next();

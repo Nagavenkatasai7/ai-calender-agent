@@ -1828,8 +1828,11 @@
                     <button class="auth-btn" onclick="window.location.href='/auth/google'">Connect Google</button>
                 </div>
                 <div id="userInfo" class="user-info">
-                    <span id="userEmail"></span>
-                    <button class="settings-btn" onclick="window.location.href='/settings'" title="Account Settings" style="margin-left: 1rem; padding: 0.5rem; background: rgba(255,255,255,0.1); border: none; border-radius: 6px; color: white; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.2)'; this.style.transform='scale(1.05)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'; this.style.transform='scale(1)'">⚙️</button>
+                    <span id="userEmail" style="margin-right: 1rem;"></span>
+                    <div class="header-actions" style="display: flex; gap: 0.8rem; align-items: center;">
+                        <button class="header-btn" onclick="window.location.href='/settings'" title="Account Settings" style="padding: 0.6rem 1rem; background: rgba(255,255,255,0.1); border: none; border-radius: 8px; color: white; cursor: pointer; transition: all 0.3s ease; font-size: 14px; font-weight: 500;" onmouseover="this.style.background='rgba(255,255,255,0.2)'; this.style.transform='scale(1.05)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'; this.style.transform='scale(1)'">Settings</button>
+                        <button id="logoutBtn" class="header-btn" style="padding: 0.6rem 1rem; background: rgba(255, 59, 48, 0.8); border: none; border-radius: 8px; color: white; cursor: pointer; transition: all 0.3s ease; font-size: 14px; font-weight: 500; display: inline-block;" onmouseover="this.style.background='rgba(255, 59, 48, 1)'; this.style.transform='scale(1.05)'" onmouseout="this.style.background='rgba(255, 59, 48, 0.8)'; this.style.transform='scale(1)'">Logout</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2231,6 +2234,49 @@
         let calendarEvents = [];
         let currentView = 'month'; // 'month', 'week', 'day'
         let currentBackground = 'default';
+
+        // Immediate authentication check to prevent cached access
+        (function checkAuthImmediately() {
+            console.log('🔐 Performing immediate authentication check...');
+            
+            // Add anti-cache headers to prevent back button access
+            if (window.history && window.history.replaceState) {
+                window.history.replaceState(null, null, window.location.href);
+            }
+            
+            // Check authentication status with server
+            fetch('/api/user/profile', {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    'Pragma': 'no-cache',
+                    'Expires': '0'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    console.log('❌ Authentication check failed - redirecting to login');
+                    // Force redirect to home page
+                    window.location.replace('/');
+                    return;
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data && data.success && data.user) {
+                    console.log('✅ Authentication verified for user:', data.user.email);
+                    currentUserEmail = data.user.email;
+                } else {
+                    console.log('❌ Invalid user data - redirecting to login');
+                    window.location.replace('/');
+                }
+            })
+            .catch(error => {
+                console.error('❌ Authentication check error:', error);
+                window.location.replace('/');
+            });
+        })();
 
         // Local storage for events (fallback when backend fails)
         function saveEventToLocalStorage(event) {
@@ -2683,6 +2729,7 @@
         function showAuthenticatedState() {
             document.getElementById('loginSection').style.display = 'none';
             document.getElementById('userInfo').style.display = 'block';
+            document.getElementById('logoutBtn').style.display = 'inline-block';
             document.getElementById('userEmail').textContent = currentUserEmail;
             document.getElementById('subscriptionStatus').style.display = 'block';
             loadSubscriptionStatus();
@@ -4849,7 +4896,84 @@
                 console.error('❌ Voice input element not found!'); // Debug
             }
         }
+
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                console.log('🚪 Logging out...');
+                await fetch('/api/auth/logout', { 
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate'
+                    }
+                });
+                console.log('✅ Logout complete - redirecting');
+            } catch (e) {
+                console.error('Logout error:', e);
+            } finally {
+                // Clear any cached data
+                currentUserEmail = null;
+                // Force redirect to home page (replaces current history entry)
+                window.location.replace('/');
+            }
+        });
+
+        // Add page visibility listener to check auth when user returns
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                console.log('👀 Page became visible - checking authentication...');
+                fetch('/api/user/profile', {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        console.log('❌ Auth check failed on page visibility - redirecting');
+                        window.location.replace('/');
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ Auth check error on page visibility:', error);
+                    window.location.replace('/');
+                });
+            }
+        });
+
+        // Prevent back button access by checking auth on popstate
+        window.addEventListener('popstate', (event) => {
+            console.log('🔙 Back button pressed - checking authentication...');
+            fetch('/api/user/profile', {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Cache-Control': 'no-cache, no-store, must-revalidate'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    console.log('❌ Auth check failed on back button - redirecting');
+                    window.location.replace('/');
+                }
+            })
+            .catch(error => {
+                console.error('❌ Auth check error on back button:', error);
+                window.location.replace('/');
+            });
+        });
+
+        // Ensure logout button is visible after auth
+        function showAuthenticatedState() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('userInfo').style.display = 'block';
+            document.getElementById('logoutBtn').style.display = 'inline-block';
+            document.getElementById('userEmail').textContent = currentUserEmail;
+            document.getElementById('subscriptionStatus').style.display = 'block';
+            loadSubscriptionStatus();
+        }
     </script>
 </body>
-</html>
 </html>
