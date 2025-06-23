@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Reminder Agent - Calendar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1c1c1e;
+            color: #ffffff;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Header with voice input */
+        .header {
+            background: #2c2c2e;
+            padding: 16px 24px;
+            border-bottom: 1px solid #38383a;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            z-index: 100;
+        }
+
+        .app-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-right: auto;
+        }
+
+        .voice-input-container {
+            flex: 1;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .voice-input {
+            width: 100%;
+            background: #1c1c1e;
+            border: 2px solid #38383a;
+            border-radius: 12px;
+            padding: 12px 50px 12px 16px;
+            font-size: 16px;
+            color: #ffffff;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .voice-input:focus {
+            border-color: #007aff;
+        }
+
+        .voice-input::placeholder {
+            color: #8e8e93;
+        }
+
+        .voice-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #007aff;
+            border: none;
+            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .voice-btn:hover {
+            background: #0056cc;
+        }
+
+        .voice-btn.listening {
+            background: #ff3b30;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: translateY(-50%) scale(1); }
+            50% { transform: translateY(-50%) scale(1.1); }
+            100% { transform: translateY(-50%) scale(1); }
+        }
+
+        .auth-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Subscription Status */
+        .subscription-status {
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            color: #667eea;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .subscription-status:hover {
+            background: rgba(102, 126, 234, 0.2);
+        }
+
+        .subscription-status.trial {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #10b981;
+        }
+
+        .subscription-status.free {
+            background: rgba(156, 163, 175, 0.1);
+            border-color: rgba(156, 163, 175, 0.3);
+            color: #9ca3af;
+        }
+
+        .subscription-status.pro {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.3);
+            color: #f59e0b;
+        }
+
+        .subscription-status.max {
+            background: rgba(167, 139, 250, 0.1);
+            border-color: rgba(167, 139, 250, 0.3);
+            color: #a78bfa;
+        }
+
+        .auth-btn {
+            background: #007aff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .auth-btn:hover {
+            background: #0056cc;
+        }
+
+        .user-info {
+            color: #8e8e93;
+            font-size: 14px;
+        }
+
+        /* Main content area */
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Calendar container */
+        .calendar-container {
+            flex: 1;
+            background: #1c1c1e;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Calendar header */
+        .calendar-header {
+            background: #2c2c2e;
+            padding: 16px 24px;
+            border-bottom: 1px solid #38383a;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .calendar-nav {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-btn {
+            background: #38383a;
+            border: none;
+            color: #ffffff;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: #48484a;
+        }
+
+        .calendar-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .view-switcher {
+            display: flex;
+            background: #38383a;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .view-btn {
+            background: transparent;
+            border: none;
+            color: #8e8e93;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .view-btn.active {
+            background: #007aff;
+            color: #ffffff;
+        }
+
+        /* Calendar grid */
+        .calendar-grid {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .month-view {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: #38383a;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .day-header {
+            background: #2c2c2e;
+            padding: 12px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: #8e8e93;
+            text-transform: uppercase;
+        }
+
+        .day-cell {
+            background: #1c1c1e;
+            min-height: 120px;
+            padding: 8px;
+            position: relative;
+            transition: background 0.3s ease;
+        }
+
+        .day-cell:hover {
+            background: #2c2c2e;
+        }
+
+        .day-cell.other-month {
+            opacity: 0.5;
+        }
+
+        .day-cell.today {
+            background: #007aff;
+        }
+
+        .day-number {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .today .day-number {
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .day-events {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .event-item {
+            background: #007aff;
+            color: #ffffff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .event-item:hover {
+            background: #0056cc;
+        }
+
+        .event-item.new-event {
+            animation: fadeInScale 0.5s ease;
+        }
+
+        @keyframes fadeInScale {
+            0% { opacity: 0; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* Week and Day View Styles */
+        .week-view {
+            display: none;
+            grid-template-columns: 60px repeat(7, 1fr);
+            grid-template-rows: 40px repeat(24, 1fr);
+            gap: 1px;
+            background: #38383a;
+            border-radius: 12px;
+            overflow: hidden;
+            height: 600px;
+            overflow-y: auto;
+        }
+
+        .day-view {
+            display: none;
+            grid-template-columns: 60px 1fr;
+            grid-template-rows: 40px repeat(24, 1fr);
+            gap: 1px;
+            background: #38383a;
+            border-radius: 12px;
+            overflow: hidden;
+            height: 600px;
+            overflow-y: auto;
+        }
+
+        .time-slot {
+            background: #2c2c2e;
+            border: 1px solid #38383a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #8e8e93;
+            min-height: 25px;
+        }
+
+        .week-day-header, .day-header-single {
+            background: #48484a;
+            color: #ffffff;
+            font-weight: 600;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            border: 1px solid #38383a;
+            min-height: 40px;
+        }
+
+        .week-day-header .day-name, .day-header-single .day-name {
+            font-size: 10px;
+            opacity: 0.8;
+        }
+
+        .week-day-header .day-number, .day-header-single .day-number {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .week-day-header.today, .day-header-single.today {
+            background: #007aff;
+        }
+
+        .hour-cell {
+            background: #1c1c1e;
+            border: 1px solid #38383a;
+            position: relative;
+            min-height: 25px;
+        }
+
+        .event-in-cell {
+            background: linear-gradient(135deg, #007aff 0%, #5856d6 100%);
+            color: white;
+            padding: 2px 4px;
+            margin: 1px;
+            border-radius: 3px;
+            font-size: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .event-in-cell:hover {
+            transform: scale(1.02);
+            z-index: 10;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 300px;
+            background: #2c2c2e;
+            border-left: 1px solid #38383a;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid #38383a;
+        }
+
+        .sidebar-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+        }
+
+        .upcoming-events {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .upcoming-event {
+            background: #1c1c1e;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #007aff;
+        }
+
+        .upcoming-event-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .upcoming-event-time {
+            font-size: 12px;
+            color: #8e8e93;
+        }
+
+        /* Loading and messages */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        /* Modal styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001;
+        }
+
+        .modal-content {
+            background: #2c2c2e;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid #38383a;
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #8e8e93;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: background 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: #38383a;
+            color: #ffffff;
+        }
+
+        .modal-body {
+            padding: 20px 24px;
+        }
+
+        .modal-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .loading-content {
+            background: #2c2c2e;
+            padding: 24px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid #38383a;
+            border-top: 3px solid #007aff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .voice-status {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #2c2c2e;
+            border: 1px solid #38383a;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            padding: 8px 12px;
+            font-size: 12px;
+            color: #8e8e93;
+            z-index: 10;
+        }
+
+        .voice-status.listening {
+            color: #ff3b30;
+            font-weight: 500;
+        }
+
+        .message {
+            position: fixed;
+            top: 80px;
+            right: 24px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .message.show {
+            transform: translateX(0);
+        }
+
+        .message.success {
+            background: #34c759;
+            color: #ffffff;
+        }
+
+        .message.error {
+            background: #ff3b30;
+            color: #ffffff;
+        }
+
+        .message.warning {
+            background: #ff9500;
+            color: #ffffff;
+        }
+
+        .browser-warning {
+            background: #ff9500;
+            color: #ffffff;
+            padding: 12px 16px;
+            text-align: center;
+            font-size: 14px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header with voice input -->
+        <div class="header">
+            <div class="app-title">🤖 AI Reminder Agent</div>
+            
+            <div class="voice-input-container">
+                <input 
+                    type="text" 
+                    id="voiceInput" 
+                    class="voice-input" 
+                    placeholder="Say something like 'Remind me to call mom tomorrow at 3pm'..."
+                >
+                <button id="voiceBtn" class="voice-btn">
+                    <span id="voiceIcon">🎤</span>
+                </button>
+                <div id="voiceStatus" class="voice-status" style="display: none;"></div>
+            </div>
+
+            <div class="auth-section">
+                <div class="subscription-status" id="subscriptionStatus" onclick="showSubscriptionModal()" style="display: none;">
+                    <span id="subscriptionText">Free Trial</span>
+                </div>
+                <div id="loginSection" style="display: none;">
+                    <button class="auth-btn" onclick="window.location.href='/auth/google'">Connect Google</button>
+                </div>
+                <div id="userInfo" class="user-info">
+                    <span id="userEmail"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Browser warning -->
+        <div id="browserWarning" class="browser-warning">
+            ⚠️ Voice input requires Chrome, Edge, or Safari for the best experience.
+        </div>
+
+        <!-- Main content -->
+        <div class="main-content">
+            <!-- Calendar -->
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <div class="calendar-nav">
+                        <button class="nav-btn" id="prevMonth">‹</button>
+                        <button class="nav-btn" id="nextMonth">›</button>
+                        <h2 class="calendar-title" id="calendarTitle">June 2025</h2>
+                    </div>
+                    
+                    <div class="view-switcher">
+                        <button class="view-btn" id="dayViewBtn">Day</button>
+                        <button class="view-btn" id="weekViewBtn">Week</button>
+                        <button class="view-btn active" id="monthViewBtn">Month</button>
+                    </div>
+                </div>
+
+                <div class="calendar-grid">
+                    <div class="month-view" id="monthView">
+                        <!-- Month calendar will be generated here -->
+                    </div>
+                    <div class="week-view" id="weekView">
+                        <!-- Week calendar will be generated here -->
+                    </div>
+                    <div class="day-view" id="dayView">
+                        <!-- Day calendar will be generated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <h3 class="sidebar-title">Upcoming Events</h3>
+                </div>
+                <div class="sidebar-content">
+                    <div class="upcoming-events" id="upcomingEvents">
+                        <!-- Upcoming events will be listed here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <div>Creating your reminder...</div>
+        </div>
+    </div>
+
+    <!-- Messages -->
+    <div id="messageContainer"></div>
+
+    <!-- Subscription Modal -->
+    <div id="subscriptionModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Subscription Status</h3>
+                <button class="modal-close" onclick="hideSubscriptionModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="subscriptionDetails">
+                    <!-- Subscription details will be loaded here -->
+                </div>
+                <div class="modal-actions">
+                    <button class="auth-btn" onclick="upgradeSubscription('pro')">Upgrade to Pro ($1/mo)</button>
+                    <button class="auth-btn" onclick="upgradeSubscription('max')">Upgrade to Max ($3/mo)</button>
+                    <button class="auth-btn" onclick="hideSubscriptionModal()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUserEmail = null;
+        let recognition = null;
+        let isListening = false;
+        let currentDate = new Date();
+        let calendarEvents = [];
+        let currentView = 'month'; // 'month', 'week', 'day'
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSpeechRecognition();
+            checkAuthStatus();
+            generateCalendar();
+            setupEventListeners();
+        });
+
+        // Check authentication status
+        function checkAuthStatus() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const success = urlParams.get('success');
+            const email = urlParams.get('email');
+            const error = urlParams.get('error');
+            const payment = urlParams.get('payment');
+            const plan = urlParams.get('plan');
+
+            if (success && email) {
+                currentUserEmail = decodeURIComponent(email);
+                showAuthenticatedState();
+                showMessage('Successfully connected to Google Calendar!', 'success');
+                window.history.replaceState({}, document.title, '/app');
+                loadCalendarEvents();
+            } else if (error) {
+                showMessage('Authentication failed. Please try again.', 'error');
+                window.history.replaceState({}, document.title, '/app');
+            }
+
+            // Handle payment success
+            if (payment === 'success' && plan) {
+                const planName = plan === 'pro' ? 'Pro' : 'Max';
+                showMessage(`🎉 Welcome to ${planName}! Your subscription is now active. Enjoy unlimited AI calendar features!`, 'success');
+                
+                // Refresh subscription status
+                setTimeout(() => {
+                    loadSubscriptionStatus();
+                }, 1000);
+                
+                // Clean up URL
+                window.history.replaceState({}, document.title, '/app');
+            } else if (payment === 'cancel') {
+                showMessage('Payment was canceled. You can upgrade anytime from your subscription settings.', 'info');
+                window.history.replaceState({}, document.title, '/app');
+            }
+        }
+
+        // Show authenticated state
+        function showAuthenticatedState() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('userInfo').style.display = 'block';
+            document.getElementById('userEmail').textContent = currentUserEmail;
+            document.getElementById('subscriptionStatus').style.display = 'block';
+            loadSubscriptionStatus();
+        }
+
+        // Load subscription status
+        async function loadSubscriptionStatus() {
+            try {
+                const response = await fetch('/api/user/subscription');
+                if (response.ok) {
+                    const data = await response.json();
+                    updateSubscriptionUI(data);
+                }
+            } catch (error) {
+                console.error('Failed to load subscription status:', error);
+            }
+        }
+
+        // Update subscription UI
+        function updateSubscriptionUI(subscriptionData) {
+            const statusElement = document.getElementById('subscriptionStatus');
+            const textElement = document.getElementById('subscriptionText');
+            
+            // Remove existing classes
+            statusElement.classList.remove('trial', 'free', 'pro', 'max');
+            
+            if (subscriptionData.isTrialActive) {
+                statusElement.classList.add('trial');
+                const daysLeft = Math.ceil((new Date(subscriptionData.trialEndsAt) - new Date()) / (1000 * 60 * 60 * 24));
+                textElement.textContent = `Trial (${daysLeft} days left)`;
+            } else {
+                statusElement.classList.add(subscriptionData.tier.toLowerCase());
+                const tierNames = { free: 'Free', pro: 'Pro', max: 'Max' };
+                textElement.textContent = tierNames[subscriptionData.tier] || 'Free';
+            }
+        }
+
+        // Show subscription modal
+        async function showSubscriptionModal() {
+            try {
+                const response = await fetch('/api/user/dashboard');
+                if (response.ok) {
+                    const data = await response.json();
+                    displaySubscriptionDetails(data);
+                    document.getElementById('subscriptionModal').style.display = 'flex';
+                }
+            } catch (error) {
+                console.error('Failed to load subscription details:', error);
+                showMessage('Failed to load subscription details', 'error');
+            }
+        }
+
+        // Handle subscription upgrade
+        async function upgradeSubscription(tierId) {
+            try {
+                showMessage('Redirecting to payment...', 'info');
+                
+                const response = await fetch('/api/subscription/checkout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ tierId })
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.checkoutUrl) {
+                    // Redirect to Stripe checkout
+                    window.location.href = data.checkoutUrl;
+                } else {
+                    throw new Error(data.error || 'Failed to create checkout session');
+                }
+
+            } catch (error) {
+                console.error('Upgrade error:', error);
+                showMessage('Failed to start upgrade process. Please try again.', 'error');
+            }
+        }
+
+        // Hide subscription modal
+        function hideSubscriptionModal() {
+            document.getElementById('subscriptionModal').style.display = 'none';
+        }
+
+        // Display subscription details
+        function displaySubscriptionDetails(data) {
+            const detailsContainer = document.getElementById('subscriptionDetails');
+            
+            const tierNames = { free: 'Free', pro: 'Pro ($1/month)', max: 'Max ($3/month)' };
+            const tierName = tierNames[data.subscription.tier] || 'Free';
+            
+            let html = `
+                <div style="margin-bottom: 20px;">
+                    <h4 style="color: #ffffff; margin-bottom: 10px;">Current Plan: ${tierName}</h4>
+                    ${data.subscription.isTrialActive ? 
+                        `<p style="color: #10b981; margin-bottom: 10px;">✓ Trial active until ${new Date(data.subscription.trialEndsAt).toLocaleDateString()}</p>` : 
+                        ''
+                    }
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <h4 style="color: #ffffff; margin-bottom: 10px;">Usage This Month</h4>
+                    <div style="color: #8e8e93;">
+                        <p>AI Events: ${data.usage.aiEventsUsed} / ${data.usage.aiEventsLimit === -1 ? 'Unlimited' : data.usage.aiEventsLimit}</p>
+                        <p>Calendars: ${data.usage.calendarsUsed} / ${data.usage.calendarsLimit === -1 ? 'Unlimited' : data.usage.calendarsLimit}</p>
+                    </div>
+                </div>
+                
+                ${data.usage.aiEventsUsed / data.usage.aiEventsLimit > 0.8 && data.usage.aiEventsLimit !== -1 ? 
+                    `<div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); color: #f59e0b; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
+                        ⚠️ You're approaching your monthly limit. Consider upgrading for unlimited usage.
+                    </div>` : 
+                    ''
+                }
+            `;
+            
+            detailsContainer.innerHTML = html;
+        }
+
+        // Speech Recognition Setup
+        function initializeSpeechRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            if (SpeechRecognition) {
+                recognition = new SpeechRecognition();
+                recognition.lang = 'en-US';
+                recognition.interimResults = true;
+                recognition.maxAlternatives = 1;
+                recognition.continuous = false;
+
+                recognition.onstart = function() {
+                    isListening = true;
+                    updateVoiceUI();
+                    showVoiceStatus('Listening... Speak now!', true);
+                };
+
+                recognition.onresult = function(event) {
+                    let finalTranscript = '';
+                    let interimTranscript = '';
+
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        const transcript = event.results[i][0].transcript;
+                        if (event.results[i].isFinal) {
+                            finalTranscript += transcript;
+                        } else {
+                            interimTranscript += transcript;
+                        }
+                    }
+
+                    const input = document.getElementById('voiceInput');
+                    if (finalTranscript) {
+                        input.value = finalTranscript.trim();
+                        showVoiceStatus('Processing...', false);
+                        createReminderFromText(finalTranscript.trim());
+                    } else if (interimTranscript) {
+                        input.value = interimTranscript;
+                        showVoiceStatus(`Hearing: "${interimTranscript}"`, true);
+                    }
+                };
+
+                recognition.onerror = function(event) {
+                    isListening = false;
+                    updateVoiceUI();
+                    hideVoiceStatus();
+                    
+                    let errorMessage = 'Voice recognition error: ';
+                    switch(event.error) {
+                        case 'no-speech':
+                            errorMessage += 'No speech detected. Please try again.';
+                            break;
+                        case 'audio-capture':
+                            errorMessage += 'Microphone not accessible.';
+                            break;
+                        case 'not-allowed':
+                            errorMessage += 'Microphone permission denied.';
+                            break;
+                        default:
+                            errorMessage += event.error;
+                    }
+                    
+                    showMessage(errorMessage, 'error');
+                };
+
+                recognition.onend = function() {
+                    isListening = false;
+                    updateVoiceUI();
+                    setTimeout(() => hideVoiceStatus(), 2000);
+                };
+            } else {
+                document.getElementById('browserWarning').style.display = 'block';
+            }
+        }
+
+        // Toggle voice recognition
+        function toggleVoiceRecognition() {
+            if (!recognition) {
+                showMessage('Speech recognition not supported', 'error');
+                return;
+            }
+
+            if (!currentUserEmail) {
+                showMessage('Please connect your Google Calendar first', 'error');
+                return;
+            }
+
+            if (isListening) {
+                recognition.stop();
+            } else {
+                try {
+                    recognition.start();
+                } catch (error) {
+                    showMessage('Could not start voice recognition', 'error');
+                }
+            }
+        }
+
+        // Update voice UI
+        function updateVoiceUI() {
+            const voiceBtn = document.getElementById('voiceBtn');
+            const voiceIcon = document.getElementById('voiceIcon');
+
+            if (isListening) {
+                voiceBtn.classList.add('listening');
+                voiceIcon.textContent = '⏹️';
+            } else {
+                voiceBtn.classList.remove('listening');
+                voiceIcon.textContent = '🎤';
+            }
+        }
+
+        // Show/hide voice status
+        function showVoiceStatus(message, listening = false) {
+            const voiceStatus = document.getElementById('voiceStatus');
+            voiceStatus.textContent = message;
+            voiceStatus.className = 'voice-status' + (listening ? ' listening' : '');
+            voiceStatus.style.display = 'block';
+        }
+
+        function hideVoiceStatus() {
+            document.getElementById('voiceStatus').style.display = 'none';
+        }
+
+        // Create reminder from text
+        async function createReminderFromText(text) {
+            if (!text.trim() || !currentUserEmail) return;
+
+            showLoading(true);
+
+            try {
+                const response = await fetch('/add-reminder', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        reminderText: text,
+                        userEmail: currentUserEmail
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showMessage(result.message || `✅ Reminder created: "${result.reminder.title}"`, 
+                               result.warning ? 'warning' : 'success');
+                    document.getElementById('voiceInput').value = '';
+                    
+                    // Add event to calendar immediately
+                    addEventToCalendar(result.reminder);
+                    loadUpcomingEvents();
+                    
+                    // Show additional info if there were issues
+                    if (result.warning) {
+                        setTimeout(() => {
+                            showMessage(result.warning, 'warning');
+                        }, 2000);
+                    }
+                } else {
+                    showMessage(result.error || 'Failed to create reminder', 'error');
+                }
+            } catch (error) {
+                showMessage('Network error. Please try again.', 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Calendar functions
+        function generateCalendar() {
+            switch(currentView) {
+                case 'month':
+                    generateMonthView();
+                    break;
+                case 'week':
+                    generateWeekView();
+                    break;
+                case 'day':
+                    generateDayView();
+                    break;
+            }
+            updateCalendarTitle();
+        }
+
+        function generateMonthView() {
+            const grid = document.getElementById('monthView');
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            // Clear grid
+            grid.innerHTML = '';
+            
+            // Add day headers
+            const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayHeaders.forEach(day => {
+                const header = document.createElement('div');
+                header.className = 'day-header';
+                header.textContent = day;
+                grid.appendChild(header);
+            });
+            
+            // Get first day of month and number of days
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const daysInPrevMonth = new Date(year, month, 0).getDate();
+            
+            // Add empty cells for previous month
+            for (let i = firstDay - 1; i >= 0; i--) {
+                const cell = createDayCell(daysInPrevMonth - i, true);
+                grid.appendChild(cell);
+            }
+            
+            // Add days of current month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const cell = createDayCell(day, false);
+                grid.appendChild(cell);
+            }
+            
+            // Add days from next month to fill grid
+            const totalCells = grid.children.length - 7; // Subtract headers
+            const remainingCells = 42 - totalCells; // 6 weeks * 7 days
+            for (let day = 1; day <= remainingCells; day++) {
+                const cell = createDayCell(day, true);
+                grid.appendChild(cell);
+            }
+        }
+
+        function generateWeekView() {
+            const grid = document.getElementById('weekView');
+            grid.innerHTML = '';
+            
+            // Get the start of the week (Sunday)
+            const startOfWeek = new Date(currentDate);
+            startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
+            
+            // Add empty corner cell
+            const corner = document.createElement('div');
+            corner.className = 'time-slot';
+            grid.appendChild(corner);
+            
+            // Add day headers
+            for (let i = 0; i < 7; i++) {
+                const day = new Date(startOfWeek);
+                day.setDate(startOfWeek.getDate() + i);
+                
+                const header = document.createElement('div');
+                header.className = 'week-day-header';
+                if (isToday(day)) header.classList.add('today');
+                
+                const dayName = document.createElement('div');
+                dayName.className = 'day-name';
+                dayName.textContent = day.toLocaleDateString('en-US', { weekday: 'short' });
+                
+                const dayNumber = document.createElement('div');
+                dayNumber.className = 'day-number';
+                dayNumber.textContent = day.getDate();
+                
+                header.appendChild(dayName);
+                header.appendChild(dayNumber);
+                grid.appendChild(header);
+            }
+            
+            // Add time slots and hour cells
+            for (let hour = 0; hour < 24; hour++) {
+                // Time label
+                const timeSlot = document.createElement('div');
+                timeSlot.className = 'time-slot';
+                timeSlot.textContent = formatHour(hour);
+                grid.appendChild(timeSlot);
+                
+                // Hour cells for each day
+                for (let day = 0; day < 7; day++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'hour-cell';
+                    cell.dataset.hour = hour;
+                    cell.dataset.day = day;
+                    grid.appendChild(cell);
+                }
+            }
+            
+            // Add events to week view
+            addEventsToWeekView(startOfWeek);
+        }
+
+        function generateDayView() {
+            const grid = document.getElementById('dayView');
+            grid.innerHTML = '';
+            
+            // Add empty corner cell
+            const corner = document.createElement('div');
+            corner.className = 'time-slot';
+            grid.appendChild(corner);
+            
+            // Add day header
+            const header = document.createElement('div');
+            header.className = 'day-header-single';
+            if (isToday(currentDate)) header.classList.add('today');
+            
+            const dayName = document.createElement('div');
+            dayName.className = 'day-name';
+            dayName.textContent = currentDate.toLocaleDateString('en-US', { weekday: 'long' });
+            
+            const dayNumber = document.createElement('div');
+            dayNumber.className = 'day-number';
+            dayNumber.textContent = currentDate.getDate();
+            
+            header.appendChild(dayName);
+            header.appendChild(dayNumber);
+            grid.appendChild(header);
+            
+            // Add time slots and hour cells
+            for (let hour = 0; hour < 24; hour++) {
+                // Time label
+                const timeSlot = document.createElement('div');
+                timeSlot.className = 'time-slot';
+                timeSlot.textContent = formatHour(hour);
+                grid.appendChild(timeSlot);
+                
+                // Hour cell
+                const cell = document.createElement('div');
+                cell.className = 'hour-cell';
+                cell.dataset.hour = hour;
+                grid.appendChild(cell);
+            }
+            
+            // Add events to day view
+            addEventsToDayView();
+        }
+
+        function updateCalendarTitle() {
+            const title = document.getElementById('calendarTitle');
+            
+            switch(currentView) {
+                case 'month':
+                    title.textContent = currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                    break;
+                case 'week':
+                    const startOfWeek = new Date(currentDate);
+                    startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
+                    const endOfWeek = new Date(startOfWeek);
+                    endOfWeek.setDate(startOfWeek.getDate() + 6);
+                    
+                    if (startOfWeek.getMonth() === endOfWeek.getMonth()) {
+                        title.textContent = `${startOfWeek.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} ${startOfWeek.getDate()}-${endOfWeek.getDate()}`;
+                    } else {
+                        title.textContent = `${startOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+                    }
+                    break;
+                case 'day':
+                    title.textContent = currentDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+                    break;
+            }
+        }
+
+        function createDayCell(day, otherMonth) {
+            const cell = document.createElement('div');
+            cell.className = 'day-cell' + (otherMonth ? ' other-month' : '');
+            
+            const today = new Date();
+            if (!otherMonth && day === today.getDate() && 
+                currentDate.getMonth() === today.getMonth() && 
+                currentDate.getFullYear() === today.getFullYear()) {
+                cell.classList.add('today');
+            }
+            
+            const dayNumber = document.createElement('div');
+            dayNumber.className = 'day-number';
+            dayNumber.textContent = day;
+            cell.appendChild(dayNumber);
+            
+            const eventsContainer = document.createElement('div');
+            eventsContainer.className = 'day-events';
+            cell.appendChild(eventsContainer);
+            
+            return cell;
+        }
+
+        // Helper functions
+        function isToday(date) {
+            const today = new Date();
+            return date.getDate() === today.getDate() &&
+                   date.getMonth() === today.getMonth() &&
+                   date.getFullYear() === today.getFullYear();
+        }
+
+        function formatHour(hour) {
+            if (hour === 0) return '12 AM';
+            if (hour < 12) return `${hour} AM`;
+            if (hour === 12) return '12 PM';
+            return `${hour - 12} PM`;
+        }
+
+        function addEventToCalendar(event) {
+            calendarEvents.push(event);
+            generateCalendar(); // Regenerate the current view to show the new event
+        }
+
+        function addEventsToWeekView(startOfWeek) {
+            calendarEvents.forEach(event => {
+                const eventDate = new Date(event.startTime);
+                const eventHour = eventDate.getHours();
+                
+                // Calculate which day of the week this event falls on
+                const dayOfWeek = Math.floor((eventDate - startOfWeek) / (1000 * 60 * 60 * 24));
+                
+                if (dayOfWeek >= 0 && dayOfWeek < 7) {
+                    const cells = document.querySelectorAll(`.hour-cell[data-hour="${eventHour}"][data-day="${dayOfWeek}"]`);
+                    cells.forEach(cell => {
+                        const eventEl = document.createElement('div');
+                        eventEl.className = 'event-in-cell';
+                        eventEl.textContent = event.title;
+                        eventEl.title = `${event.title} - ${new Date(event.startTime).toLocaleTimeString()}`;
+                        cell.appendChild(eventEl);
+                    });
+                }
+            });
+        }
+
+        function addEventsToDayView() {
+            calendarEvents.forEach(event => {
+                const eventDate = new Date(event.startTime);
+                
+                // Only show events for the current day
+                if (eventDate.getDate() === currentDate.getDate() &&
+                    eventDate.getMonth() === currentDate.getMonth() &&
+                    eventDate.getFullYear() === currentDate.getFullYear()) {
+                    
+                    const eventHour = eventDate.getHours();
+                    const cells = document.querySelectorAll(`.hour-cell[data-hour="${eventHour}"]`);
+                    
+                    cells.forEach(cell => {
+                        const eventEl = document.createElement('div');
+                        eventEl.className = 'event-in-cell';
+                        eventEl.textContent = event.title;
+                        eventEl.title = `${event.title} - ${new Date(event.startTime).toLocaleTimeString()}`;
+                        cell.appendChild(eventEl);
+                    });
+                }
+            });
+        }
+
+        // View switching functions
+        function switchView(newView) {
+            // Hide all views
+            document.getElementById('monthView').style.display = 'none';
+            document.getElementById('weekView').style.display = 'none';
+            document.getElementById('dayView').style.display = 'none';
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected view and update active button
+            currentView = newView;
+            document.getElementById(`${newView}View`).style.display = 'grid';
+            document.getElementById(`${newView}ViewBtn`).classList.add('active');
+            
+            generateCalendar();
+        }
+
+        // Load calendar events
+        async function loadCalendarEvents() {
+            try {
+                const response = await fetch(`/reminders/${encodeURIComponent(currentUserEmail)}`);
+                const result = await response.json();
+                
+                if (result.reminders) {
+                    calendarEvents = result.reminders;
+                    loadUpcomingEvents();
+                }
+            } catch (error) {
+                console.error('Error loading events:', error);
+            }
+        }
+
+        // Load upcoming events in sidebar
+        function loadUpcomingEvents() {
+            const container = document.getElementById('upcomingEvents');
+            
+            if (calendarEvents.length === 0) {
+                container.innerHTML = '<div style="color: #8e8e93; text-align: center; padding: 20px;">No upcoming events</div>';
+                return;
+            }
+            
+            const sortedEvents = calendarEvents
+                .filter(event => new Date(event.startTime) > new Date())
+                .sort((a, b) => new Date(a.startTime) - new Date(b.startTime))
+                .slice(0, 10);
+            
+            container.innerHTML = sortedEvents.map(event => `
+                <div class="upcoming-event">
+                    <div class="upcoming-event-title">${event.title}</div>
+                    <div class="upcoming-event-time">${new Date(event.startTime).toLocaleString()}</div>
+                </div>
+            `).join('');
+        }
+
+        // Calendar navigation
+        function previousPeriod() {
+            switch(currentView) {
+                case 'month':
+                    currentDate.setMonth(currentDate.getMonth() - 1);
+                    break;
+                case 'week':
+                    currentDate.setDate(currentDate.getDate() - 7);
+                    break;
+                case 'day':
+                    currentDate.setDate(currentDate.getDate() - 1);
+                    break;
+            }
+            generateCalendar();
+        }
+
+        function nextPeriod() {
+            switch(currentView) {
+                case 'month':
+                    currentDate.setMonth(currentDate.getMonth() + 1);
+                    break;
+                case 'week':
+                    currentDate.setDate(currentDate.getDate() + 7);
+                    break;
+                case 'day':
+                    currentDate.setDate(currentDate.getDate() + 1);
+                    break;
+            }
+            generateCalendar();
+        }
+
+        // Utility functions
+        function showLoading(show = true) {
+            document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+        }
+
+        function showMessage(text, type = 'success') {
+            const container = document.getElementById('messageContainer');
+            const message = document.createElement('div');
+            message.className = `message ${type}`;
+            message.textContent = text;
+            
+            container.appendChild(message);
+            
+            setTimeout(() => message.classList.add('show'), 100);
+            setTimeout(() => {
+                message.classList.remove('show');
+                setTimeout(() => container.removeChild(message), 300);
+            }, 5000);
+        }
+
+        // Event listeners
+        function setupEventListeners() {
+            document.getElementById('voiceBtn').addEventListener('click', toggleVoiceRecognition);
+            document.getElementById('prevMonth').addEventListener('click', previousPeriod);
+            document.getElementById('nextMonth').addEventListener('click', nextPeriod);
+            
+            // View switcher buttons
+            document.getElementById('dayViewBtn').addEventListener('click', () => switchView('day'));
+            document.getElementById('weekViewBtn').addEventListener('click', () => switchView('week'));
+            document.getElementById('monthViewBtn').addEventListener('click', () => switchView('month'));
+            
+            // Voice input enter key
+            document.getElementById('voiceInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && this.value.trim()) {
+                    createReminderFromText(this.value.trim());
+                }
+            });
+        }
+    </script>
+</body>
+</html>
