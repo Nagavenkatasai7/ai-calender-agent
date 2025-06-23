@@ -1,52 +1,64 @@
 # 🤖 AI Reminder Agent
 
-A smart reminder application that converts natural language into Google Calendar events using AI-powered text parsing.
+A comprehensive smart calendar application with AI-powered natural language processing, secure authentication, and Google Calendar integration. Transform your thoughts into organized calendar events with advanced security features and subscription tiers.
 
 ![AI Reminder Agent](https://img.shields.io/badge/AI-Powered-blue)
 ![Node.js](https://img.shields.io/badge/Node.js-18+-green)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)
 ![Google Calendar](https://img.shields.io/badge/Google-Calendar-red)
 ![OpenAI](https://img.shields.io/badge/OpenAI-GPT-orange)
+![Security](https://img.shields.io/badge/Security-Enterprise%20Grade-green)
 
-## ✨ Features
+## ✨ Latest Features
 
-### 🎯 Core Functionality
-- **Natural Language Processing**: Just type what you want to be reminded about
-- **Smart Time Detection**: Understands relative and absolute time expressions
-- **Google Calendar Integration**: Automatically creates calendar events
-- **AI-Powered Parsing**: Uses OpenAI to extract event details from text
-- **Beautiful Web Interface**: Modern, responsive design
+### 🔐 **Enterprise-Grade Security**
+- **Multi-Factor Authentication (2FA)**: TOTP and backup codes support
+- **OAuth Integration**: Seamless Google OAuth with proper session management
+- **Email Verification**: Secure account activation with Gmail SMTP
+- **Password Security**: BCrypt hashing with strength validation
+- **Rate Limiting**: Protection against brute force attacks
+- **Session Management**: Secure session handling with JWT tokens
+- **CSRF Protection**: Comprehensive security headers and validation
 
-### 📅 Smart Event Creation
-- **Flexible Time Formats**: "tomorrow at 3pm", "next Friday at 10am", "in 2 hours"
-- **Duration Detection**: "meeting for 1 hour", "2-hour workshop"
-- **Event Details**: Automatically extracts titles, descriptions, and timing
-- **Timezone Support**: Handles timezone-aware scheduling
-- **Recurring Events**: Support for recurring reminders
+### 🎯 **Core AI Functionality**
+- **Natural Language Processing**: Convert speech to calendar events
+- **Smart Time Detection**: Understands complex time expressions
+- **Google Calendar Sync**: Real-time synchronization with your calendar
+- **AI-Powered Parsing**: Advanced OpenAI integration for event extraction
+- **Voice Recognition**: Direct voice-to-calendar functionality
+- **Smart Reminders**: Intelligent email and push notifications
 
-### 💡 Example Usage
-```
-"Remind me to call mom tomorrow at 3pm"
-→ Creates: "Call mom" event tomorrow at 3:00 PM
+### 💎 **Subscription Tiers**
+- **Free Tier**: 10 AI events/month, 1 calendar, basic features
+- **Pro Tier**: 100 AI events/month, 5 calendars, advanced features
+- **Max Tier**: Unlimited events, unlimited calendars, team features
+- **Stripe Integration**: Secure payment processing and subscription management
 
-"Team meeting next Friday at 10am for 2 hours"
-→ Creates: "Team meeting" event Friday 10:00 AM - 12:00 PM
+### 🎨 **Modern UI/UX**
+- **Glass Morphism Design**: Beautiful, modern interface
+- **Responsive Layout**: Works perfectly on all devices
+- **Dark/Light Themes**: Customizable appearance
+- **Interactive Modals**: Smooth authentication flows
+- **Real-time Feedback**: Live validation and status updates
 
-"Doctor appointment on June 25th at 2:30pm"
-→ Creates: "Doctor appointment" event on June 25th at 2:30 PM
-```
+### 📧 **Communication System**
+- **Gmail SMTP Integration**: Professional email notifications
+- **Password Reset**: Secure password recovery via email
+- **Verification Links**: One-click account activation
+- **Reminder Emails**: Smart notification scheduling
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 - Node.js 18+ installed
 - Google Cloud Console account
-- OpenAI API account (optional but recommended)
-- Gmail account for Google Calendar access
+- OpenAI API account
+- Gmail account with App Password
+- Stripe account (for payments)
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/yourusername/ai-reminder-agent.git
+git clone https://github.com/Nagavenkatasai7/ai-calender-agent.git
 cd ai-reminder-agent
 ```
 
@@ -58,16 +70,21 @@ npm install
 ### 3. Set Up Google OAuth
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
 2. Create a new project or select existing one
-3. Enable Google Calendar API
+3. Enable Google Calendar API and Google+ API
 4. Create OAuth 2.0 credentials (Web application)
 5. Add authorized redirect URIs:
    - `http://localhost:3000/auth/callback`
-   - `http://localhost:3000/auth/google/callback`
 6. Add authorized JavaScript origins:
    - `http://localhost:3000`
 
-### 4. Configure Environment Variables
-Create a `.env` file in the root directory:
+### 4. Set Up Gmail App Password
+1. Enable 2-Factor Authentication on your Gmail
+2. Go to [App Passwords](https://myaccount.google.com/apppasswords)
+3. Generate a new App Password for "Mail"
+4. Use this 16-character password in your `.env` file
+
+### 5. Configure Environment Variables
+Create a `.env` file based on `.env.example`:
 
 ```env
 # Google OAuth Configuration
@@ -78,184 +95,205 @@ GOOGLE_REDIRECT_URI=http://localhost:3000/auth/callback
 # OpenAI Configuration
 OPENAI_API_KEY=your_openai_api_key_here
 
-# Email Configuration (Optional)
+# Email Configuration (Gmail)
 EMAIL_USER=your_email@gmail.com
-EMAIL_PASS=your_gmail_app_password
+EMAIL_PASS=your_16_character_app_password
+EMAIL_FROM=your_email@gmail.com
 
-# Stripe Configuration (For Payments)
-STRIPE_PUBLISHABLE_KEY=pk_live_51Rd1BwBdnTkIo216KvzF2czJ4d9WKSXwVJ49h0IrHB3XlmzOEbcjxmxpzY7SLOHa1kaDoDypEwxanEwEVKmfYZYG00slhS9UNN
-STRIPE_SECRET_KEY=your_stripe_secret_key_here
-STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret_here
+# Stripe Configuration
+STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
+STRIPE_SECRET_KEY=your_stripe_secret_key
+STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
+
+# Security Configuration
+SESSION_SECRET=your_random_session_secret_here
+JWT_SECRET=your_jwt_secret_change_in_production
 
 # Application Configuration
 PORT=3000
 NODE_ENV=development
-SESSION_SECRET=your_random_session_secret_here
+BASE_URL=http://localhost:3000
 ```
 
-### 5. Run the Application
+### 6. Run the Application
 ```bash
-npm run dev
+npm start
 ```
 
 Visit `http://localhost:3000` in your browser! 🎉
 
-## 📖 Detailed Setup Guide
+## 🔐 Authentication System
 
-### Google Cloud Console Setup
+### Sign Up Flow
+1. **Account Creation**: Secure registration with password validation
+2. **Email Verification**: Automated verification email with secure tokens
+3. **Auto-Login**: Seamless login after email verification
+4. **Google OAuth**: Alternative registration via Google account
 
-1. **Create OAuth Client**:
-   - Go to APIs & Services → Credentials
-   - Click "Create Credentials" → "OAuth client ID"
-   - Select "Web application"
-   - Add redirect URIs and JavaScript origins as shown above
+### Sign In Options
+- **Email/Password**: Traditional secure login with rate limiting
+- **Google OAuth**: One-click login with Google Calendar access
+- **2FA Support**: Optional two-factor authentication for enhanced security
+- **Password Reset**: Secure password recovery via email
 
-2. **Enable Required APIs**:
-   - Google Calendar API
-   - Google+ API (for OAuth)
+### Security Features
+- **BCrypt Password Hashing**: Industry-standard password protection
+- **JWT Tokens**: Secure session management
+- **Rate Limiting**: Protection against brute force attacks
+- **Session Timeout**: Automatic logout for security
+- **CSRF Protection**: Cross-site request forgery prevention
+- **SQL Injection Prevention**: Parameterized queries and input validation
 
-3. **Configure OAuth Consent Screen**:
-   - Add test users (your email addresses)
-   - Set publishing status to "Testing" for development
+## 📱 User Interface
 
-### OpenAI API Setup
+### Landing Page
+- **Modern Design**: Glass morphism with gradient backgrounds
+- **Authentication Modals**: Smooth sign-in/sign-up forms
+- **Feature Showcase**: Interactive demonstration of capabilities
+- **Security Badges**: Trust indicators and certifications
 
-1. **Get API Key**:
-   - Visit [OpenAI Platform](https://platform.openai.com/)
-   - Create an account and get your API key
-   - Add billing information for usage
+### Calendar Application
+- **Voice Input**: Direct speech-to-calendar functionality
+- **Smart Parsing**: Real-time AI processing of natural language
+- **Calendar Integration**: Live Google Calendar synchronization
+- **Event Management**: Create, edit, and delete calendar events
+- **Subscription Dashboard**: Usage tracking and tier management
 
-2. **Alternative Free Options**:
-   - Hugging Face API
-   - Cohere API
-   - Local models (configuration in `src/aiParser.ts`)
+### Settings Panel
+- **Profile Management**: Update personal information
+- **Security Settings**: 2FA setup and password changes
+- **Subscription Management**: Tier upgrades and billing
+- **Connected Accounts**: Manage OAuth connections
 
-### Email Configuration (Optional)
+## 🔧 API Endpoints
 
-For email reminders, you need Gmail App Passwords:
-
-1. Enable 2-Factor Authentication on your Gmail
-2. Generate an App Password for the application
-3. Use the 16-character App Password (not your regular password)
-
-## 🖥️ Usage
-
-### Web Interface
-
-1. **Connect Google Calendar**: Click the connect button to authenticate
-2. **Enter Natural Language**: Type your reminder in the text box
-3. **AI Processing**: The system parses your text and extracts event details
-4. **Calendar Integration**: Event is automatically created in Google Calendar
-
-### API Endpoints
-
-- `GET /` - Main web interface
-- `GET /auth` - Initiate Google OAuth flow
-- `GET /auth/callback` - OAuth callback handler
-- `POST /add-reminder` - Create new reminder
-- `GET /reminders/:userEmail` - Get user's reminders
-- `DELETE /reminders/:id` - Delete a reminder
-- `GET /health` - Health check endpoint
-
-### Example API Usage
-
+### Authentication
 ```javascript
-// Create a reminder
-const response = await fetch('/add-reminder', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    reminderText: "Team meeting tomorrow at 2pm",
-    userEmail: "user@example.com"
-  })
-});
+POST /api/auth/register      # Create new account
+POST /api/auth/login         # Email/password login
+GET  /api/auth/verify-email/:token  # Email verification
+POST /api/auth/logout        # Secure logout
+GET  /auth/google           # Google OAuth flow
+GET  /auth/callback         # OAuth callback
 ```
 
-## 🔧 Configuration
-
-### Environment Variables
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `GOOGLE_CLIENT_ID` | Yes | Google OAuth client ID |
-| `GOOGLE_CLIENT_SECRET` | Yes | Google OAuth client secret |
-| `GOOGLE_REDIRECT_URI` | Yes | OAuth redirect URI |
-| `OPENAI_API_KEY` | Recommended | OpenAI API key for AI parsing |
-| `EMAIL_USER` | Optional | Gmail address for email reminders |
-| `EMAIL_PASS` | Optional | Gmail App Password |
-| `STRIPE_PUBLISHABLE_KEY` | Optional | Stripe publishable key for payments |
-| `STRIPE_SECRET_KEY` | Optional | Stripe secret key for payments |
-| `STRIPE_WEBHOOK_SECRET` | Optional | Stripe webhook secret for webhooks |
-| `SESSION_SECRET` | Yes | Random secret for session encryption |
-| `PORT` | Optional | Server port (default: 3000) |
-| `NODE_ENV` | Optional | Environment (development/production) |
-
-### Advanced Configuration
-
-- **AI Model**: Modify `src/aiParser.ts` to use different AI models
-- **Database**: Currently uses JSON file storage, can be upgraded to proper database
-- **Email Templates**: Customize in `src/emailService.ts`
-- **UI Styling**: Modify `public/index.html` for custom styling
-
-## 🚦 Development
-
-### Available Scripts
-
-```bash
-npm run dev      # Start development server with hot reload
-npm run build    # Build TypeScript to JavaScript
-npm run start    # Start production server
-npm run watch    # Watch TypeScript files for changes
+### User Management
+```javascript
+GET  /api/user/profile      # Get user profile
+PUT  /api/user/profile      # Update profile
+GET  /api/user/dashboard    # Usage dashboard
+GET  /api/auth/status       # Authentication status
 ```
 
-### Project Structure
-
-```
-ai-reminder-agent/
-├── src/
-│   ├── app.ts          # Main application server
-│   ├── calendar.ts     # Google Calendar integration
-│   ├── aiParser.ts     # AI-powered text parsing
-│   ├── emailService.ts # Email notification service
-│   └── database.ts     # Data storage management
-├── public/
-│   └── index.html      # Web interface
-├── .env.example        # Environment variables template
-├── package.json        # Dependencies and scripts
-└── tsconfig.json       # TypeScript configuration
+### Reminders & Calendar
+```javascript
+POST /api/reminders         # Create AI-powered reminder
+GET  /api/reminders         # Get user reminders
+DELETE /api/reminders/:id   # Delete reminder
 ```
 
-## 🐛 Troubleshooting
+### Subscriptions
+```javascript
+GET  /api/subscription/pricing     # Get pricing tiers
+POST /api/subscription/checkout    # Create checkout session
+GET  /api/subscription/status      # Get subscription status
+POST /api/subscription/cancel      # Cancel subscription
+```
+
+## 💡 Usage Examples
+
+### Natural Language Processing
+```
+"Team meeting tomorrow at 2pm for 2 hours"
+→ Creates: "Team meeting" 
+   Date: Tomorrow 2:00 PM - 4:00 PM
+   Reminders: Email 15 minutes before
+
+"Call mom next Friday at 3:30pm"
+→ Creates: "Call mom"
+   Date: Friday 3:30 PM - 4:30 PM
+   Reminders: Email 10 minutes before
+
+"Doctor appointment on December 15th at 10am"
+→ Creates: "Doctor appointment"
+   Date: Dec 15th 10:00 AM - 11:00 AM
+   Reminders: Email 1 hour before
+```
+
+### Voice Commands
+- **"Create reminder..."**: Direct voice input processing
+- **"Schedule meeting..."**: Automatic calendar event creation
+- **"Set alarm for..."**: Smart reminder scheduling
+- **"Book appointment..."**: Professional event management
+
+## 🏗️ Architecture
+
+### Backend Services
+```
+src/
+├── app.ts                 # Main Express application
+├── auth.ts               # Authentication service
+├── database.ts           # SQLite database management
+├── aiParser.ts           # OpenAI integration
+├── calendar.ts           # Google Calendar API
+├── emailService.ts       # Gmail SMTP service
+├── subscriptionService.ts # Stripe integration
+└── types/
+    └── session.d.ts      # TypeScript definitions
+```
+
+### Frontend Pages
+```
+public/
+├── secure-landing.html   # Main landing page
+├── app.html             # Calendar application
+├── settings.html        # User settings
+├── reset-password.html  # Password recovery
+└── pricing.html         # Subscription tiers
+```
+
+### Database Schema
+- **Users**: Authentication and profile data
+- **Reminders**: Calendar events and AI metadata
+- **Subscriptions**: Billing and usage tracking
+- **Sessions**: Secure session management
+- **Security Logs**: Audit trail for security events
+
+## 🔍 Troubleshooting
 
 ### Common Issues
 
-**Authentication Failed**:
-- Verify redirect URIs in Google Cloud Console
-- Check that OAuth client credentials are correct
-- Wait 5-10 minutes after updating Google Cloud settings
+**Google OAuth Errors**:
+- Verify redirect URIs match exactly in Google Cloud Console
+- Ensure Calendar API is enabled
+- Check OAuth consent screen configuration
+- Wait 5-10 minutes after Google Cloud changes
 
-**Invalid Client Error**:
-- Ensure redirect URIs match exactly
-- Verify client ID and secret are correct
-- Check that APIs are enabled in Google Cloud Console
+**Email Not Sending**:
+- Verify Gmail App Password (not regular password)
+- Check 2FA is enabled on Gmail account
+- Confirm EMAIL_USER and EMAIL_PASS in .env
+- Check spam folder for verification emails
 
-**AI Parsing Not Working**:
-- Verify OpenAI API key is valid and has credits
-- Check API usage limits
-- Consider using alternative AI providers
+**Session/Cookie Issues**:
+- Clear browser cookies and localStorage
+- Check SESSION_SECRET is set in .env
+- Verify SameSite cookie policy (now set to 'lax')
+- Ensure saveUninitialized is true for OAuth
 
-**Calendar Events Not Created**:
-- Ensure Google Calendar API is enabled
-- Check user has calendar permissions
-- Verify OAuth scopes include calendar access
+**Database Errors**:
+- Check SQLite file permissions in data/ directory
+- Verify database initialization in logs
+- Ensure no file locks on database
 
 ### Debug Mode
-
-Add debug logging by setting:
+Enable comprehensive logging:
 ```env
 NODE_ENV=development
 DEBUG=true
 ```
+
+View detailed session information at `/api/debug/session`
 
 ## 🤝 Contributing
 
@@ -267,12 +305,39 @@ DEBUG=true
 6. Submit a pull request
 
 ### Development Guidelines
-
 - Follow TypeScript best practices
-- Add proper error handling
-- Write descriptive commit messages
-- Test all authentication flows
+- Add comprehensive error handling
+- Test authentication flows thoroughly
 - Ensure responsive design
+- Add proper logging and monitoring
+
+## 📊 Performance & Monitoring
+
+### Application Metrics
+- **Response Times**: Optimized API endpoints
+- **Security Monitoring**: Real-time threat detection
+- **Usage Analytics**: Subscription tier tracking
+- **Error Reporting**: Comprehensive error logging
+
+### Scalability Features
+- **Session Management**: Distributed session storage ready
+- **Database Optimization**: Indexed queries and connection pooling
+- **Caching Strategy**: Redis-ready for high traffic
+- **Load Balancing**: Stateless architecture for horizontal scaling
+
+## 🛡️ Security Compliance
+
+### Data Protection
+- **GDPR Compliance**: User data rights and privacy
+- **Data Encryption**: End-to-end encryption for sensitive data
+- **Secure Storage**: BCrypt password hashing
+- **Session Security**: Secure cookie configuration
+
+### Security Standards
+- **OWASP Top 10**: Protection against common vulnerabilities
+- **SOC 2 Ready**: Enterprise security controls
+- **SSL/TLS**: Secure communication protocols
+- **Regular Updates**: Dependency security monitoring
 
 ## 📝 License
 
@@ -280,18 +345,19 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- [OpenAI](https://openai.com/) for AI text parsing capabilities
-- [Google Calendar API](https://developers.google.com/calendar) for calendar integration
+- [OpenAI](https://openai.com/) for advanced AI text parsing
+- [Google Calendar API](https://developers.google.com/calendar) for seamless integration
+- [Stripe](https://stripe.com/) for secure payment processing
 - [Node.js](https://nodejs.org/) and [TypeScript](https://www.typescriptlang.org/) communities
 
 ## 📞 Support
 
-- Create an [issue](https://github.com/yourusername/ai-reminder-agent/issues) for bug reports
-- Start a [discussion](https://github.com/yourusername/ai-reminder-agent/discussions) for questions
-- Check existing issues before creating new ones
+- 🐛 [Report Issues](https://github.com/Nagavenkatasai7/ai-calender-agent/issues)
+- 💬 [Start Discussion](https://github.com/Nagavenkatasai7/ai-calender-agent/discussions)
+- 📧 Email: support@ai-reminder.com
 
 ---
 
-**Made with ❤️ by [Your Name]**
+**Made with ❤️ by Nagavenkata Sai**
 
-*Transform your natural language into organized calendar events with the power of AI!* 
+*Transform your natural language into organized calendar events with enterprise-grade security and AI-powered intelligence!* ✨ 
