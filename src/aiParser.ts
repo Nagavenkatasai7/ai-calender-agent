@@ -158,15 +158,31 @@ Return ONLY the JSON object, no additional text.`;
     
     const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // 1 hour duration
     
-    // Extract title (remove time and alert references)
+    // Extract clean title (remove all time, date, and command references)
     let title = reminderText
-      .replace(/remind me|alert me|send reminder/gi, '')
-      .replace(/\d{1,2}:\d{2}\s*(am|pm)?/gi, '')
-      .replace(/\d+\s*(hour|minute)s?\s*before/gi, '')
-      .replace(/tomorrow|next\s+\w+/gi, '')
+      .replace(/remind me to|remind me|alert me to|alert me|send reminder|schedule/gi, '')
+      .replace(/\d{1,2}:\d{2}\s*(am|pm|a\.m\.|p\.m\.)?/gi, '') // Remove time formats
+      .replace(/\d{1,2}\s*(am|pm|a\.m\.|p\.m\.)/gi, '') // Remove hour formats
+      .replace(/at\s+\d+/gi, '') // Remove "at 6", "at 3" etc
+      .replace(/\d+\s*(hour|minute)s?\s*before/gi, '') // Remove alert timing
+      .replace(/tomorrow|today|tonight|this\s+evening/gi, '') // Remove date references
+      .replace(/next\s+(monday|tuesday|wednesday|thursday|friday|saturday|sunday|week|month)/gi, '') // Remove future dates
+      .replace(/on\s+(monday|tuesday|wednesday|thursday|friday|saturday|sunday)/gi, '') // Remove day references
+      .replace(/\bat\s+/gi, '') // Remove remaining "at" words
+      .replace(/\s+p\.m\.|p\.m\.|a\.m\.|a\.m\./gi, '') // Remove period markers
+      .replace(/\s+/g, ' ') // Clean up multiple spaces
       .trim();
     
-    if (!title) title = 'Reminder';
+    // Handle edge cases where title becomes empty or too short
+    if (!title || title.length < 2) {
+      title = 'Reminder';
+    }
+    
+    // Clean up any remaining artifacts
+    title = title
+      .replace(/^(to\s+|for\s+)/i, '') // Remove leading "to" or "for"
+      .replace(/\s+(at|on|in)$/i, '') // Remove trailing prepositions
+      .trim();
     
     return {
       title: title.charAt(0).toUpperCase() + title.slice(1),

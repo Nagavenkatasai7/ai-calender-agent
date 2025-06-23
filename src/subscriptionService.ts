@@ -211,6 +211,10 @@ export class SubscriptionService {
     await this.updateUserSubscription(userId, tier);
   }
 
+  async cancelUserSubscription(userId: string): Promise<void> {
+    await this.updateUserSubscription(userId, 'free', undefined);
+  }
+
   async getUserSubscriptionStatus(userId: string): Promise<{
     tier: 'free' | 'pro' | 'max';
     status: 'active' | 'trial' | 'canceled';

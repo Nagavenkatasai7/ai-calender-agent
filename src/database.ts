@@ -26,6 +26,17 @@ export interface User {
   id: string;
   email: string;
   name?: string;
+  password_hash?: string;
+  email_verified: boolean;
+  email_verification_token?: string;
+  email_verification_expires?: Date;
+  password_reset_token?: string;
+  password_reset_expires?: Date;
+  two_factor_secret?: string;
+  two_factor_enabled: boolean;
+  two_factor_backup_codes?: string;
+  failed_login_attempts: number;
+  locked_until?: Date;
   subscription_tier: 'free' | 'pro' | 'max';
   subscription_status: 'active' | 'canceled' | 'trial';
   trial_ends_at?: Date;
@@ -117,12 +128,23 @@ export class Database {
   }
 
   private async init() {
-    // Users table with subscription info
+    // Users table with subscription info and security fields
     await this.run(`
       CREATE TABLE IF NOT EXISTS users (
         id TEXT PRIMARY KEY,
         email TEXT UNIQUE NOT NULL,
         name TEXT,
+        password_hash TEXT,
+        email_verified BOOLEAN DEFAULT FALSE,
+        email_verification_token TEXT,
+        email_verification_expires DATETIME,
+        password_reset_token TEXT,
+        password_reset_expires DATETIME,
+        two_factor_secret TEXT,
+        two_factor_enabled BOOLEAN DEFAULT FALSE,
+        two_factor_backup_codes TEXT,
+        failed_login_attempts INTEGER DEFAULT 0,
+        locked_until DATETIME,
         subscription_tier TEXT DEFAULT 'free',
         subscription_status TEXT DEFAULT 'trial',
         trial_ends_at DATETIME,
@@ -212,6 +234,55 @@ export class Database {
         refresh_token TEXT,
         expires_at DATETIME,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // User sessions for security tracking
+    await this.run(`
+      CREATE TABLE IF NOT EXISTS user_sessions (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        session_token TEXT UNIQUE NOT NULL,
+        ip_address TEXT,
+        user_agent TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        last_activity DATETIME DEFAULT CURRENT_TIMESTAMP,
+        expires_at DATETIME,
+        is_active BOOLEAN DEFAULT TRUE,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+      )
+    `);
+
+    // Connected accounts (Google, Outlook, etc.)
+    await this.run(`
+      CREATE TABLE IF NOT EXISTS connected_accounts (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        provider TEXT NOT NULL,
+        provider_account_id TEXT NOT NULL,
+        access_token TEXT,
+        refresh_token TEXT,
+        expires_at DATETIME,
+        scope TEXT,
+        is_active BOOLEAN DEFAULT TRUE,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users (id),
+        UNIQUE(user_id, provider, provider_account_id)
+      )
+    `);
+
+    // Security audit log
+    await this.run(`
+      CREATE TABLE IF NOT EXISTS security_logs (
+        id TEXT PRIMARY KEY,
+        user_id TEXT,
+        action TEXT NOT NULL,
+        ip_address TEXT,
+        user_agent TEXT,
+        details TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users (id)
       )
     `);
 
@@ -617,5 +688,168 @@ export class Database {
 
   async cleanupOldReminders(): Promise<void> {
     // Implementation for cleanup
+  }
+
+  // Security-related database methods
+  async updateUserPassword(userId: string, passwordHash: string): Promise<void> {
+    await this.run(
+      'UPDATE users SET password_hash = ? WHERE id = ?',
+      [passwordHash, userId]
+    );
+  }
+
+  async updateEmailVerificationToken(userId: string, token: string, expires: Date): Promise<void> {
+    await this.run(
+      'UPDATE users SET email_verification_token = ?, email_verification_expires = ? WHERE id = ?',
+      [token, expires.toISOString(), userId]
+    );
+  }
+
+  async getUserByVerificationToken(token: string): Promise<User | null> {
+    return new Promise((resolve, reject) => {
+      this.db.get(
+        'SELECT * FROM users WHERE email_verification_token = ? AND email_verification_expires > ?',
+        [token, new Date().toISOString()],
+        (err, row: any) => {
+          if (err) {
+            reject(err);
+          } else if (row) {
+            resolve({
+              ...row,
+              settings: JSON.parse(row.settings),
+              created_at: new Date(row.created_at),
+              last_login: new Date(row.last_login),
+              trial_ends_at: row.trial_ends_at ? new Date(row.trial_ends_at) : undefined
+            });
+          } else {
+            resolve(null);
+          }
+        }
+      );
+    });
+  }
+
+  async markEmailVerified(userId: string): Promise<void> {
+    await this.run(
+      'UPDATE users SET email_verified = TRUE, email_verification_token = NULL, email_verification_expires = NULL WHERE id = ?',
+      [userId]
+    );
+  }
+
+  async updatePasswordResetToken(userId: string, token: string, expires: Date): Promise<void> {
+    await this.run(
+      'UPDATE users SET password_reset_token = ?, password_reset_expires = ? WHERE id = ?',
+      [token, expires.toISOString(), userId]
+    );
+  }
+
+  async getUserByPasswordResetToken(token: string): Promise<User | null> {
+    return new Promise((resolve, reject) => {
+      this.db.get(
+        'SELECT * FROM users WHERE password_reset_token = ? AND password_reset_expires > ?',
+        [token, new Date().toISOString()],
+        (err, row: any) => {
+          if (err) {
+            reject(err);
+          } else if (row) {
+            resolve({
+              ...row,
+              settings: JSON.parse(row.settings),
+              created_at: new Date(row.created_at),
+              last_login: new Date(row.last_login),
+              trial_ends_at: row.trial_ends_at ? new Date(row.trial_ends_at) : undefined
+            });
+          } else {
+            resolve(null);
+          }
+        }
+      );
+    });
+  }
+
+  async clearPasswordResetToken(userId: string): Promise<void> {
+    await this.run(
+      'UPDATE users SET password_reset_token = NULL, password_reset_expires = NULL WHERE id = ?',
+      [userId]
+    );
+  }
+
+  async updateLastLogin(userId: string): Promise<void> {
+    await this.run(
+      'UPDATE users SET last_login = ? WHERE id = ?',
+      [new Date().toISOString(), userId]
+    );
+  }
+
+  async updateTwoFactorSecret(userId: string, secret: string, enabled: boolean): Promise<void> {
+    await this.run(
+      'UPDATE users SET two_factor_secret = ?, two_factor_enabled = ? WHERE id = ?',
+      [secret, enabled, userId]
+    );
+  }
+
+  async enable2FA(userId: string, backupCodes: string): Promise<void> {
+    await this.run(
+      'UPDATE users SET two_factor_enabled = TRUE, two_factor_backup_codes = ? WHERE id = ?',
+      [backupCodes, userId]
+    );
+  }
+
+  async disable2FA(userId: string): Promise<void> {
+    await this.run(
+      'UPDATE users SET two_factor_enabled = FALSE, two_factor_secret = NULL, two_factor_backup_codes = NULL WHERE id = ?',
+      [userId]
+    );
+  }
+
+  async updateTwoFactorBackupCodes(userId: string, backupCodes: string): Promise<void> {
+    await this.run(
+      'UPDATE users SET two_factor_backup_codes = ? WHERE id = ?',
+      [backupCodes, userId]
+    );
+  }
+
+  async updateUserProfile(userId: string, updates: { name?: string; settings?: UserSettings }): Promise<void> {
+    const fields = [];
+    const values = [];
+
+    if (updates.name !== undefined) {
+      fields.push('name = ?');
+      values.push(updates.name);
+    }
+
+    if (updates.settings !== undefined) {
+      fields.push('settings = ?');
+      values.push(JSON.stringify(updates.settings));
+    }
+
+    if (fields.length > 0) {
+      values.push(userId);
+      await this.run(
+        `UPDATE users SET ${fields.join(', ')} WHERE id = ?`,
+        values
+      );
+    }
+  }
+
+  async getConnectedAccounts(userId: string): Promise<any[]> {
+    return new Promise((resolve, reject) => {
+      this.db.all(
+        'SELECT * FROM connected_accounts WHERE user_id = ? AND is_active = TRUE ORDER BY created_at DESC',
+        [userId],
+        (err, rows: any[]) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(rows.map(row => ({
+              ...row,
+              created_at: new Date(row.created_at),
+              updated_at: new Date(row.updated_at),
+              expires_at: row.expires_at ? new Date(row.expires_at) : undefined
+            })));
+          }
+        }
+      );
+    });
   }
 } 

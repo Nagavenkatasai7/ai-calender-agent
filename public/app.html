@@ -16,7 +16,32 @@
             background: #1c1c1e;
             color: #ffffff;
             height: 100vh;
+            width: 100vw;
             overflow: hidden;
+            margin: 0;
+            padding: 0;
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        /* Subtle overlay for better text readability - Apple style */
+        body.has-background::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.15);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        body.has-background * {
+            position: relative;
+            z-index: 1;
         }
 
         .app-container {
@@ -25,44 +50,62 @@
             height: 100vh;
         }
 
-        /* Header with voice input */
+        /* Header with voice input - Apple Transparency */
         .header {
-            background: #2c2c2e;
-            padding: 16px 24px;
-            border-bottom: 1px solid #38383a;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(40px) saturate(1.8);
+            -webkit-backdrop-filter: blur(40px) saturate(1.8);
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
             display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 16px;
             z-index: 100;
+            min-height: 80px;
         }
 
         .app-title {
             font-size: 18px;
             font-weight: 600;
             color: #ffffff;
-            margin-right: auto;
+            white-space: nowrap;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+            flex-shrink: 0;
+            order: 1;
         }
 
         .voice-input-container {
-            flex: 1;
-            max-width: 600px;
-            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 420px;
+            flex-shrink: 0;
+            order: 3;
+            margin-left: auto;
         }
 
         .voice-input {
-            width: 100%;
-            background: #1c1c1e;
-            border: 2px solid #38383a;
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
             border-radius: 12px;
-            padding: 12px 50px 12px 16px;
+            padding: 14px 18px;
             font-size: 16px;
             color: #ffffff;
             outline: none;
-            transition: border-color 0.3s ease;
+            transition: all 0.3s ease;
+            height: 48px;
+            box-sizing: border-box;
+            resize: none;
         }
 
         .voice-input:focus {
-            border-color: #007aff;
+            border-color: rgba(0, 122, 255, 0.8);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 20px rgba(0, 122, 255, 0.2);
         }
 
         .voice-input::placeholder {
@@ -70,41 +113,48 @@
         }
 
         .voice-btn {
-            position: absolute;
-            right: 8px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: #007aff;
+            background: rgba(0, 122, 255, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border: none;
-            border-radius: 8px;
-            width: 36px;
-            height: 36px;
+            border-radius: 12px;
+            width: 48px;
+            height: 48px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             transition: all 0.3s ease;
+            font-size: 18px;
+            flex-shrink: 0;
         }
 
         .voice-btn:hover {
-            background: #0056cc;
+            background: rgba(0, 122, 255, 1);
+            transform: scale(1.05);
         }
 
         .voice-btn.listening {
-            background: #ff3b30;
+            background: rgba(255, 59, 48, 0.9);
             animation: pulse 1.5s infinite;
         }
 
+
+
         @keyframes pulse {
-            0% { transform: translateY(-50%) scale(1); }
-            50% { transform: translateY(-50%) scale(1.1); }
-            100% { transform: translateY(-50%) scale(1); }
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
 
         .auth-section {
             display: flex;
             align-items: center;
             gap: 12px;
+            flex-shrink: 0;
+            order: 2;
+            flex: 1;
+            justify-content: center;
         }
 
         /* Subscription Status */
@@ -169,35 +219,325 @@
             font-size: 14px;
         }
 
-        /* Main content area */
+        /* Main content area - Responsive */
         .main-content {
             display: flex;
             flex: 1;
             overflow: hidden;
+            flex-direction: row;
+            gap: 12px;
+            padding: 12px;
         }
 
-        /* Calendar container */
-        .calendar-container {
-            flex: 1;
-            background: #1c1c1e;
+        /* Left Sidebar - Immersive */
+        .left-sidebar {
+            width: 280px;
             display: flex;
             flex-direction: column;
+            gap: 16px;
+            flex-shrink: 0;
         }
 
-        /* Calendar header */
-        .calendar-header {
-            background: #2c2c2e;
-            padding: 16px 24px;
-            border-bottom: 1px solid #38383a;
+        /* Mini Calendar - Ultra Transparent */
+        .mini-calendar-container {
+            background: rgba(44, 44, 46, 0.15);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            border-radius: 12px;
+            border: 1px solid rgba(99, 99, 102, 0.1);
+            padding: 16px;
+        }
+
+        .mini-calendar-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .mini-calendar-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        .mini-nav-btn {
+            background: rgba(58, 58, 62, 0.8);
+            border: none;
+            border-radius: 6px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .mini-nav-btn:hover {
+            background: rgba(78, 78, 82, 1);
+        }
+
+        .mini-calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+            font-size: 12px;
+        }
+
+        .mini-day-header {
+            text-align: center;
+            font-size: 10px;
+            font-weight: 600;
+            color: #8e8e93;
+            padding: 4px 0;
+            text-transform: uppercase;
+        }
+
+        .mini-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8e8e93;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .mini-day:hover {
+            background: rgba(58, 58, 62, 0.6);
+            color: #ffffff;
+        }
+
+        .mini-day.current-month {
+            color: #ffffff;
+        }
+
+        .mini-day.today {
+            background: #007aff;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .mini-day.selected {
+            background: rgba(0, 122, 255, 0.3);
+            color: #ffffff;
+        }
+
+        .mini-day.has-events::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 3px;
+            height: 3px;
+            background: #34c759;
+            border-radius: 50%;
+        }
+
+        /* Calendar Settings - Ultra Transparent */
+        .calendar-settings, .event-categories {
+            background: rgba(44, 44, 46, 0.15);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            border-radius: 12px;
+            border: 1px solid rgba(99, 99, 102, 0.1);
+            padding: 16px;
+        }
+
+        .settings-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+            margin: 0 0 12px 0;
+        }
+
+        .setting-group, .category-item {
+            margin-bottom: 12px;
+        }
+
+        .setting-label, .category-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 13px;
+            color: #ffffff;
+            user-select: none;
+        }
+
+        .setting-label input[type="checkbox"] {
+            display: none;
+        }
+
+        .checkmark {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(99, 99, 102, 0.6);
+            border-radius: 3px;
+            margin-right: 8px;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .setting-label input[type="checkbox"]:checked + .checkmark {
+            background: #007aff;
+            border-color: #007aff;
+        }
+
+        .setting-label input[type="checkbox"]:checked + .checkmark::after {
+            content: '✓';
+            position: absolute;
+            color: white;
+            font-size: 10px;
+            top: -1px;
+            left: 2px;
+        }
+
+        .category-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .work-color { background: #34c759; }
+        .personal-color { background: #ff3b30; }
+        .private-color { background: #ff9500; }
+        .default-color { background: #007aff; }
+
+        /* Right Sidebar - Ultra Transparent */
+        .right-sidebar {
+            width: 320px;
+            background: rgba(44, 44, 46, 0.15);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            border-radius: 12px;
+            border: 1px solid rgba(99, 99, 102, 0.1);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .right-sidebar .sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid rgba(99, 99, 102, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .add-event-btn {
+            background: #007aff;
+            border: none;
+            border-radius: 8px;
+            color: #ffffff;
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .add-event-btn:hover {
+            background: #0056cc;
+            transform: scale(1.05);
+        }
+
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid rgba(99, 99, 102, 0.2);
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #8e8e93;
+            padding: 12px 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab-btn.active {
+            color: #007aff;
+            border-bottom-color: #007aff;
+        }
+
+        .tab-btn:hover {
+            color: #ffffff;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 16px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .today-btn {
+            background: rgba(0, 122, 255, 0.8);
+            border: none;
+            border-radius: 6px;
+            color: #ffffff;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-left: 8px;
+        }
+
+        .today-btn:hover {
+            background: #007aff;
+            transform: scale(1.05);
+        }
+
+        /* Calendar container - Fully immersive and transparent */
+        .calendar-container {
+            flex: 1;
+            background: transparent !important;
+            display: flex !important;
+            flex-direction: column;
+            min-width: 0;
+            min-height: 600px;
+            position: relative;
+            overflow: visible;
+        }
+
+        /* Calendar header - Ultra transparent for immersion */
+        .calendar-header {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px) saturate(1.2);
+            -webkit-backdrop-filter: blur(10px) saturate(1.2);
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            border-radius: 12px 12px 0 0;
         }
 
         .calendar-nav {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 12px;
         }
 
         .nav-btn {
@@ -222,108 +562,243 @@
             font-size: 22px;
             font-weight: 600;
             color: #ffffff;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+        }
+
+        .calendar-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .view-switcher {
             display: flex;
-            background: #38383a;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-radius: 8px;
             overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .view-btn {
             background: transparent;
             border: none;
-            color: #8e8e93;
+            color: #ffffff;
             padding: 8px 16px;
             cursor: pointer;
             transition: all 0.3s ease;
+            font-size: 14px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
         }
 
         .view-btn.active {
-            background: #007aff;
+            background: rgba(0, 122, 255, 0.6);
             color: #ffffff;
+            box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
         }
 
-        /* Calendar grid */
+        .background-btn {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            white-space: nowrap;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .background-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Calendar grid - Glass Container */
         .calendar-grid {
             flex: 1;
-            padding: 24px;
-            overflow-y: auto;
+            padding: 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         .month-view {
-            display: grid;
+            display: none; /* Will be set to grid by JavaScript */
             grid-template-columns: repeat(7, 1fr);
-            gap: 1px;
-            background: #38383a;
+            grid-template-rows: 40px repeat(6, minmax(140px, 1fr));
+            gap: 0;
+            background: rgba(32, 32, 34, 0.15);
+            backdrop-filter: blur(5px) saturate(1.1);
+            -webkit-backdrop-filter: blur(5px) saturate(1.1);
             border-radius: 12px;
             overflow: hidden;
+            height: 100%;
+            min-height: 600px;
+            flex: 1;
+            border: 1px solid rgba(99, 99, 102, 0.1);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
         }
 
         .day-header {
-            background: #2c2c2e;
-            padding: 12px;
+            background: rgba(48, 48, 52, 0.3);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            padding: 12px 8px;
             text-align: center;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
-            color: #8e8e93;
+            color: #ffffff;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(99, 99, 102, 0.1);
+            border-right: 1px solid rgba(99, 99, 102, 0.05);
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+        }
+
+        .day-header:last-child {
+            border-right: none;
         }
 
         .day-cell {
-            background: #1c1c1e;
-            min-height: 120px;
+            background: rgba(44, 44, 46, 0.1);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+            min-height: 140px;
             padding: 8px;
             position: relative;
-            transition: background 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(99, 99, 102, 0.08);
+            border-bottom: 1px solid rgba(99, 99, 102, 0.08);
+            cursor: pointer;
+        }
+
+        .day-cell:nth-child(7n) {
+            border-right: none;
         }
 
         .day-cell:hover {
-            background: #2c2c2e;
+            background: rgba(58, 58, 62, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            z-index: 5;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
         }
 
         .day-cell.other-month {
+            background: rgba(28, 28, 30, 0.4);
             opacity: 0.5;
         }
 
+        .day-cell.other-month .day-number {
+            color: #636366;
+        }
+
         .day-cell.today {
-            background: #007aff;
+            background: linear-gradient(135deg, rgba(0, 122, 255, 0.2) 0%, rgba(30, 144, 255, 0.15) 100%);
+            border: 2px solid #007aff;
+            box-shadow: 0 0 20px rgba(0, 122, 255, 0.3), 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         .day-number {
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #ffffff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+            align-self: flex-start;
+            min-width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: all 0.2s ease;
         }
 
-        .today .day-number {
-            color: #ffffff;
-            font-weight: 600;
+        .day-cell.today .day-number {
+            background: linear-gradient(135deg, #007aff 0%, #0056cc 100%);
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(0, 122, 255, 0.4);
         }
 
         .day-events {
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: 3px;
+            flex: 1;
+            overflow: hidden;
         }
 
         .event-item {
-            background: #007aff;
+            background: linear-gradient(135deg, #007aff 0%, #5856d6 100%);
             color: #ffffff;
-            padding: 2px 6px;
-            border-radius: 4px;
+            padding: 4px 8px;
+            border-radius: 6px;
             font-size: 11px;
             font-weight: 500;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             cursor: pointer;
-            transition: background 0.3s ease;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .event-item:hover {
-            background: #0056cc;
+            background: linear-gradient(135deg, #0056cc 0%, #4c44d6 100%);
+            transform: scale(1.02);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .event-item.private {
+            background: linear-gradient(135deg, #ff9500 0%, #ff6b00 100%);
+        }
+
+        .event-item.work {
+            background: linear-gradient(135deg, #34c759 0%, #30d158 100%);
+        }
+
+        .event-item.personal {
+            background: linear-gradient(135deg, #ff3b30 0%, #ff453a 100%);
+        }
+
+        /* Add event indicator */
+        .day-cell.has-events::before {
+            content: '';
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 6px;
+            height: 6px;
+            background: #34c759;
+            border-radius: 50%;
+            box-shadow: 0 0 6px rgba(52, 199, 89, 0.6);
+        }
+
+        /* More events indicator */
+        .event-more {
+            font-size: 9px;
+            color: #8e8e93;
+            padding: 2px 4px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: all 0.2s ease;
+        }
+
+        .event-more:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
         }
 
         .event-item.new-event {
@@ -335,44 +810,52 @@
             100% { opacity: 1; transform: scale(1); }
         }
 
-        /* Week and Day View Styles */
+        /* Week and Day View Styles - Responsive */
         .week-view {
             display: none;
             grid-template-columns: 60px repeat(7, 1fr);
-            grid-template-rows: 40px repeat(24, 1fr);
+            grid-template-rows: 40px repeat(24, minmax(30px, 1fr));
             gap: 1px;
-            background: #38383a;
+            background: rgba(56, 56, 58, 0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             border-radius: 12px;
             overflow: hidden;
-            height: 600px;
-            overflow-y: auto;
+            height: 100%;
+            flex: 1;
         }
 
         .day-view {
             display: none;
             grid-template-columns: 60px 1fr;
-            grid-template-rows: 40px repeat(24, 1fr);
+            grid-template-rows: 40px repeat(24, minmax(30px, 1fr));
             gap: 1px;
-            background: #38383a;
+            background: rgba(56, 56, 58, 0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             border-radius: 12px;
             overflow: hidden;
-            height: 600px;
-            overflow-y: auto;
+            height: 100%;
+            flex: 1;
         }
 
         .time-slot {
-            background: #2c2c2e;
-            border: 1px solid #38383a;
+            background: rgba(44, 44, 46, 0.8);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(56, 56, 58, 0.5);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
-            color: #8e8e93;
-            min-height: 25px;
+            font-size: 11px;
+            color: #ffffff;
+            min-height: 30px;
         }
 
         .week-day-header, .day-header-single {
-            background: #48484a;
+            background: rgba(72, 72, 74, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             color: #ffffff;
             font-weight: 600;
             display: flex;
@@ -380,7 +863,7 @@
             align-items: center;
             justify-content: center;
             font-size: 14px;
-            border: 1px solid #38383a;
+            border: 1px solid rgba(56, 56, 58, 0.5);
             min-height: 40px;
         }
 
@@ -399,10 +882,12 @@
         }
 
         .hour-cell {
-            background: #1c1c1e;
-            border: 1px solid #38383a;
+            background: rgba(28, 28, 30, 0.3);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            border: 1px solid rgba(56, 56, 58, 0.3);
             position: relative;
-            min-height: 25px;
+            min-height: 30px;
         }
 
         .event-in-cell {
@@ -424,29 +909,34 @@
             z-index: 10;
         }
 
-        /* Sidebar */
+        /* Sidebar - Apple Glass */
         .sidebar {
-            width: 300px;
-            background: #2c2c2e;
-            border-left: 1px solid #38383a;
+            width: 280px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(40px) saturate(1.8);
+            -webkit-backdrop-filter: blur(40px) saturate(1.8);
+            border-left: 1px solid rgba(255, 255, 255, 0.15);
             display: flex;
             flex-direction: column;
+            flex-shrink: 0;
         }
 
         .sidebar-header {
-            padding: 16px;
-            border-bottom: 1px solid #38383a;
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .sidebar-title {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
             color: #ffffff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
         }
 
         .sidebar-content {
             flex: 1;
-            padding: 16px;
+            padding: 12px;
             overflow-y: auto;
         }
 
@@ -632,6 +1122,11 @@
             color: #ffffff;
         }
 
+        .message.info {
+            background: #007aff;
+            color: #ffffff;
+        }
+
         .browser-warning {
             background: #ff9500;
             color: #ffffff;
@@ -639,6 +1134,669 @@
             text-align: center;
             font-size: 14px;
             display: none;
+        }
+
+        /* Mobile Responsive Design */
+        @media (max-width: 768px) {
+            .header {
+                padding: 12px 16px;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 12px;
+                min-height: auto;
+            }
+
+            .app-title {
+                font-size: 16px;
+                text-align: center;
+                order: 1;
+                margin: 0;
+            }
+
+            .auth-section {
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 8px;
+                order: 2;
+                width: 100%;
+                flex: none;
+            }
+
+            .voice-input-container {
+                width: 100%;
+                order: 3;
+                gap: 6px;
+            }
+
+            .voice-input {
+                font-size: 14px;
+                padding: 12px 16px;
+                height: 44px;
+            }
+
+            .voice-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 16px;
+            }
+
+            .main-content {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                border-left: none;
+                border-top: 1px solid #38383a;
+                max-height: 200px;
+                order: 2;
+            }
+
+            .calendar-container {
+                order: 1;
+            }
+
+            .calendar-header {
+                padding: 8px 12px;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+
+            .calendar-nav {
+                justify-content: center;
+                gap: 8px;
+                flex-wrap: wrap;
+            }
+
+            .calendar-title {
+                text-align: center;
+                font-size: 16px;
+                order: -1;
+            }
+
+            .calendar-controls {
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .view-switcher {
+                order: 1;
+            }
+
+            .background-btn {
+                order: 2;
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+
+            .calendar-grid {
+                padding: 6px;
+            }
+
+            .day-cell {
+                min-height: 0;
+                padding: 3px;
+            }
+
+            .day-header {
+                padding: 4px 2px;
+                font-size: 9px;
+            }
+
+            .day-number {
+                font-size: 12px;
+            }
+
+            .event-item {
+                font-size: 9px;
+                padding: 1px 3px;
+            }
+
+            /* Week and Day view adjustments for mobile */
+            .week-view {
+                grid-template-columns: 45px repeat(7, 1fr);
+                grid-template-rows: 30px repeat(24, minmax(25px, 1fr));
+                height: 100%;
+            }
+
+            .day-view {
+                grid-template-columns: 45px 1fr;
+                grid-template-rows: 30px repeat(24, minmax(25px, 1fr));
+                height: 100%;
+            }
+
+            .time-slot {
+                font-size: 9px;
+                min-height: 25px;
+            }
+
+            .week-day-header, .day-header-single {
+                font-size: 10px;
+                min-height: 30px;
+            }
+
+            .event-in-cell {
+                font-size: 8px;
+                padding: 1px 2px;
+            }
+        }
+
+        /* Tablet Responsive Design */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .header {
+                padding: 10px 16px;
+            }
+
+            .sidebar {
+                width: 250px;
+            }
+
+            .calendar-grid {
+                padding: 10px;
+            }
+
+            .day-cell {
+                min-height: 0;
+                padding: 5px;
+            }
+
+            .day-header {
+                padding: 6px 4px;
+                font-size: 11px;
+            }
+        }
+
+        /* Large Desktop */
+        @media (min-width: 1400px) {
+            .sidebar {
+                width: 320px;
+            }
+
+            .calendar-grid {
+                padding: 16px;
+            }
+
+            .day-cell {
+                min-height: 0;
+                padding: 8px;
+            }
+
+            .day-header {
+                padding: 10px;
+                font-size: 12px;
+            }
+        }
+
+        /* Landscape phone specific */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .main-content {
+                flex-direction: row;
+            }
+
+            .sidebar {
+                width: 200px;
+                border-left: 1px solid #38383a;
+                border-top: none;
+                max-height: none;
+                order: 0;
+            }
+
+            .calendar-container {
+                order: 0;
+            }
+
+            .day-cell {
+                min-height: 0;
+            }
+        }
+
+        /* Hide sidebar toggle button by default */
+        .sidebar-toggle {
+            display: none;
+            background: #38383a;
+            border: none;
+            color: #ffffff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        /* Show sidebar toggle on mobile */
+        @media (max-width: 768px) {
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .sidebar.hidden {
+                display: none;
+            }
+        }
+
+        /* Event Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        .modal-content {
+            background: rgba(44, 44, 46, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #8e8e93;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            color: #ffffff;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            border-color: rgba(0, 122, 255, 0.8);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 20px rgba(0, 122, 255, 0.2);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .form-checkbox input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #007aff;
+        }
+
+        .form-checkbox label {
+            color: #ffffff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .alert-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+        }
+
+        .alert-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            padding: 8px;
+            color: #ffffff;
+            font-size: 13px;
+        }
+
+        .alert-unit {
+            color: #8e8e93;
+            font-size: 13px;
+            min-width: 60px;
+        }
+
+        .remove-alert {
+            background: rgba(255, 59, 48, 0.8);
+            border: none;
+            color: white;
+            border-radius: 4px;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .add-alert {
+            background: rgba(52, 199, 89, 0.8);
+            border: none;
+            color: white;
+            border-radius: 6px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #007aff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056cc;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-danger {
+            background: rgba(255, 59, 48, 0.8);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: rgba(255, 59, 48, 1);
+        }
+
+        /* Background Selection Modal Styles */
+        #backgroundModal.modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        #backgroundModal.modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #backgroundModal .modal-content {
+            background: rgba(44, 44, 46, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #backgroundModal .background-modal {
+            max-width: 800px;
+        }
+
+        #backgroundModal .modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #38383a;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        #backgroundModal .modal-header h3 {
+            margin: 0;
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        #backgroundModal .modal-close {
+            background: none;
+            border: none;
+            color: #8e8e93;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #backgroundModal .modal-close:hover {
+            color: #ffffff;
+        }
+
+        #backgroundModal .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .background-options {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .background-section h4 {
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0 0 12px 0;
+        }
+
+        .background-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+        }
+
+        .background-option {
+            background: #38383a;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .background-option:hover {
+            border-color: #007aff;
+        }
+
+        .background-option.active {
+            border-color: #007aff;
+            background: rgba(0, 122, 255, 0.1);
+        }
+
+        .bg-preview {
+            width: 100%;
+            height: 80px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 6px;
+            margin-bottom: 6px;
+        }
+
+        .default-bg {
+            background: linear-gradient(135deg, #1c1c1e 0%, #2c2c2e 100%);
+        }
+
+        .background-option span {
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .custom-upload {
+            text-align: center;
+            padding: 20px;
+            border: 2px dashed #38383a;
+            border-radius: 8px;
+            background: rgba(56, 56, 58, 0.3);
+        }
+
+        .upload-btn {
+            background: #007aff;
+            border: none;
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+
+        .upload-btn:hover {
+            background: #0056cc;
+        }
+
+        .upload-hint {
+            color: #8e8e93;
+            font-size: 12px;
+            margin: 8px 0 0 0;
+        }
+
+        /* Mobile adjustments for background modal */
+        @media (max-width: 768px) {
+            .background-modal {
+                width: 95%;
+                max-height: 85%;
+            }
+
+            .background-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .bg-preview {
+                height: 60px;
+            }
+
+            .modal-body {
+                padding: 16px;
+            }
         }
     </style>
 </head>
@@ -658,6 +1816,7 @@
                 <button id="voiceBtn" class="voice-btn">
                     <span id="voiceIcon">🎤</span>
                 </button>
+
                 <div id="voiceStatus" class="voice-status" style="display: none;"></div>
             </div>
 
@@ -670,6 +1829,7 @@
                 </div>
                 <div id="userInfo" class="user-info">
                     <span id="userEmail"></span>
+                    <button class="settings-btn" onclick="window.location.href='/settings'" title="Account Settings" style="margin-left: 1rem; padding: 0.5rem; background: rgba(255,255,255,0.1); border: none; border-radius: 6px; color: white; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.2)'; this.style.transform='scale(1.05)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'; this.style.transform='scale(1)'">⚙️</button>
                 </div>
             </div>
         </div>
@@ -681,19 +1841,113 @@
 
         <!-- Main content -->
         <div class="main-content">
-            <!-- Calendar -->
+            <!-- Left Sidebar with Mini Calendar and Settings -->
+            <div class="left-sidebar">
+                <!-- Mini Calendar -->
+                <div class="mini-calendar-container">
+                    <div class="mini-calendar-header">
+                        <button class="mini-nav-btn" id="miniPrevMonth">‹</button>
+                        <h3 class="mini-calendar-title" id="miniCalendarTitle">June 2025</h3>
+                        <button class="mini-nav-btn" id="miniNextMonth">›</button>
+                    </div>
+                    <div class="mini-calendar" id="miniCalendar">
+                        <!-- Mini calendar will be generated here -->
+                    </div>
+                </div>
+
+                <!-- Calendar Settings -->
+                <div class="calendar-settings">
+                    <h4 class="settings-title">View Options</h4>
+                    
+                    <div class="setting-group">
+                        <label class="setting-label">
+                            <input type="checkbox" id="showAllDay" checked>
+                            <span class="checkmark"></span>
+                            Show All Day Events
+                        </label>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label class="setting-label">
+                            <input type="checkbox" id="showWeekends" checked>
+                            <span class="checkmark"></span>
+                            Show Weekends
+                        </label>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label class="setting-label">
+                            <input type="checkbox" id="showEventTime" checked>
+                            <span class="checkmark"></span>
+                            Show Event Times
+                        </label>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label class="setting-label">
+                            <input type="checkbox" id="compactView">
+                            <span class="checkmark"></span>
+                            Compact View
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Event Categories -->
+                <div class="event-categories">
+                    <h4 class="settings-title">Categories</h4>
+                    
+                    <div class="category-item">
+                        <label class="category-label">
+                            <input type="checkbox" class="category-filter" data-category="work" checked>
+                            <span class="category-color work-color"></span>
+                            Work
+                        </label>
+                    </div>
+                    
+                    <div class="category-item">
+                        <label class="category-label">
+                            <input type="checkbox" class="category-filter" data-category="personal" checked>
+                            <span class="category-color personal-color"></span>
+                            Personal
+                        </label>
+                    </div>
+                    
+                    <div class="category-item">
+                        <label class="category-label">
+                            <input type="checkbox" class="category-filter" data-category="private" checked>
+                            <span class="category-color private-color"></span>
+                            Private
+                        </label>
+                    </div>
+                    
+                    <div class="category-item">
+                        <label class="category-label">
+                            <input type="checkbox" class="category-filter" data-category="default" checked>
+                            <span class="category-color default-color"></span>
+                            General
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Calendar Area -->
             <div class="calendar-container">
                 <div class="calendar-header">
                     <div class="calendar-nav">
                         <button class="nav-btn" id="prevMonth">‹</button>
                         <button class="nav-btn" id="nextMonth">›</button>
                         <h2 class="calendar-title" id="calendarTitle">June 2025</h2>
+                        <button class="today-btn" id="todayBtn">Today</button>
                     </div>
                     
+            <div class="calendar-controls">
                     <div class="view-switcher">
                         <button class="view-btn" id="dayViewBtn">Day</button>
                         <button class="view-btn" id="weekViewBtn">Week</button>
                         <button class="view-btn active" id="monthViewBtn">Month</button>
+                </div>
+                <button class="background-btn" id="backgroundBtn" onclick="openBackgroundSelector()">🎨 Background</button>
+                        <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleEventsSidebar()">📋 Events</button>
                     </div>
                 </div>
 
@@ -710,14 +1964,36 @@
                 </div>
             </div>
 
-            <!-- Sidebar -->
-            <div class="sidebar">
+            <!-- Right Sidebar with Events List -->
+            <div class="right-sidebar" id="rightSidebar">
                 <div class="sidebar-header">
-                    <h3 class="sidebar-title">Upcoming Events</h3>
+                    <h3 class="sidebar-title">Events</h3>
+                    <button class="add-event-btn" onclick="openEventModal()">+ Add Event</button>
                 </div>
+                
+                <div class="sidebar-tabs">
+                    <button class="tab-btn active" data-tab="upcoming">Upcoming</button>
+                    <button class="tab-btn" data-tab="today">Today</button>
+                    <button class="tab-btn" data-tab="week">This Week</button>
+                </div>
+                
                 <div class="sidebar-content">
+                    <div class="tab-content active" id="upcomingTab">
                     <div class="upcoming-events" id="upcomingEvents">
                         <!-- Upcoming events will be listed here -->
+                    </div>
+                </div>
+                    
+                    <div class="tab-content" id="todayTab">
+                        <div class="today-events" id="todayEvents">
+                            <!-- Today's events will be listed here -->
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="weekTab">
+                        <div class="week-events" id="weekEvents">
+                            <!-- This week's events will be listed here -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -755,6 +2031,198 @@
         </div>
     </div>
 
+    <!-- Enhanced Background Selection Modal -->
+    <div id="backgroundModal" class="modal" style="display: none;">
+        <div class="modal-content background-modal" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3>🎨 Choose Calendar Background & Theme</h3>
+                <button class="modal-close" onclick="closeBackgroundSelector()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="background-options">
+                    <!-- Themes Section -->
+                    <div class="background-section">
+                        <h4>🌙 Themes</h4>
+                        <div class="background-grid">
+                            <div class="background-option active" data-bg="dark-theme" onclick="selectBackground('dark-theme')">
+                                <div class="bg-preview" style="background: linear-gradient(135deg, #1a1a1c 0%, #2c2c2e 100%);">
+                                    <div style="color: white; font-size: 10px; padding: 10px;">📅</div>
+                                </div>
+                                <span>Dark Theme</span>
+                            </div>
+                            <div class="background-option" data-bg="light-theme" onclick="selectBackground('light-theme')">
+                                <div class="bg-preview" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+                                    <div style="color: #333; font-size: 10px; padding: 10px;">📅</div>
+                                </div>
+                                <span>Light Theme</span>
+                            </div>
+                            <div class="background-option" data-bg="mixed-theme" onclick="selectBackground('mixed-theme')">
+                                <div class="bg-preview" style="background: linear-gradient(135deg, #1a1a1c 0%, #f8f9fa 50%, #2c2c2e 100%);">
+                                    <div style="color: white; font-size: 10px; padding: 10px;">📅</div>
+                                </div>
+                                <span>Mixed Theme</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Nature Section -->
+                    <div class="background-section">
+                        <h4>🏔️ Nature & Landscapes</h4>
+                        <div class="background-grid">
+                            <div class="background-option" data-bg="nature1" onclick="selectBackground('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80')">
+                                <div class="bg-preview" style="background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'); background-size: cover; background-position: center;"></div>
+                                <span>Mountain Vista</span>
+                            </div>
+                            <div class="background-option" data-bg="nature2" onclick="selectBackground('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80')">
+                                <div class="bg-preview" style="background-image: url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'); background-size: cover; background-position: center;"></div>
+                                <span>Forest Path</span>
+                            </div>
+                            <div class="background-option" data-bg="nature3" onclick="selectBackground('https://images.unsplash.com/photo-1439066615861-d1af74d74000?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80')">
+                                <div class="bg-preview" style="background-image: url('https://images.unsplash.com/photo-1439066615861-d1af74d74000?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'); background-size: cover; background-position: center;"></div>
+                                <span>Ocean Waves</span>
+                            </div>
+                            <div class="background-option" data-bg="nature4" onclick="selectBackground('https://images.unsplash.com/photo-1464822759844-d150baec32d4?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80')">
+                                <div class="bg-preview" style="background-image: url('https://images.unsplash.com/photo-1464822759844-d150baec32d4?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'); background-size: cover; background-position: center;"></div>
+                                <span>Lake Sunset</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Minimal Section -->
+                    <div class="background-section">
+                        <h4>🎨 Minimal & Abstract</h4>
+                        <div class="background-grid">
+                            <div class="background-option" data-bg="minimal1" onclick="selectBackground('https://images.unsplash.com/photo-1557683316-973673baf926?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80')">
+                                <div class="bg-preview" style="background-image: url('https://images.unsplash.com/photo-1557683316-973673baf926?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'); background-size: cover; background-position: center;"></div>
+                                <span>Gradient Flow</span>
+                            </div>
+                            <div class="background-option" data-bg="minimal2" onclick="selectBackground('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80')">
+                                <div class="bg-preview" style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'); background-size: cover; background-position: center;"></div>
+                                <span>Abstract Blue</span>
+                            </div>
+                            <div class="background-option" data-bg="minimal3" onclick="selectBackground('https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80')">
+                                <div class="bg-preview" style="background-image: url('https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'); background-size: cover; background-position: center;"></div>
+                                <span>Soft Curves</span>
+                            </div>
+                            <div class="background-option" data-bg="minimal4" onclick="selectBackground('linear-gradient(135deg, #667eea 0%, #764ba2 100%)')">
+                                <div class="bg-preview" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+                                <span>Purple Gradient</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Space Section -->
+                    <div class="background-section">
+                        <h4>🌌 Space & Sky</h4>
+                        <div class="background-grid">
+                            <div class="background-option" data-bg="space1" onclick="selectBackground('https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80')">
+                                <div class="bg-preview" style="background-image: url('https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'); background-size: cover; background-position: center;"></div>
+                                <span>Starry Night</span>
+                            </div>
+                            <div class="background-option" data-bg="space2" onclick="selectBackground('https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80')">
+                                <div class="bg-preview" style="background-image: url('https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'); background-size: cover; background-position: center;"></div>
+                                <span>Galaxy</span>
+                            </div>
+                            <div class="background-option" data-bg="space3" onclick="selectBackground('https://images.unsplash.com/photo-1510797215324-95aa89f43c33?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80')">
+                                <div class="bg-preview" style="background-image: url('https://images.unsplash.com/photo-1510797215324-95aa89f43c33?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'); background-size: cover; background-position: center;"></div>
+                                <span>Sunset Sky</span>
+                            </div>
+                            <div class="background-option" data-bg="space4" onclick="selectBackground('https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80')">
+                                <div class="bg-preview" style="background-image: url('https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'); background-size: cover; background-position: center;"></div>
+                                <span>Aurora</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Custom Upload Section -->
+                    <div class="background-section">
+                        <h4>📁 Custom Image</h4>
+                        <div class="custom-upload" style="text-align: center; padding: 20px; border: 2px dashed #666; border-radius: 8px; margin: 10px 0;">
+                            <input type="file" id="customImageInput" accept="image/*" onchange="handleCustomImage(event)" style="display: none;">
+                            <button class="upload-btn" onclick="document.getElementById('customImageInput').click()" style="background: #007aff; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 14px;">
+                                📁 Upload Your Image
+                            </button>
+                            <p style="color: #8e8e93; font-size: 12px; margin: 8px 0 0 0;">Supports JPG, PNG, GIF (max 5MB)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WORKING Event Modal -->
+    <div id="eventModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999999; display: none; align-items: center; justify-content: center;">
+        <div style="background: #2c2c2e; border-radius: 12px; width: 90%; max-width: 600px; max-height: 90%; overflow-y: auto; border: 2px solid #007aff;">
+            <div style="padding: 20px; border-bottom: 1px solid #444; display: flex; justify-content: space-between; align-items: center;">
+                <h3 id="eventModalTitle" style="color: #fff; margin: 0; font-size: 18px;">Create New Event</h3>
+                <button id="closeModalBtn" style="background: none; border: none; color: #8e8e93; font-size: 24px; cursor: pointer; padding: 5px;">&times;</button>
+            </div>
+            <div style="padding: 20px;">
+                <form id="eventForm">
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; color: #fff; font-size: 14px; margin-bottom: 5px;">Event Title *</label>
+                        <input type="text" id="eventTitle" placeholder="Enter event title" required style="width: 100%; background: #444; border: 1px solid #666; border-radius: 6px; padding: 10px; color: #fff; font-size: 14px; box-sizing: border-box;">
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; color: #fff; font-size: 14px; margin-bottom: 5px;">Description</label>
+                        <textarea id="eventDescription" placeholder="Enter description (optional)" style="width: 100%; background: #444; border: 1px solid #666; border-radius: 6px; padding: 10px; color: #fff; font-size: 14px; box-sizing: border-box; height: 60px; resize: vertical;"></textarea>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <div style="flex: 1;">
+                            <label style="display: block; color: #fff; font-size: 14px; margin-bottom: 5px;">Start Date *</label>
+                            <input type="date" id="eventStartDate" required style="width: 100%; background: #444; border: 1px solid #666; border-radius: 6px; padding: 10px; color: #fff; font-size: 14px; box-sizing: border-box;">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="display: block; color: #fff; font-size: 14px; margin-bottom: 5px;">Start Time *</label>
+                            <input type="time" id="eventStartTime" required style="width: 100%; background: #444; border: 1px solid #666; border-radius: 6px; padding: 10px; color: #fff; font-size: 14px; box-sizing: border-box;">
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <div style="flex: 1;">
+                            <label style="display: block; color: #fff; font-size: 14px; margin-bottom: 5px;">End Date *</label>
+                            <input type="date" id="eventEndDate" required style="width: 100%; background: #444; border: 1px solid #666; border-radius: 6px; padding: 10px; color: #fff; font-size: 14px; box-sizing: border-box;">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="display: block; color: #fff; font-size: 14px; margin-bottom: 5px;">End Time *</label>
+                            <input type="time" id="eventEndTime" required style="width: 100%; background: #444; border: 1px solid #666; border-radius: 6px; padding: 10px; color: #fff; font-size: 14px; box-sizing: border-box;">
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; color: #fff; font-size: 14px; margin-bottom: 5px;">Location</label>
+                        <input type="text" id="eventLocation" placeholder="Enter location (optional)" style="width: 100%; background: #444; border: 1px solid #666; border-radius: 6px; padding: 10px; color: #fff; font-size: 14px; box-sizing: border-box;">
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: flex; align-items: center; color: #fff; font-size: 14px; cursor: pointer;">
+                            <input type="checkbox" id="eventPrivate" style="margin-right: 8px;">
+                            Make this event private
+                        </label>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; color: #fff; font-size: 14px; margin-bottom: 5px;">Time Zone</label>
+                        <select id="eventTimeZone" style="width: 100%; background: #444; border: 1px solid #666; border-radius: 6px; padding: 10px; color: #fff; font-size: 14px; box-sizing: border-box;">
+                            <option value="America/New_York">Eastern Time (EST/EDT)</option>
+                            <option value="America/Chicago">Central Time (CST/CDT)</option>
+                            <option value="America/Denver">Mountain Time (MST/MDT)</option>
+                            <option value="America/Los_Angeles">Pacific Time (PST/PDT)</option>
+                            <option value="UTC">UTC</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div style="padding: 20px; border-top: 1px solid #444; display: flex; gap: 10px; justify-content: flex-end;">
+                <button type="button" id="cancelEventBtn" style="background: #666; border: none; border-radius: 6px; color: #fff; padding: 10px 20px; font-size: 14px; cursor: pointer;">Cancel</button>
+                <button type="button" id="deleteEventBtn" style="background: #ff3b30; border: none; border-radius: 6px; color: #fff; padding: 10px 20px; font-size: 14px; cursor: pointer; display: none;">Delete Event</button>
+                <button type="button" id="saveEventBtn" style="background: #007aff; border: none; border-radius: 6px; color: #fff; padding: 10px 20px; font-size: 14px; cursor: pointer;">Save Event</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let currentUserEmail = null;
         let recognition = null;
@@ -762,14 +2230,416 @@
         let currentDate = new Date();
         let calendarEvents = [];
         let currentView = 'month'; // 'month', 'week', 'day'
+        let currentBackground = 'default';
+
+        // Local storage for events (fallback when backend fails)
+        function saveEventToLocalStorage(event) {
+            console.log('💾 Saving event to localStorage:', event); // Debug
+            try {
+                let storedEvents = JSON.parse(localStorage.getItem('ai-reminder-events') || '[]');
+                
+                // Ensure event has proper structure
+                const eventToSave = {
+                    ...event,
+                    id: event.id || `local-${Date.now()}-${Math.random()}`,
+                    createdAt: new Date().toISOString(),
+                    // Ensure dates are serializable
+                    startTime: event.startTime instanceof Date ? event.startTime.toISOString() : event.startTime,
+                    endTime: event.endTime instanceof Date ? event.endTime.toISOString() : event.endTime
+                };
+                
+                // Check if event already exists and update it, otherwise add new
+                const existingIndex = storedEvents.findIndex(e => e.id === eventToSave.id);
+                if (existingIndex !== -1) {
+                    storedEvents[existingIndex] = eventToSave;
+                    console.log('📝 Updated existing event in localStorage'); // Debug
+                } else {
+                    storedEvents.push(eventToSave);
+                    console.log('➕ Added new event to localStorage'); // Debug
+                }
+                
+                localStorage.setItem('ai-reminder-events', JSON.stringify(storedEvents));
+                console.log('✅ Event saved to localStorage with ID:', eventToSave.id); // Debug
+            } catch (error) {
+                console.error('❌ Failed to save event to localStorage:', error); // Debug
+            }
+        }
+
+        function loadEventsFromLocalStorage() {
+            console.log('📂 Loading events from localStorage'); // Debug
+            try {
+                const storedEvents = JSON.parse(localStorage.getItem('ai-reminder-events') || '[]');
+                console.log('📋 Found stored events:', storedEvents.length); // Debug
+                
+                // Add stored events to calendar with proper structure
+                storedEvents.forEach(event => {
+                    // Ensure event has proper structure and ID
+                    if (!event.id) {
+                        event.id = `local-${Date.now()}-${Math.random()}`;
+                    }
+                    
+                    // Ensure dates are Date objects
+                    if (typeof event.startTime === 'string') {
+                        event.startTime = new Date(event.startTime);
+                    }
+                    if (typeof event.endTime === 'string') {
+                        event.endTime = new Date(event.endTime);
+                    }
+                    
+                    // Check if event already exists
+                    if (!calendarEvents.find(e => e.id === event.id)) {
+                        calendarEvents.push(event);
+                        console.log('📅 Added event from localStorage:', event.title, 'ID:', event.id); // Debug
+                    }
+                });
+                
+                // Regenerate calendar to show events
+                generateCalendar();
+                return storedEvents;
+            } catch (error) {
+                console.error('❌ Failed to load events from localStorage:', error); // Debug
+                return [];
+            }
+        }
+
+        function clearLocalStorageEvents() {
+            localStorage.removeItem('ai-reminder-events');
+            console.log('🗑️ Local storage events cleared'); // Debug
+        }
+
+        // Diagnostic function to check calendar visibility
+        function diagnoseProblem() {
+            console.log('🔍 DIAGNOSTIC REPORT:'); // Debug
+            
+            const calendarContainer = document.querySelector('.calendar-container');
+            const monthView = document.getElementById('monthView');
+            const weekView = document.getElementById('weekView');
+            const dayView = document.getElementById('dayView');
+            
+            console.log('📋 Elements found:', {
+                calendarContainer: !!calendarContainer,
+                monthView: !!monthView,
+                weekView: !!weekView,
+                dayView: !!dayView
+            }); // Debug
+            
+            if (calendarContainer) {
+                const containerStyles = getComputedStyle(calendarContainer);
+                console.log('📏 Calendar container styles:', {
+                    display: containerStyles.display,
+                    visibility: containerStyles.visibility,
+                    opacity: containerStyles.opacity,
+                    height: containerStyles.height,
+                    width: containerStyles.width
+                }); // Debug
+            }
+            
+            if (monthView) {
+                const monthStyles = getComputedStyle(monthView);
+                console.log('📅 Month view styles:', {
+                    display: monthStyles.display,
+                    visibility: monthStyles.visibility,
+                    opacity: monthStyles.opacity,
+                    height: monthStyles.height,
+                    width: monthStyles.width,
+                    children: monthView.children.length
+                }); // Debug
+            }
+            
+            console.log('🔧 Current view:', currentView); // Debug
+            console.log('📅 Current date:', currentDate); // Debug
+        }
 
         // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 DOM Content Loaded - Initializing App'); // Debug
+            
+            try {
+                console.log('📞 Initializing speech recognition...'); // Debug
             initializeSpeechRecognition();
+                
+                console.log('🔐 Checking auth status...'); // Debug
             checkAuthStatus();
+                
+                console.log('📅 Generating calendar...'); // Debug
             generateCalendar();
+                
+                console.log('🔧 Setting up event listeners...'); // Debug
             setupEventListeners();
+                
+                // Setup additional event listeners
+                setupAdditionalEventListeners();
+                
+                console.log('🖼️ Loading saved background...'); // Debug
+                loadSavedBackground();
+                
+                console.log('🎨 Setting up background modal...'); // Debug
+                setupBackgroundModal();
+                
+                console.log('💾 Loading events from local storage...'); // Debug
+                loadEventsFromLocalStorage();
+                
+                console.log('🖱️ Setting up day click handlers...'); // Debug
+                setupDayClickHandlers();
+                
+                console.log('🔘 Setting up manual event button...'); // Debug
+                setupModalEventListeners();
+                
+                console.log('📅 Generating mini calendar...');
+                generateMiniCalendar();
+                
+                console.log('🔧 Setting up sidebar tabs...');
+                setupSidebarTabs();
+                
+                console.log('⚙️ Setting up calendar settings...');
+                setupCalendarSettings();
+                
+                console.log('💾 Loading calendar settings...');
+                loadCalendarSettings();
+                
+                console.log('🗂️ Loading tab content...');
+                loadTabContent('upcoming');
+                
+                console.log('🧪 Adding test events if none exist...');
+                addTestEventsIfNeeded();
+                
+                console.log('✅ App initialization complete!'); // Debug
+                
+                // Show comprehensive startup message
+                console.log(`
+🎯 AI REMINDER AGENT READY!
+================================
+📱 Speech Recognition: ${recognition ? '✅ ENABLED' : '❌ DISABLED'}
+🎤 Microphone Access: Will be tested on first use
+📅 Calendar System: Loading...
+🔐 Authentication: ${currentUserEmail ? '✅ ' + currentUserEmail : '⚠️ Test Mode'}
+
+🗣️  HOW TO USE VOICE COMMANDS:
+1️⃣ Click the blue microphone button (🎤)
+2️⃣ Wait for the red recording indicator
+3️⃣ Speak clearly: "Remind me to call John tomorrow at 3 PM"
+4️⃣ Wait for processing and calendar creation
+
+💡 SMART TITLE EXTRACTION EXAMPLES:
+• "Call mom today at 6 p.m." → 📅 "Call mom"
+• "Remind me to buy groceries tomorrow" → 📅 "Buy groceries"  
+• "Schedule dentist appointment next Monday at 2 PM" → 📅 "Dentist appointment"
+• "Meeting with boss at 10 AM" → 📅 "Meeting with boss"
+
+💬 SUPPORTED PHRASES:
+• "Remind me to [task] at [time]"
+• "Schedule [task] for [day] at [time]" 
+• "[Task] tomorrow at [time]"
+• "[Task] next week"
+================================
+                `); // Debug
+            } catch (error) {
+                console.error('❌ Error during app initialization:', error); // Debug
+            }
+            
+            // Force calendar generation after a short delay to ensure DOM is ready
+            setTimeout(() => {
+                console.log('🔄 Force regenerating calendar after delay...'); // Debug
+                try {
+                    // Ensure month view is visible and active
+                    switchView('month');
+                    console.log('✅ Calendar forced to regenerate'); // Debug
+                    
+                    // Run diagnostic
+                    setTimeout(() => {
+                        diagnoseProblem();
+                    }, 200);
+                } catch (error) {
+                    console.error('❌ Error in force regeneration:', error); // Debug
+                }
+            }, 500);
+            
+            // Test microphone permissions on load
+            setTimeout(() => {
+                console.log('Testing microphone access...'); // Debug
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    navigator.mediaDevices.getUserMedia({ audio: true })
+                        .then(stream => {
+                            console.log('✅ Microphone access granted'); // Debug
+                            stream.getTracks().forEach(track => track.stop()); // Stop the stream
+                        })
+                        .catch(error => {
+                            console.error('❌ Microphone access denied:', error); // Debug
+                            showMessage('Microphone access required for voice input. Please allow microphone access.', 'error');
+                        });
+                } else {
+                    console.error('❌ MediaDevices API not supported'); // Debug
+                }
+            }, 1000);
         });
+
+        // Setup background modal functionality
+        function setupBackgroundModal() {
+            const modal = document.getElementById('backgroundModal');
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeBackgroundSelector();
+                    }
+                });
+            }
+        }
+
+        // Toggle sidebar for mobile
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('hidden');
+            
+            const toggleBtn = document.getElementById('sidebarToggle');
+            if (sidebar.classList.contains('hidden')) {
+                toggleBtn.textContent = '📅 Show Events';
+            } else {
+                toggleBtn.textContent = '✖️ Hide Events';
+            }
+        }
+
+        // Background selector functions
+        function openBackgroundSelector() {
+            const modal = document.getElementById('backgroundModal');
+            if (modal) {
+                // Show modal with proper transition
+                modal.style.display = 'flex';
+                // Use requestAnimationFrame to ensure display is applied first
+                requestAnimationFrame(() => {
+                    modal.classList.add('show');
+                });
+            } else {
+                console.error('Background modal element not found!');
+            }
+        }
+
+        function closeBackgroundSelector() {
+            const modal = document.getElementById('backgroundModal');
+            if (modal) {
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300);
+            }
+        }
+
+        // Close modal when clicking outside - will be set up after DOM loads
+
+        function selectBackground(backgroundType) {
+            const body = document.body;
+            
+            // Remove active class from all options
+            document.querySelectorAll('.background-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            
+            // Reset all background styles
+                body.style.backgroundImage = '';
+            body.style.background = '';
+            body.classList.remove('has-background', 'light-theme', 'dark-theme', 'mixed-theme');
+            
+            if (backgroundType === 'dark-theme') {
+                body.style.background = 'linear-gradient(135deg, #1a1a1c 0%, #2c2c2e 100%)';
+                body.classList.add('dark-theme');
+                currentBackground = 'dark-theme';
+                document.querySelector('[data-bg="dark-theme"]').classList.add('active');
+            } else if (backgroundType === 'light-theme') {
+                body.style.background = 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)';
+                body.classList.add('light-theme');
+                currentBackground = 'light-theme';
+                document.querySelector('[data-bg="light-theme"]').classList.add('active');
+            } else if (backgroundType === 'mixed-theme') {
+                body.style.background = 'linear-gradient(135deg, #1a1a1c 0%, #f8f9fa 50%, #2c2c2e 100%)';
+                body.classList.add('mixed-theme');
+                currentBackground = 'mixed-theme';
+                document.querySelector('[data-bg="mixed-theme"]').classList.add('active');
+            } else if (backgroundType.startsWith('linear-gradient')) {
+                // Handle CSS gradients
+                body.style.background = backgroundType;
+                body.classList.add('has-background');
+                currentBackground = backgroundType;
+                document.querySelector(`[onclick*="${backgroundType.replace(/'/g, "\\'")}"]`).classList.add('active');
+            } else if (backgroundType.startsWith('data:')) {
+                // Handle uploaded images (base64)
+                body.style.backgroundImage = `url('${backgroundType}')`;
+                body.style.backgroundSize = 'cover';
+                body.style.backgroundPosition = 'center';
+                body.style.backgroundAttachment = 'fixed';
+                body.classList.add('has-background');
+                currentBackground = backgroundType;
+            } else {
+                // Handle external image URLs
+                body.style.backgroundImage = `url('${backgroundType}')`;
+                body.style.backgroundSize = 'cover';
+                body.style.backgroundPosition = 'center';
+                body.style.backgroundAttachment = 'fixed';
+                body.classList.add('has-background');
+                currentBackground = backgroundType;
+                const targetElement = document.querySelector(`[onclick*="${backgroundType}"]`);
+                if (targetElement) {
+                    targetElement.classList.add('active');
+                }
+            }
+            
+            // Save preference
+            localStorage.setItem('calendarBackground', currentBackground);
+            
+            // Close modal after short delay
+            setTimeout(() => {
+                closeBackgroundSelector();
+            }, 500);
+            
+            showMessage('Background updated successfully!', 'success');
+        }
+
+        function handleCustomImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Check file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showMessage('Image size must be less than 5MB', 'error');
+                event.target.value = ''; // Reset file input
+                return;
+            }
+            
+            // Check file type
+            if (!file.type.startsWith('image/')) {
+                showMessage('Please select a valid image file', 'error');
+                event.target.value = ''; // Reset file input
+                return;
+            }
+            
+            // Show loading message
+            showMessage('Uploading image...', 'info');
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                selectBackground(e.target.result);
+                    showMessage('Custom image applied successfully!', 'success');
+                } catch (error) {
+                    showMessage('Error applying custom image', 'error');
+                    console.error('Error applying custom image:', error);
+                }
+            };
+            reader.onerror = function() {
+                showMessage('Error reading image file', 'error');
+                event.target.value = ''; // Reset file input
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function loadSavedBackground() {
+            const savedBackground = localStorage.getItem('calendarBackground');
+            if (savedBackground) {
+                // Apply saved background on page load
+                selectBackground(savedBackground);
+            } else {
+                // Default to dark theme
+                selectBackground('dark-theme');
+            }
+        }
 
         // Check authentication status
         function checkAuthStatus() {
@@ -933,114 +2803,295 @@
             detailsContainer.innerHTML = html;
         }
 
-        // Speech Recognition Setup
+        // Speech Recognition Setup - Enhanced for better accuracy
         function initializeSpeechRecognition() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            console.log('🎤 Initializing enhanced speech recognition...'); // Debug
             
-            if (SpeechRecognition) {
+            // Check for browser support
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const SpeechGrammarList = window.SpeechGrammarList || window.webkitSpeechGrammarList;
+            
+            console.log('🔍 Browser capabilities:', {
+                SpeechRecognition: !!SpeechRecognition,
+                SpeechGrammarList: !!SpeechGrammarList,
+                userAgent: navigator.userAgent.substring(0, 50) + '...'
+            }); // Debug
+            
+            if (!SpeechRecognition) {
+                console.error('❌ Speech recognition not supported in this browser'); // Debug
+                console.log('💡 Supported browsers: Chrome, Edge, Safari (latest versions)'); // Debug
+                showMessage('Speech recognition requires Chrome, Edge, or Safari browser', 'error');
+                return;
+            }
+            
+            try {
                 recognition = new SpeechRecognition();
+                
+                // Enhanced settings for better accuracy
                 recognition.lang = 'en-US';
                 recognition.interimResults = true;
-                recognition.maxAlternatives = 1;
+                recognition.maxAlternatives = 3; // Get multiple alternatives
                 recognition.continuous = false;
 
+                // Set up grammar if supported
+                if (SpeechGrammarList) {
+                    const grammarList = new SpeechGrammarList();
+                    const grammar = '#JSGF V1.0; grammar reminder; public <reminder> = remind me to <action> at <time> | schedule <action> for <time> | <action> tomorrow | <action> next week;';
+                    grammarList.addFromString(grammar, 1);
+                    recognition.grammars = grammarList;
+                    console.log('✅ Grammar list applied'); // Debug
+                }
+                
+                console.log('✅ Enhanced speech recognition initialized successfully'); // Debug
+                console.log('📋 Recognition settings:', {
+                    lang: recognition.lang,
+                    interimResults: recognition.interimResults,
+                    maxAlternatives: recognition.maxAlternatives,
+                    continuous: recognition.continuous,
+                    hasGrammar: !!recognition.grammars
+                }); // Debug
+                // Set up event handlers
                 recognition.onstart = function() {
+                    console.log('🎤 Speech recognition started'); // Debug
                     isListening = true;
                     updateVoiceUI();
                     showVoiceStatus('Listening... Speak now!', true);
                 };
 
                 recognition.onresult = function(event) {
+                    console.log('🎯 Speech recognition result received:', event); // Debug
                     let finalTranscript = '';
                     let interimTranscript = '';
+                    let bestAlternative = '';
+                    let highestConfidence = 0;
 
                     for (let i = event.resultIndex; i < event.results.length; i++) {
-                        const transcript = event.results[i][0].transcript;
-                        if (event.results[i].isFinal) {
-                            finalTranscript += transcript;
+                        const result = event.results[i];
+                        console.log(`📝 Result ${i}:`, result); // Debug
+                        
+                        if (result.isFinal) {
+                            // Choose the best alternative based on confidence
+                            for (let j = 0; j < result.length; j++) {
+                                const alternative = result[j];
+                                console.log(`💭 Alternative ${j}:`, alternative.transcript, 'Confidence:', alternative.confidence); // Debug
+                                
+                                if (alternative.confidence > highestConfidence) {
+                                    highestConfidence = alternative.confidence;
+                                    bestAlternative = alternative.transcript;
+                                }
+                            }
+                            finalTranscript += bestAlternative || result[0].transcript;
                         } else {
-                            interimTranscript += transcript;
+                            // For interim results, use the first alternative
+                            interimTranscript += result[0].transcript;
                         }
                     }
 
                     const input = document.getElementById('voiceInput');
                     if (finalTranscript) {
-                        input.value = finalTranscript.trim();
+                        const cleanedTranscript = finalTranscript.trim();
+                        console.log('✅ Final transcript selected:', cleanedTranscript, 'Confidence:', highestConfidence); // Debug
+                        input.value = cleanedTranscript;
                         showVoiceStatus('Processing...', false);
-                        createReminderFromText(finalTranscript.trim());
+                        createReminderFromText(cleanedTranscript);
                     } else if (interimTranscript) {
-                        input.value = interimTranscript;
-                        showVoiceStatus(`Hearing: "${interimTranscript}"`, true);
+                        input.value = interimTranscript.trim();
+                        showVoiceStatus(`Hearing: "${interimTranscript.trim()}"`, true);
                     }
                 };
 
                 recognition.onerror = function(event) {
+                    console.error('🎤 Speech recognition error:', event.error); // Debug
                     isListening = false;
                     updateVoiceUI();
                     hideVoiceStatus();
                     
-                    let errorMessage = 'Voice recognition error: ';
+                    let errorMessage = '';
+                    let shouldRestart = false;
+                    
                     switch(event.error) {
                         case 'no-speech':
-                            errorMessage += 'No speech detected. Please try again.';
+                            errorMessage = 'No speech detected. Please speak clearly and try again.';
+                            shouldRestart = true;
                             break;
                         case 'audio-capture':
-                            errorMessage += 'Microphone not accessible.';
+                            errorMessage = 'Microphone not accessible. Please check your microphone connection.';
                             break;
                         case 'not-allowed':
-                            errorMessage += 'Microphone permission denied.';
+                            errorMessage = 'Microphone permission denied. Please allow microphone access in your browser.';
+                            break;
+                        case 'network':
+                            errorMessage = 'Network error. Please check your internet connection.';
+                            shouldRestart = true;
+                            break;
+                        case 'language-not-supported':
+                            errorMessage = 'Language not supported. Switching to English (US).';
+                            recognition.lang = 'en-US';
+                            shouldRestart = true;
+                            break;
+                        case 'service-not-allowed':
+                            errorMessage = 'Speech recognition service not allowed. Please try a different browser.';
+                            break;
+                        case 'bad-grammar':
+                            errorMessage = 'Grammar error. Please speak more clearly.';
+                            shouldRestart = true;
                             break;
                         default:
-                            errorMessage += event.error;
+                            errorMessage = `Speech recognition error: ${event.error}. Please try again.`;
+                            shouldRestart = true;
                     }
                     
                     showMessage(errorMessage, 'error');
+                    
+                    // Auto-restart for recoverable errors after 2 seconds
+                    if (shouldRestart) {
+                        setTimeout(() => {
+                            if (!isListening) {
+                                console.log('🔄 Auto-restarting speech recognition...'); // Debug
+                                try {
+                                    recognition.start();
+                                } catch (error) {
+                                    console.error('❌ Failed to restart recognition:', error); // Debug
+                                }
+                            }
+                        }, 2000);
+                    }
                 };
 
                 recognition.onend = function() {
+                    console.log('🎤 Speech recognition ended'); // Debug
                     isListening = false;
                     updateVoiceUI();
                     setTimeout(() => hideVoiceStatus(), 2000);
                 };
-            } else {
-                document.getElementById('browserWarning').style.display = 'block';
+                
+            } catch (error) {
+                console.error('❌ Error creating speech recognition:', error); // Debug
+                recognition = null;
+                showMessage('Failed to initialize speech recognition: ' + error.message, 'error');
+                return;
             }
         }
 
-        // Toggle voice recognition
-        function toggleVoiceRecognition() {
+        // Enhanced microphone access with noise cancellation
+        async function initializeMicrophone() {
+            try {
+                console.log('🎧 Initializing enhanced microphone...'); // Debug
+                console.log('🔍 Checking getUserMedia support:', !!navigator.mediaDevices?.getUserMedia); // Debug
+                
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    throw new Error('getUserMedia not supported in this browser');
+                }
+                
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true,
+                        channelCount: 1,
+                        sampleRate: 48000
+                    }
+                });
+                
+                console.log('✅ Microphone stream obtained:', stream); // Debug
+                console.log('🎵 Audio tracks:', stream.getAudioTracks()); // Debug
+                
+                // Stop the stream as we just needed to get permission and test settings
+                stream.getTracks().forEach(track => {
+                    console.log('🛑 Stopping track:', track); // Debug
+                    track.stop();
+                });
+                return true;
+            } catch (error) {
+                console.error('❌ Failed to initialize microphone:', error); // Debug
+                let errorMessage = 'Microphone access required. ';
+                
+                if (error.name === 'NotAllowedError') {
+                    errorMessage += 'Please allow microphone permissions in your browser.';
+                } else if (error.name === 'NotFoundError') {
+                    errorMessage += 'No microphone found. Please connect a microphone.';
+                } else if (error.name === 'NotSupportedError') {
+                    errorMessage += 'Microphone not supported in this browser.';
+            } else {
+                    errorMessage += error.message;
+                }
+                
+                showMessage(errorMessage, 'error');
+                return false;
+            }
+        }
+
+        // Toggle voice recognition with enhanced error handling
+        async function toggleVoiceRecognition() {
+            console.log('🎤 Voice button clicked!'); // Debug
+            console.log('Recognition object:', recognition); // Debug
+            console.log('Current user email:', currentUserEmail); // Debug
+            console.log('Is listening:', isListening); // Debug
+            
             if (!recognition) {
-                showMessage('Speech recognition not supported', 'error');
+                console.error('❌ Speech recognition not supported'); // Debug
+                showMessage('Speech recognition not supported in this browser. Please use Chrome, Safari, or Edge.', 'error');
                 return;
             }
 
             if (!currentUserEmail) {
-                showMessage('Please connect your Google Calendar first', 'error');
-                return;
+                console.warn('❌ No user email found'); // Debug
+                console.log('🔧 Using test mode for microphone testing...'); // Debug
+                // For testing speech recognition, we'll temporarily bypass auth
+                currentUserEmail = 'test@example.com';
+                showMessage('⚠️ Test mode: Speech recognition enabled without authentication', 'warning');
             }
 
             if (isListening) {
+                console.log('🛑 Stopping voice recognition'); // Debug
                 recognition.stop();
             } else {
+                console.log('🎯 Starting voice recognition'); // Debug
+                
+                // Initialize microphone with enhanced settings first
+                const micReady = await initializeMicrophone();
+                if (!micReady) {
+                    return;
+                }
+                
                 try {
                     recognition.start();
+                    console.log('✅ Recognition start command sent'); // Debug
                 } catch (error) {
-                    showMessage('Could not start voice recognition', 'error');
+                    console.error('❌ Error starting recognition:', error); // Debug
+                    if (error.name === 'InvalidStateError') {
+                        showMessage('Voice recognition is already running. Please wait.', 'warning');
+                    } else {
+                        showMessage('Could not start voice recognition: ' + error.message, 'error');
+                    }
                 }
             }
         }
 
         // Update voice UI
         function updateVoiceUI() {
+            console.log('🔄 Updating voice UI, isListening:', isListening); // Debug
             const voiceBtn = document.getElementById('voiceBtn');
             const voiceIcon = document.getElementById('voiceIcon');
 
+            console.log('🔍 Voice UI elements:', { voiceBtn, voiceIcon }); // Debug
+
+            if (voiceBtn) {
             if (isListening) {
                 voiceBtn.classList.add('listening');
-                voiceIcon.textContent = '⏹️';
+                    voiceBtn.style.backgroundColor = '#ff3b30'; // Red when recording
+                    voiceBtn.style.boxShadow = '0 0 20px rgba(255, 59, 48, 0.5)';
+                    if (voiceIcon) voiceIcon.textContent = '⏹️';
+                    console.log('✅ Voice UI set to listening mode'); // Debug
             } else {
                 voiceBtn.classList.remove('listening');
-                voiceIcon.textContent = '🎤';
+                    voiceBtn.style.backgroundColor = '#007aff'; // Blue when idle
+                    voiceBtn.style.boxShadow = '0 2px 10px rgba(0, 122, 255, 0.3)';
+                    if (voiceIcon) voiceIcon.textContent = '🎤';
+                    console.log('✅ Voice UI set to idle mode'); // Debug
+                }
+            } else {
+                console.error('❌ Voice button not found in updateVoiceUI'); // Debug
             }
         }
 
@@ -1056,44 +3107,170 @@
             document.getElementById('voiceStatus').style.display = 'none';
         }
 
+        // Preprocess text for better AI parsing
+        function preprocessTextForAI(text) {
+            console.log('🧠 Preprocessing text for AI:', text); // Debug
+            
+            // Normalize common speech patterns and clean up speech recognition artifacts
+            let processed = text
+                .trim()
+                // Fix common speech recognition errors and punctuation
+                .replace(/\bp\.m\./gi, 'PM')
+                .replace(/\ba\.m\./gi, 'AM')
+                .replace(/\bp\s*m\b/gi, 'PM')
+                .replace(/\ba\s*m\b/gi, 'AM')
+                .replace(/\bo\s*clock/gi, "o'clock")
+                // Standardize command patterns
+                .replace(/\bremind me to\b/gi, 'remind me to')
+                .replace(/\bset a reminder\b/gi, 'remind me to')
+                .replace(/\bschedule\b/gi, 'remind me to')
+                .replace(/\bi need to\b/gi, 'remind me to')
+                // Fix time patterns to be more consistent
+                .replace(/\bat (\d+)\s*(pm|p\.m\.)/gi, 'at $1:00 PM')
+                .replace(/\bat (\d+)\s*(am|a\.m\.)/gi, 'at $1:00 AM')
+                .replace(/\bat (\d+):(\d+)\s*(pm|p\.m\.)/gi, 'at $1:$2 PM')
+                .replace(/\bat (\d+):(\d+)\s*(am|a\.m\.)/gi, 'at $1:$2 AM')
+                .replace(/\bat (\d+)\s*$/gi, 'at $1:00 PM') // Default to PM if no AM/PM specified
+                // Fix day patterns
+                .replace(/\bmonday\b/gi, 'Monday')
+                .replace(/\btuesday\b/gi, 'Tuesday')
+                .replace(/\bwednesday\b/gi, 'Wednesday')
+                .replace(/\bthursday\b/gi, 'Thursday')
+                .replace(/\bfriday\b/gi, 'Friday')
+                .replace(/\bsaturday\b/gi, 'Saturday')
+                .replace(/\bsunday\b/gi, 'Sunday')
+                // Standardize date references
+                .replace(/\btomorrow at\b/gi, 'tomorrow at')
+                .replace(/\bnext week\b/gi, 'next week')
+                .replace(/\bnext month\b/gi, 'next month')
+                .replace(/\btoday at\b/gi, 'today at')
+                .replace(/\btonight at\b/gi, 'tonight at')
+                // Fix common misheard words
+                .replace(/\btoo\b/gi, 'to')
+                .replace(/\bfour\b/gi, 'for')
+                .replace(/\bwrite\b/gi, 'right')
+                .replace(/\bthere\b/gi, 'their')
+                // Clean up multiple spaces
+                .replace(/\s+/g, ' ');
+            
+            // Ensure proper capitalization
+            if (processed && processed.length > 0) {
+                processed = processed.charAt(0).toUpperCase() + processed.slice(1);
+            }
+            
+            console.log('✅ Preprocessed text:', processed); // Debug
+            return processed;
+        }
+
         // Create reminder from text
         async function createReminderFromText(text) {
-            if (!text.trim() || !currentUserEmail) return;
+            console.log('📝 Creating reminder from text:', text); // Debug
+            console.log('Current user email:', currentUserEmail); // Debug
+            
+            if (!text || !text.trim()) {
+                console.warn('❌ No text provided'); // Debug
+                showMessage('Please enter some text for your reminder', 'warning');
+                return;
+            }
+            
+            if (!currentUserEmail) {
+                console.warn('❌ No user email found - allowing local operation'); // Debug
+                // Allow local operations even without authentication
+                currentUserEmail = 'local@user.com'; // Temporary for local operations
+            }
+
+            // Preprocess text for better AI parsing
+            const processedText = preprocessTextForAI(text);
+            console.log('🔄 Using processed text:', processedText); // Debug
 
             showLoading(true);
+            console.log('🚀 Sending request to create reminder...'); // Debug
 
             try {
-                const response = await fetch('/add-reminder', {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+
+                const response = await fetch('/api/reminders', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'same-origin', // Include session cookies
+                    signal: controller.signal,
                     body: JSON.stringify({
-                        reminderText: text,
-                        userEmail: currentUserEmail
+                        reminderText: processedText
                     })
                 });
 
+                clearTimeout(timeoutId);
+                console.log('📡 Response status:', response.status); // Debug
+                console.log('📡 Response headers:', response.headers); // Debug
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('❌ HTTP error:', response.status, errorText); // Debug
+                    
+                    if (response.status === 401) {
+                        showMessage('Please login again. Redirecting...', 'error');
+                        setTimeout(() => window.location.href = '/login', 2000);
+                        return;
+                    } else if (response.status === 429) {
+                        showMessage('Too many requests. Please wait a moment and try again.', 'warning');
+                        return;
+                    } else {
+                        throw new Error(`HTTP ${response.status}: ${errorText}`);
+                    }
+                }
+
                 const result = await response.json();
+                console.log('📋 Response data:', result); // Debug
 
                 if (result.success) {
-                    showMessage(result.message || `✅ Reminder created: "${result.reminder.title}"`, 
-                               result.warning ? 'warning' : 'success');
-                    document.getElementById('voiceInput').value = '';
+                    const successMessage = result.message || `✅ Reminder created: "${result.reminder?.title || 'Event'}"`;
+                    showMessage(successMessage, result.warning ? 'warning' : 'success');
+                    
+                    // Clear input
+                    const voiceInput = document.getElementById('voiceInput');
+                    if (voiceInput) {
+                        voiceInput.value = '';
+                    }
                     
                     // Add event to calendar immediately
+                    if (result.reminder) {
+                        console.log('📅 Adding event to calendar:', result.reminder); // Debug
                     addEventToCalendar(result.reminder);
+                        saveEventToLocalStorage(result.reminder);
                     loadUpcomingEvents();
+                    }
                     
                     // Show additional info if there were issues
                     if (result.warning) {
                         setTimeout(() => {
                             showMessage(result.warning, 'warning');
-                        }, 2000);
+                        }, 3000);
                     }
                 } else {
-                    showMessage(result.error || 'Failed to create reminder', 'error');
+                    console.error('❌ Server error:', result.error); // Debug
+                    const errorMessage = result.error || 'Failed to create reminder. Please try again.';
+                    showMessage(errorMessage, 'error');
+                    
+                    // If it's a parsing error, suggest manual entry
+                    if (result.error?.includes('parse') || result.error?.includes('understand')) {
+                        setTimeout(() => {
+                            showMessage('💡 Tip: Try being more specific with dates and times (e.g., "Remind me to call John tomorrow at 3 PM")', 'info');
+                        }, 3000);
+                    }
                 }
             } catch (error) {
-                showMessage('Network error. Please try again.', 'error');
+                console.error('❌ Network/Fetch error:', error); // Debug
+                
+                if (error.name === 'AbortError') {
+                    showMessage('Request timed out. Please check your connection and try again.', 'error');
+                } else if (error.message?.includes('NetworkError') || error.message?.includes('fetch')) {
+                    showMessage('Network connection issue. Please check your internet and try again.', 'error');
+                } else {
+                    showMessage(`Error: ${error.message || 'Something went wrong. Please try again.'}`, 'error');
+                }
             } finally {
                 showLoading(false);
             }
@@ -1101,36 +3278,62 @@
 
         // Calendar functions
         function generateCalendar() {
+            console.log('📅 generateCalendar() called with view:', currentView); // Debug
+            
+            try {
             switch(currentView) {
                 case 'month':
+                        console.log('📅 Generating month view...'); // Debug
                     generateMonthView();
                     break;
                 case 'week':
+                        console.log('📅 Generating week view...'); // Debug
                     generateWeekView();
                     break;
                 case 'day':
+                        console.log('📅 Generating day view...'); // Debug
                     generateDayView();
                     break;
+                    default:
+                        console.warn('⚠️ Unknown view type:', currentView); // Debug
             }
+                
+                console.log('📅 Updating calendar title...'); // Debug
             updateCalendarTitle();
+                console.log('✅ Calendar generation complete!'); // Debug
+            } catch (error) {
+                console.error('❌ Error generating calendar:', error); // Debug
+            }
         }
 
         function generateMonthView() {
+            console.log('📅 generateMonthView() called'); // Debug
             const grid = document.getElementById('monthView');
+            console.log('📅 monthView element:', grid); // Debug
+            
+            if (!grid) {
+                console.error('❌ monthView element not found!'); // Debug
+                return;
+            }
+            
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
+            console.log('📅 Current date:', year, month, currentDate); // Debug
             
             // Clear grid
             grid.innerHTML = '';
+            console.log('📅 Grid cleared'); // Debug
             
             // Add day headers
             const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            console.log('📅 Adding day headers:', dayHeaders); // Debug
             dayHeaders.forEach(day => {
                 const header = document.createElement('div');
                 header.className = 'day-header';
                 header.textContent = day;
                 grid.appendChild(header);
             });
+            console.log('📅 Day headers added'); // Debug
             
             // Get first day of month and number of days
             const firstDay = new Date(year, month, 1).getDay();
@@ -1156,6 +3359,13 @@
                 const cell = createDayCell(day, true);
                 grid.appendChild(cell);
             }
+            
+            console.log('📅 Month view generation complete. Total cells:', grid.children.length); // Debug
+            console.log('📅 Grid display style:', getComputedStyle(grid).display); // Debug
+            console.log('📅 Grid visibility:', getComputedStyle(grid).visibility); // Debug
+            
+            // Add events to the month view
+            addEventsToMonthView();
         }
 
         function generateWeekView() {
@@ -1289,23 +3499,222 @@
             const cell = document.createElement('div');
             cell.className = 'day-cell' + (otherMonth ? ' other-month' : '');
             
+            // Calculate the actual date for this cell
+            const year = currentDate.getFullYear();
+            let month = currentDate.getMonth();
+            
+            if (otherMonth) {
+                if (day > 15) {
+                    month = month - 1;
+                    if (month < 0) {
+                        month = 11;
+                    }
+                } else {
+                    month = month + 1;
+                    if (month > 11) {
+                        month = 0;
+                    }
+                }
+            }
+            
+            const cellDate = new Date(year, month, day);
+            
+            // Check if this is today
             const today = new Date();
-            if (!otherMonth && day === today.getDate() && 
-                currentDate.getMonth() === today.getMonth() && 
-                currentDate.getFullYear() === today.getFullYear()) {
+            if (cellDate.toDateString() === today.toDateString()) {
                 cell.classList.add('today');
             }
             
+            // Create day number
             const dayNumber = document.createElement('div');
             dayNumber.className = 'day-number';
             dayNumber.textContent = day;
             cell.appendChild(dayNumber);
             
+            // Create events container
             const eventsContainer = document.createElement('div');
             eventsContainer.className = 'day-events';
             cell.appendChild(eventsContainer);
             
+            // Store date information
+            cell.dataset.year = year;
+            cell.dataset.month = month;
+            cell.dataset.day = day;
+            cell.dataset.fullDate = cellDate.toISOString().split('T')[0];
+            
+            // Add event listeners for Fantastical-like interaction
+            cell.addEventListener('dblclick', function(e) {
+                e.stopPropagation();
+                debugLog('Double-clicked on date', cellDate.toDateString());
+                openEventModalForDate(cellDate);
+            });
+            
+            cell.addEventListener('click', function(e) {
+                if (e.target === cell || e.target === dayNumber) {
+                    e.stopPropagation();
+                    // Add subtle visual feedback
+                    cell.style.background = 'rgba(0, 122, 255, 0.1)';
+                    setTimeout(() => {
+                        cell.style.background = '';
+                    }, 200);
+                }
+            });
+            
             return cell;
+        }
+
+        // Function to open event modal for a specific date
+        function openEventModalForDate(date) {
+            debugLog('Opening event modal for specific date', date.toDateString());
+            
+            if (ManualEventSystem) {
+                ManualEventSystem.openModal();
+                
+                // Pre-fill the date fields
+                setTimeout(() => {
+                    const dateString = date.toISOString().split('T')[0];
+                    const startDateField = document.getElementById('eventStartDate');
+                    const endDateField = document.getElementById('eventEndDate');
+                    const startTimeField = document.getElementById('eventStartTime');
+                    const endTimeField = document.getElementById('eventEndTime');
+                    
+                    if (startDateField && endDateField && startTimeField && endTimeField) {
+                        startDateField.value = dateString;
+                        endDateField.value = dateString;
+                        startTimeField.value = '12:00';
+                        endTimeField.value = '13:00';
+                        
+                        debugLog('Date pre-filled for event creation', dateString);
+                    }
+                }, 100);
+            }
+        }
+
+        function addEventsToMonthView() {
+            debugLog('Adding events to month view', `${calendarEvents.length} events`);
+            
+            // Clear existing events
+            document.querySelectorAll('.day-events').forEach(container => {
+                container.innerHTML = '';
+            });
+            
+            // Remove existing event indicators
+            document.querySelectorAll('.day-cell').forEach(cell => {
+                cell.classList.remove('has-events');
+            });
+            
+            calendarEvents.forEach(event => {
+                const eventDate = new Date(event.startTime);
+                const eventYear = eventDate.getFullYear();
+                const eventMonth = eventDate.getMonth();
+                const eventDay = eventDate.getDate();
+                
+                // Find the corresponding day cell
+                const cells = document.querySelectorAll(`.day-cell[data-year="${eventYear}"][data-month="${eventMonth}"][data-day="${eventDay}"]`);
+                
+                cells.forEach(cell => {
+                    const eventsContainer = cell.querySelector('.day-events');
+                    if (eventsContainer) {
+                        // Add event indicator
+                        cell.classList.add('has-events');
+                        
+                        const eventEl = document.createElement('div');
+                        eventEl.className = 'event-item';
+                        
+                        // Add category-based styling
+                        if (event.isPrivate) {
+                            eventEl.classList.add('private');
+                        } else if (event.description && event.description.toLowerCase().includes('work')) {
+                            eventEl.classList.add('work');
+                        } else if (event.description && event.description.toLowerCase().includes('personal')) {
+                            eventEl.classList.add('personal');
+                        }
+                        
+                        // Set event content
+                        const eventTime = new Date(event.startTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                        eventEl.textContent = `${eventTime} ${event.title}`;
+                        eventEl.title = `${event.title}\n${eventTime} - ${new Date(event.endTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}\n${event.description || ''}`;
+                        
+                        // Add click handler for editing
+                        eventEl.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            debugLog('Event element clicked', event.title);
+                            
+                            // Ensure we have a complete event object
+                            const completeEvent = {
+                                id: event.id || `edit-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                                title: event.title || '',
+                                description: event.description || '',
+                                location: event.location || '',
+                                startTime: event.startTime,
+                                endTime: event.endTime,
+                                isPrivate: event.isPrivate || false,
+                                timeZone: event.timeZone || 'America/New_York',
+                                alertMinutes: event.alertMinutes || [60]
+                            };
+                            
+                            debugLog('Complete event object', completeEvent);
+                            showEventDetails(completeEvent);
+                        });
+                        
+                        // Add hover effect
+                        eventEl.addEventListener('mouseenter', () => {
+                            eventEl.style.zIndex = '10';
+                        });
+                        
+                        eventEl.addEventListener('mouseleave', () => {
+                            eventEl.style.zIndex = '';
+                        });
+                        
+                        eventsContainer.appendChild(eventEl);
+                        
+                        // Limit displayed events and show "more" indicator
+                        if (eventsContainer.children.length > 3) {
+                            // Hide events beyond the 3rd and show a "more" indicator
+                            Array.from(eventsContainer.children).forEach((child, index) => {
+                                if (index >= 2) {
+                                    child.style.display = 'none';
+                                }
+                            });
+                            
+                            // Add or update "more" indicator
+                            let moreIndicator = eventsContainer.querySelector('.event-more');
+                            if (!moreIndicator) {
+                                moreIndicator = document.createElement('div');
+                                moreIndicator.className = 'event-more';
+                                moreIndicator.addEventListener('click', (e) => {
+                                    e.stopPropagation();
+                                    // Show all events in modal or expand view
+                                    showDayEventsModal(eventDate, cell);
+                                });
+                                eventsContainer.appendChild(moreIndicator);
+                            }
+                            const hiddenCount = eventsContainer.children.length - 3;
+                            moreIndicator.textContent = `+${hiddenCount} more`;
+                        }
+                        
+                        debugLog('Event added to month view', event.title);
+                    }
+                });
+            });
+        }
+
+        // Function to show all events for a specific day
+        function showDayEventsModal(date, dayCell) {
+            const dayEvents = calendarEvents.filter(event => {
+                const eventDate = new Date(event.startTime);
+                return eventDate.toDateString() === date.toDateString();
+            });
+            
+            if (dayEvents.length === 0) return;
+            
+            const eventsList = dayEvents.map(event => {
+                const startTime = new Date(event.startTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const endTime = new Date(event.endTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                return `• ${startTime}-${endTime}: ${event.title}`;
+            }).join('\n');
+            
+            alert(`Events for ${date.toDateString()}:\n\n${eventsList}\n\nDouble-click on any event in the calendar to edit it.`);
         }
 
         // Helper functions
@@ -1314,6 +3723,33 @@
             return date.getDate() === today.getDate() &&
                    date.getMonth() === today.getMonth() &&
                    date.getFullYear() === today.getFullYear();
+        }
+
+        function showEventDetails(event) {
+            debugLog('Event clicked for editing', event.title);
+            
+            if (!event) {
+                debugLog('ERROR: No event provided');
+                alert('Error: No event selected');
+                return;
+            }
+            
+            if (!event.id) {
+                debugLog('Event has no ID, generating one');
+                event.id = `temp-${Date.now()}-${Math.random()}`;
+            }
+            
+            debugLog('Opening edit modal for event', event.title);
+            
+            // Ensure ManualEventSystem is available
+            if (!ManualEventSystem) {
+                debugLog('ERROR: ManualEventSystem not available');
+                alert('Event system not ready. Please try again.');
+                return;
+            }
+            
+            // Open the event modal in edit mode with the event data
+            ManualEventSystem.openModal(event);
         }
 
         function formatHour(hour) {
@@ -1374,18 +3810,42 @@
 
         // View switching functions
         function switchView(newView) {
+            console.log('🔄 switchView() called with:', newView); // Debug
+            
             // Hide all views
-            document.getElementById('monthView').style.display = 'none';
-            document.getElementById('weekView').style.display = 'none';
-            document.getElementById('dayView').style.display = 'none';
+            const monthView = document.getElementById('monthView');
+            const weekView = document.getElementById('weekView');
+            const dayView = document.getElementById('dayView');
+            
+            console.log('📅 View elements found:', { monthView, weekView, dayView }); // Debug
+            
+            if (monthView) monthView.style.display = 'none';
+            if (weekView) weekView.style.display = 'none';
+            if (dayView) dayView.style.display = 'none';
             
             // Remove active class from all buttons
             document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
             
             // Show selected view and update active button
             currentView = newView;
-            document.getElementById(`${newView}View`).style.display = 'grid';
-            document.getElementById(`${newView}ViewBtn`).classList.add('active');
+            const selectedView = document.getElementById(`${newView}View`);
+            const selectedBtn = document.getElementById(`${newView}ViewBtn`);
+            
+            console.log('📅 Selected elements:', { selectedView, selectedBtn }); // Debug
+            
+            if (selectedView) {
+                selectedView.style.display = 'grid';
+                console.log('✅ View displayed:', `${newView}View`); // Debug
+            } else {
+                console.error('❌ Selected view not found:', `${newView}View`); // Debug
+            }
+            
+            if (selectedBtn) {
+                selectedBtn.classList.add('active');
+                console.log('✅ Button activated:', `${newView}ViewBtn`); // Debug
+            } else {
+                console.error('❌ Selected button not found:', `${newView}ViewBtn`); // Debug
+            }
             
             generateCalendar();
         }
@@ -1478,9 +3938,893 @@
             }, 5000);
         }
 
+        // =====================================================
+        // MANUAL EVENT MANAGEMENT SYSTEM - REBUILT FROM SCRATCH
+        // =====================================================
+        
+        let currentEditingEvent = null;
+        let ManualEventSystem = null;
+
+        // Debug utility (disabled for production)
+        function debugLog(message, data = null) {
+            // Debug messages disabled
+            return;
+        }
+
+        // Disable all console logs for clean production experience
+        (function() {
+            if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+                console.log = function() {};
+                console.warn = function() {};
+                console.info = function() {};
+            }
+        })();
+
+        // Initialize Manual Event System
+        function initializeManualEventSystem() {
+            debugLog('Initializing Manual Event System...');
+            
+            ManualEventSystem = {
+                                 // Open the event modal - SIMPLIFIED VERSION THAT WORKS
+                 openModal: function(event = null) {
+                     debugLog('🚀 OPENING MODAL - SIMPLIFIED VERSION');
+                     
+                     const modal = document.getElementById('eventModal');
+                     if (!modal) {
+                         debugLog('❌ Modal not found!');
+                         alert('Modal not found!');
+                         return;
+                     }
+                     
+                     // FORCE THE MODAL TO SHOW - NO CSS CLASSES, DIRECT STYLES
+                     modal.style.position = 'fixed';
+                     modal.style.top = '0';
+                     modal.style.left = '0';
+                     modal.style.width = '100%';
+                     modal.style.height = '100%';
+                     modal.style.backgroundColor = 'rgba(0,0,0,0.8)';
+                     modal.style.zIndex = '999999999';
+                     modal.style.display = 'flex';
+                     modal.style.alignItems = 'center';
+                     modal.style.justifyContent = 'center';
+                     modal.style.opacity = '1';
+                     modal.style.visibility = 'visible';
+                     
+                     currentEditingEvent = event;
+                     
+                     if (event) {
+                         // Edit mode
+                         document.getElementById('eventModalTitle').textContent = 'Edit Event';
+                         document.getElementById('deleteEventBtn').style.display = 'inline-block';
+                         this.populateForm(event);
+                         debugLog('✏️ Modal opened in EDIT mode for:', event.title);
+                     } else {
+                         // Create mode
+                         document.getElementById('eventModalTitle').textContent = 'Create New Event';
+                         document.getElementById('deleteEventBtn').style.display = 'none';
+                         this.resetForm();
+                         this.setDefaultDateTime();
+                         debugLog('➕ Modal opened in CREATE mode');
+                     }
+                     
+                     // Focus the title field
+                     setTimeout(() => {
+                         const titleField = document.getElementById('eventTitle');
+                         if (titleField) {
+                             titleField.focus();
+                         }
+                     }, 100);
+                     
+                     debugLog('✅ Modal should now be visible on screen!');
+                 },
+                 
+                 // Fallback event creator using prompts
+                 fallbackEventCreator: function() {
+                     debugLog('Using fallback event creator');
+                     
+                     const title = prompt('Enter event title:');
+                     if (!title) return;
+                     
+                     const date = prompt('Enter date (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
+                     if (!date) return;
+                     
+                     const startTime = prompt('Enter start time (HH:MM):', '12:00');
+                     if (!startTime) return;
+                     
+                     const endTime = prompt('Enter end time (HH:MM):', '13:00');
+                     if (!endTime) return;
+                     
+                     const eventData = {
+                         id: `manual-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                         title: title,
+                         description: '',
+                         location: '',
+                         startTime: new Date(`${date}T${startTime}`),
+                         endTime: new Date(`${date}T${endTime}`),
+                         isPrivate: false,
+                         timeZone: 'America/New_York',
+                         alertMinutes: [60]
+                     };
+                     
+                     calendarEvents.push(eventData);
+                     this.saveToLocalStorage(eventData);
+                     generateCalendar();
+                     
+                     alert('Event created successfully using fallback method!');
+                     debugLog('Fallback event created', eventData.title);
+                 },
+
+                 // Fallback event editor using prompts
+                 fallbackEventEditor: function(event) {
+                     debugLog('Using fallback event editor for', event.title);
+                     
+                     const startDate = new Date(event.startTime);
+                     const endDate = new Date(event.endTime);
+                     
+                     const title = prompt('Edit event title:', event.title);
+                     if (title === null) return; // User cancelled
+                     
+                     const description = prompt('Edit description:', event.description || '');
+                     const location = prompt('Edit location:', event.location || '');
+                     
+                     const date = prompt('Edit date (YYYY-MM-DD):', startDate.toISOString().split('T')[0]);
+                     if (!date) return;
+                     
+                     const startTime = prompt('Edit start time (HH:MM):', startDate.toTimeString().slice(0, 5));
+                     if (!startTime) return;
+                     
+                     const endTime = prompt('Edit end time (HH:MM):', endDate.toTimeString().slice(0, 5));
+                     if (!endTime) return;
+                     
+                     const isPrivate = confirm('Is this a private event?');
+                     
+                     // Check if user wants to delete
+                     if (confirm('Do you want to delete this event instead of editing?')) {
+                         this.deleteEventById(event.id);
+                         return;
+                     }
+                     
+                     const updatedEvent = {
+                         ...event,
+                         title: title || event.title,
+                         description: description,
+                         location: location,
+                         startTime: new Date(`${date}T${startTime}`),
+                         endTime: new Date(`${date}T${endTime}`),
+                         isPrivate: isPrivate
+                     };
+                     
+                     // Update the event
+                     const index = calendarEvents.findIndex(e => e.id === event.id);
+                     if (index !== -1) {
+                         calendarEvents[index] = updatedEvent;
+                         this.saveToLocalStorage(updatedEvent);
+                         generateCalendar();
+                         alert('Event updated successfully!');
+                         debugLog('Fallback event updated', updatedEvent.title);
+                     }
+                 },
+
+                 // Delete event by ID
+                 deleteEventById: function(eventId) {
+                     const index = calendarEvents.findIndex(e => e.id === eventId);
+                     if (index !== -1) {
+                         const eventTitle = calendarEvents[index].title;
+                         calendarEvents.splice(index, 1);
+                         
+                         // Remove from localStorage
+                         const storedEvents = JSON.parse(localStorage.getItem('ai-reminder-events') || '[]');
+                         const filteredEvents = storedEvents.filter(e => e.id !== eventId);
+                         localStorage.setItem('ai-reminder-events', JSON.stringify(filteredEvents));
+                         
+                         generateCalendar();
+                         alert('Event deleted successfully!');
+                         debugLog('Event deleted', eventTitle);
+                     }
+                 },
+                
+                // Close the modal
+                closeModal: function() {
+                    debugLog('🔒 Closing modal');
+                    const modal = document.getElementById('eventModal');
+                    if (modal) {
+                        modal.style.display = 'none';
+                    }
+                    currentEditingEvent = null;
+                    debugLog('✅ Modal closed');
+                },
+                
+                // Reset form to default state
+                resetForm: function() {
+                    debugLog('Resetting form');
+                    document.getElementById('eventForm').reset();
+                    this.setupDefaultAlert();
+                },
+                
+                // Set default date/time
+                setDefaultDateTime: function() {
+                    debugLog('Setting default date/time');
+                    const now = new Date();
+                    const tomorrow = new Date(now);
+                    tomorrow.setDate(now.getDate() + 1);
+                    tomorrow.setHours(12, 0, 0, 0);
+                    
+                    const endTime = new Date(tomorrow);
+                    endTime.setHours(13, 0, 0, 0);
+                    
+                    document.getElementById('eventStartDate').value = tomorrow.toISOString().split('T')[0];
+                    document.getElementById('eventStartTime').value = '12:00';
+                    document.getElementById('eventEndDate').value = endTime.toISOString().split('T')[0];
+                    document.getElementById('eventEndTime').value = '13:00';
+                },
+                
+                // Setup default alert
+                setupDefaultAlert: function() {
+                    const alertsList = document.getElementById('alertsList');
+                    alertsList.innerHTML = `
+                        <div class="alert-item">
+                            <input type="number" class="alert-input" value="60" min="1" max="10080">
+                            <span class="alert-unit">minutes before</span>
+                            <button type="button" class="remove-alert">Remove</button>
+                        </div>
+                    `;
+                },
+                
+                // Populate form with event data
+                populateForm: function(event) {
+                    debugLog('Populating form with event data', event.title);
+                    
+                    document.getElementById('eventTitle').value = event.title || '';
+                    document.getElementById('eventDescription').value = event.description || '';
+                    document.getElementById('eventLocation').value = event.location || '';
+                    
+                    const startDate = new Date(event.startTime);
+                    const endDate = new Date(event.endTime);
+                    
+                    document.getElementById('eventStartDate').value = startDate.toISOString().split('T')[0];
+                    document.getElementById('eventStartTime').value = startDate.toTimeString().split(' ')[0].slice(0, 5);
+                    document.getElementById('eventEndDate').value = endDate.toISOString().split('T')[0];
+                    document.getElementById('eventEndTime').value = endDate.toTimeString().split(' ')[0].slice(0, 5);
+                    
+                    document.getElementById('eventPrivate').checked = event.isPrivate || false;
+                    document.getElementById('eventTimeZone').value = event.timeZone || 'America/New_York';
+                },
+                
+                // Save event
+                saveEvent: function() {
+                    debugLog('Saving event...');
+                    
+                    const title = document.getElementById('eventTitle').value.trim();
+                    const startDate = document.getElementById('eventStartDate').value;
+                    const startTime = document.getElementById('eventStartTime').value;
+                    const endDate = document.getElementById('eventEndDate').value;
+                    const endTime = document.getElementById('eventEndTime').value;
+                    
+                    if (!title || !startDate || !startTime || !endDate || !endTime) {
+                        alert('Please fill in all required fields');
+                        return;
+                    }
+                    
+                    const eventData = {
+                        id: currentEditingEvent ? currentEditingEvent.id : `manual-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                        title: title,
+                        description: document.getElementById('eventDescription').value.trim(),
+                        location: document.getElementById('eventLocation').value.trim(),
+                        startTime: new Date(`${startDate}T${startTime}`),
+                        endTime: new Date(`${endDate}T${endTime}`),
+                        isPrivate: document.getElementById('eventPrivate').checked,
+                        timeZone: document.getElementById('eventTimeZone').value,
+                        alertMinutes: [60] // Simplified for now
+                    };
+                    
+                    if (currentEditingEvent) {
+                        // Update existing event
+                        const index = calendarEvents.findIndex(e => e.id === eventData.id);
+                        if (index !== -1) {
+                            calendarEvents[index] = eventData;
+                        }
+                        debugLog('Event updated', eventData.title);
+                    } else {
+                        // Create new event
+                        calendarEvents.push(eventData);
+                        debugLog('Event created', eventData.title);
+                    }
+                    
+                    // Save to localStorage
+                    this.saveToLocalStorage(eventData);
+                    
+                    // Close modal and refresh calendar
+                    this.closeModal();
+                    generateCalendar();
+                    
+                    alert('Event saved successfully!');
+                },
+                
+                // Delete event
+                deleteEvent: function() {
+                    if (!currentEditingEvent) return;
+                    
+                    if (confirm('Are you sure you want to delete this event?')) {
+                        debugLog('Deleting event', currentEditingEvent.title);
+                        
+                        const index = calendarEvents.findIndex(e => e.id === currentEditingEvent.id);
+                        if (index !== -1) {
+                            calendarEvents.splice(index, 1);
+                        }
+                        
+                        // Remove from localStorage
+                        const storedEvents = JSON.parse(localStorage.getItem('ai-reminder-events') || '[]');
+                        const filteredEvents = storedEvents.filter(e => e.id !== currentEditingEvent.id);
+                        localStorage.setItem('ai-reminder-events', JSON.stringify(filteredEvents));
+                        
+                        this.closeModal();
+                        generateCalendar();
+                        alert('Event deleted successfully!');
+                    }
+                },
+                
+                // Save to localStorage
+                saveToLocalStorage: function(eventData) {
+                    let storedEvents = JSON.parse(localStorage.getItem('ai-reminder-events') || '[]');
+                    
+                    const existingIndex = storedEvents.findIndex(e => e.id === eventData.id);
+                    if (existingIndex !== -1) {
+                        storedEvents[existingIndex] = {
+                            ...eventData,
+                            startTime: eventData.startTime.toISOString(),
+                            endTime: eventData.endTime.toISOString()
+                        };
+                    } else {
+                        storedEvents.push({
+                            ...eventData,
+                            startTime: eventData.startTime.toISOString(),
+                            endTime: eventData.endTime.toISOString()
+                        });
+                    }
+                    
+                    localStorage.setItem('ai-reminder-events', JSON.stringify(storedEvents));
+                    debugLog('Saved to localStorage', eventData.title);
+                }
+            };
+            
+            debugLog('Manual Event System initialized successfully');
+            return ManualEventSystem;
+        }
+
+        // Legacy function wrappers for compatibility
+        function openEventModal(event = null) {
+            if (ManualEventSystem) {
+                ManualEventSystem.openModal(event);
+            } else {
+                debugLog('ERROR: Manual Event System not initialized');
+            }
+        }
+
+        function closeEventModal() {
+            if (ManualEventSystem) {
+                ManualEventSystem.closeModal();
+            }
+        }
+
+        function saveEvent() {
+            if (ManualEventSystem) {
+                ManualEventSystem.saveEvent();
+            }
+        }
+
+        function deleteEvent() {
+            if (ManualEventSystem) {
+                ManualEventSystem.deleteEvent();
+            }
+        }
+
+        // =====================================================
+        // ENHANCED CALENDAR INTERFACE SYSTEM
+        // =====================================================
+
+        let miniCalendarDate = new Date();
+        let selectedMiniDate = null;
+
+        // Generate Mini Calendar
+        function generateMiniCalendar() {
+            const miniCalendar = document.getElementById('miniCalendar');
+            const miniTitle = document.getElementById('miniCalendarTitle');
+            
+            if (!miniCalendar || !miniTitle) return;
+
+            // Update title
+            miniTitle.textContent = miniCalendarDate.toLocaleDateString('en-US', { 
+                month: 'long', 
+                year: 'numeric' 
+            });
+
+            // Clear existing content
+            miniCalendar.innerHTML = '';
+
+            // Add day headers
+            const dayHeaders = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+            dayHeaders.forEach(day => {
+                const header = document.createElement('div');
+                header.className = 'mini-day-header';
+                header.textContent = day;
+                miniCalendar.appendChild(header);
+            });
+
+            // Calculate first day of month and number of days
+            const firstDay = new Date(miniCalendarDate.getFullYear(), miniCalendarDate.getMonth(), 1);
+            const lastDay = new Date(miniCalendarDate.getFullYear(), miniCalendarDate.getMonth() + 1, 0);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay());
+
+            // Generate 42 days (6 weeks)
+            for (let i = 0; i < 42; i++) {
+                const date = new Date(startDate);
+                date.setDate(startDate.getDate() + i);
+                
+                const dayEl = document.createElement('div');
+                dayEl.className = 'mini-day';
+                dayEl.textContent = date.getDate();
+                
+                const isCurrentMonth = date.getMonth() === miniCalendarDate.getMonth();
+                const isToday = date.toDateString() === new Date().toDateString();
+                const hasEvents = calendarEvents.some(event => 
+                    new Date(event.startTime).toDateString() === date.toDateString()
+                );
+
+                if (isCurrentMonth) dayEl.classList.add('current-month');
+                if (isToday) dayEl.classList.add('today');
+                if (hasEvents) dayEl.classList.add('has-events');
+                if (selectedMiniDate && date.toDateString() === selectedMiniDate.toDateString()) {
+                    dayEl.classList.add('selected');
+                }
+
+                // Add click handler
+                dayEl.addEventListener('click', () => {
+                    selectedMiniDate = new Date(date);
+                    currentDate = new Date(date);
+                    generateMiniCalendar();
+                    generateCalendar();
+                    debugLog('Mini calendar date selected', date.toDateString());
+                });
+
+                miniCalendar.appendChild(dayEl);
+            }
+        }
+
+        // Sidebar tab switching
+        function setupSidebarTabs() {
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetTab = btn.dataset.tab;
+                    
+                    // Remove active class from all tabs and contents
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Add active class to clicked tab and corresponding content
+                    btn.classList.add('active');
+                    document.getElementById(`${targetTab}Tab`).classList.add('active');
+                    
+                    // Load content for the selected tab
+                    loadTabContent(targetTab);
+                });
+            });
+        }
+
+        // Load content for different tabs
+        function loadTabContent(tabName) {
+            const now = new Date();
+            let filteredEvents = [];
+
+            switch (tabName) {
+                case 'upcoming':
+                    filteredEvents = calendarEvents
+                        .filter(event => new Date(event.startTime) >= now)
+                        .sort((a, b) => new Date(a.startTime) - new Date(b.startTime))
+                        .slice(0, 10);
+                    displayEventsList(filteredEvents, 'upcomingEvents');
+                    break;
+                    
+                case 'today':
+                    filteredEvents = calendarEvents.filter(event => {
+                        const eventDate = new Date(event.startTime);
+                        return eventDate.toDateString() === now.toDateString();
+                    });
+                    displayEventsList(filteredEvents, 'todayEvents');
+                    break;
+                    
+                case 'week':
+                    const weekStart = new Date(now);
+                    weekStart.setDate(now.getDate() - now.getDay());
+                    const weekEnd = new Date(weekStart);
+                    weekEnd.setDate(weekStart.getDate() + 7);
+                    
+                    filteredEvents = calendarEvents.filter(event => {
+                        const eventDate = new Date(event.startTime);
+                        return eventDate >= weekStart && eventDate < weekEnd;
+                    });
+                    displayEventsList(filteredEvents, 'weekEvents');
+                    break;
+            }
+        }
+
+        // Display events list in sidebar
+        function displayEventsList(events, containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            if (events.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #8e8e93; padding: 20px;">No events found</div>';
+                return;
+            }
+
+            container.innerHTML = events.map(event => {
+                const startDate = new Date(event.startTime);
+                const endDate = new Date(event.endTime);
+                const startTime = startDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const endTime = endDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const dateStr = startDate.toLocaleDateString([], {month: 'short', day: 'numeric'});
+
+                let categoryClass = 'default';
+                if (event.isPrivate) categoryClass = 'private';
+                else if (event.description && event.description.toLowerCase().includes('work')) categoryClass = 'work';
+                else if (event.description && event.description.toLowerCase().includes('personal')) categoryClass = 'personal';
+
+                return `
+                    <div class="upcoming-event ${categoryClass}" data-event-id="${event.id}" style="cursor: pointer;">
+                        <div class="upcoming-event-title">${event.title}</div>
+                        <div class="upcoming-event-time">${dateStr} • ${startTime} - ${endTime}</div>
+                        ${event.location ? `<div class="upcoming-event-location">📍 ${event.location}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+
+            // Add click listeners to sidebar events
+            setTimeout(() => {
+                container.querySelectorAll('.upcoming-event').forEach(eventElement => {
+                    eventElement.addEventListener('click', () => {
+                        const eventId = eventElement.dataset.eventId;
+                        const event = events.find(e => e.id === eventId);
+                        if (event) {
+                            debugLog('Sidebar event clicked', event.title);
+                            showEventDetails(event);
+                        }
+                    });
+                });
+            }, 100);
+        }
+
+        // Calendar settings handlers
+        function setupCalendarSettings() {
+            const settings = {
+                showAllDay: document.getElementById('showAllDay'),
+                showWeekends: document.getElementById('showWeekends'),
+                showEventTime: document.getElementById('showEventTime'),
+                compactView: document.getElementById('compactView')
+            };
+
+            Object.entries(settings).forEach(([key, element]) => {
+                if (element) {
+                    element.addEventListener('change', () => {
+                        debugLog(`Setting changed: ${key}`, element.checked);
+                        applyViewSettings();
+                        generateCalendar();
+                    });
+                }
+            });
+
+            // Category filters
+            document.querySelectorAll('.category-filter').forEach(filter => {
+                filter.addEventListener('change', () => {
+                    debugLog('Category filter changed', filter.dataset.category);
+                    applyViewSettings();
+                    generateCalendar();
+                });
+            });
+        }
+
+        // Apply view settings
+        function applyViewSettings() {
+            const compactView = document.getElementById('compactView')?.checked;
+            const showEventTime = document.getElementById('showEventTime')?.checked;
+            
+            // Apply compact view
+            if (compactView) {
+                document.documentElement.style.setProperty('--day-cell-height', '100px');
+            } else {
+                document.documentElement.style.setProperty('--day-cell-height', '140px');
+            }
+
+            // Store settings in localStorage
+            const settings = {
+                showAllDay: document.getElementById('showAllDay')?.checked,
+                showWeekends: document.getElementById('showWeekends')?.checked,
+                showEventTime: document.getElementById('showEventTime')?.checked,
+                compactView: document.getElementById('compactView')?.checked,
+                categoryFilters: Array.from(document.querySelectorAll('.category-filter:checked')).map(el => el.dataset.category)
+            };
+            
+            localStorage.setItem('calendarSettings', JSON.stringify(settings));
+            debugLog('Settings saved', settings);
+        }
+
+        // Load saved settings
+        function loadCalendarSettings() {
+            const saved = localStorage.getItem('calendarSettings');
+            if (!saved) return;
+
+            try {
+                const settings = JSON.parse(saved);
+                
+                Object.entries(settings).forEach(([key, value]) => {
+                    if (key === 'categoryFilters') {
+                        document.querySelectorAll('.category-filter').forEach(filter => {
+                            filter.checked = value.includes(filter.dataset.category);
+                        });
+                    } else {
+                        const element = document.getElementById(key);
+                        if (element) element.checked = value;
+                    }
+                });
+                
+                applyViewSettings();
+                debugLog('Settings loaded', settings);
+            } catch (error) {
+                debugLog('Error loading settings', error.message);
+            }
+        }
+
+        // Toggle events sidebar
+        function toggleEventsSidebar() {
+            const sidebar = document.getElementById('rightSidebar');
+            if (sidebar.style.display === 'none') {
+                sidebar.style.display = 'flex';
+                debugLog('Events sidebar shown');
+            } else {
+                sidebar.style.display = 'none';
+                debugLog('Events sidebar hidden');
+            }
+        }
+
+        // Go to today
+        function goToToday() {
+            currentDate = new Date();
+            miniCalendarDate = new Date();
+            selectedMiniDate = new Date();
+            generateMiniCalendar();
+            generateCalendar();
+            debugLog('Navigated to today');
+        }
+
+        // Add test events if calendar is empty (for testing edit functionality)
+        function addTestEventsIfNeeded() {
+            if (calendarEvents.length === 0) {
+                debugLog('No events found, adding test events');
+                
+                const now = new Date();
+                const today = new Date(now);
+                const tomorrow = new Date(now);
+                tomorrow.setDate(now.getDate() + 1);
+                
+                const testEvents = [
+                    {
+                        id: `test-1-${Date.now()}`,
+                        title: 'Team Meeting',
+                        description: 'Weekly team sync meeting',
+                        location: 'Conference Room A',
+                        startTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 10, 0),
+                        endTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 11, 0),
+                        isPrivate: false,
+                        timeZone: 'America/New_York',
+                        alertMinutes: [15, 60]
+                    },
+                    {
+                        id: `test-2-${Date.now()}`,
+                        title: 'Doctor Appointment',
+                        description: 'Annual checkup',
+                        location: 'Medical Center',
+                        startTime: new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate(), 14, 30),
+                        endTime: new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate(), 15, 30),
+                        isPrivate: true,
+                        timeZone: 'America/New_York',
+                        alertMinutes: [60]
+                    },
+                    {
+                        id: `test-3-${Date.now()}`,
+                        title: 'Lunch with Sarah',
+                        description: 'Catch up over lunch',
+                        location: 'Downtown Cafe',
+                        startTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12, 30),
+                        endTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 13, 30),
+                        isPrivate: false,
+                        timeZone: 'America/New_York',
+                        alertMinutes: [30]
+                    }
+                ];
+                
+                testEvents.forEach(event => {
+                    calendarEvents.push(event);
+                    if (ManualEventSystem) {
+                        ManualEventSystem.saveToLocalStorage(event);
+                    }
+                });
+                
+                debugLog('Test events added', testEvents.length);
+                
+                // Regenerate calendar and sidebar to show test events
+                generateCalendar();
+                generateMiniCalendar();
+                loadTabContent('upcoming');
+            } else {
+                debugLog('Events already exist, skipping test events');
+            }
+        }
+
+        // Setup additional event listeners
+        function setupAdditionalEventListeners() {
+            // Mini calendar navigation
+            const miniPrevBtn = document.getElementById('miniPrevMonth');
+            const miniNextBtn = document.getElementById('miniNextMonth');
+            
+            if (miniPrevBtn) {
+                miniPrevBtn.addEventListener('click', () => {
+                    miniCalendarDate.setMonth(miniCalendarDate.getMonth() - 1);
+                    generateMiniCalendar();
+                    debugLog('Mini calendar: Previous month');
+                });
+            }
+            
+            if (miniNextBtn) {
+                miniNextBtn.addEventListener('click', () => {
+                    miniCalendarDate.setMonth(miniCalendarDate.getMonth() + 1);
+                    generateMiniCalendar();
+                    debugLog('Mini calendar: Next month');
+                });
+            }
+            
+            // Today button
+            const todayBtn = document.getElementById('todayBtn');
+            if (todayBtn) {
+                todayBtn.addEventListener('click', goToToday);
+            }
+            
+            debugLog('Additional event listeners setup complete');
+        }
+
+        // Setup modal event listeners
+        function setupModalEventListeners() {
+            debugLog('Setting up modal listeners...');
+            
+            // Initialize the manual event system first
+            initializeManualEventSystem();
+            
+            // Setup modal button listeners
+            setTimeout(() => {
+                const closeBtn = document.getElementById('closeModalBtn');
+                const cancelBtn = document.getElementById('cancelEventBtn');
+                const saveBtn = document.getElementById('saveEventBtn');
+                const deleteBtn = document.getElementById('deleteEventBtn');
+                
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', closeEventModal);
+                    debugLog('Close button listener added');
+                }
+                
+                if (cancelBtn) {
+                    cancelBtn.addEventListener('click', closeEventModal);
+                    debugLog('Cancel button listener added');
+                }
+                
+                if (saveBtn) {
+                    saveBtn.addEventListener('click', saveEvent);
+                    debugLog('Save button listener added');
+                }
+                
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', deleteEvent);
+                    debugLog('Delete button listener added');
+                }
+                
+                debugLog('All modal button listeners setup complete');
+            }, 100);
+        }
+
+        // Add double-click functionality to day cells for quick event creation
+        function setupDayClickHandlers() {
+            document.addEventListener('dblclick', function(e) {
+                if (e.target.classList.contains('day-cell') || e.target.closest('.day-cell')) {
+                    const dayCell = e.target.closest('.day-cell') || e.target;
+                    const year = dayCell.dataset.year;
+                    const month = dayCell.dataset.month;
+                    const day = dayCell.dataset.day;
+                    
+                    if (year && month && day) {
+                        const selectedDate = new Date(parseInt(year), parseInt(month), parseInt(day));
+                        openEventModalForDate(selectedDate);
+                    }
+                }
+            });
+        }
+
+        function openEventModalForDate(date) {
+            openEventModal(); // Open in create mode
+            
+            // Set the date fields to the selected date
+            const dateString = date.toISOString().split('T')[0];
+            document.getElementById('eventStartDate').value = dateString;
+            document.getElementById('eventEndDate').value = dateString;
+            
+            // Set default times
+            document.getElementById('eventStartTime').value = '12:00';
+            document.getElementById('eventEndTime').value = '13:00';
+        }
+
+        // Test microphone functionality
+        function testMicrophoneSetup() {
+            console.log('🧪 Testing microphone setup...'); // Debug
+            
+            const voiceBtn = document.getElementById('voiceBtn');
+            const voiceInput = document.getElementById('voiceInput');
+            const voiceIcon = document.getElementById('voiceIcon');
+            
+            console.log('🔍 Microphone elements check:', {
+                voiceBtn: !!voiceBtn,
+                voiceInput: !!voiceInput,
+                voiceIcon: !!voiceIcon,
+                recognition: !!recognition,
+                currentUserEmail: currentUserEmail
+            }); // Debug
+            
+            if (!voiceBtn) {
+                console.error('❌ Voice button not found!'); // Debug
+                showMessage('Voice button missing from interface', 'error');
+                return false;
+            }
+            
+            if (!recognition) {
+                console.error('❌ Speech recognition not initialized!'); // Debug
+                showMessage('Speech recognition not available', 'error');
+                return false;
+            }
+            
+            // Test button click functionality
+            console.log('✅ Microphone setup test passed'); // Debug
+            return true;
+        }
+
         // Event listeners
         function setupEventListeners() {
-            document.getElementById('voiceBtn').addEventListener('click', toggleVoiceRecognition);
+            console.log('🔧 Setting up event listeners...'); // Debug
+            
+            const voiceBtn = document.getElementById('voiceBtn');
+            console.log('🔍 Voice button element found:', !!voiceBtn); // Debug
+            
+            if (voiceBtn) {
+                voiceBtn.addEventListener('click', toggleVoiceRecognition);
+                console.log('✅ Voice button event listener added'); // Debug
+                
+                // Test the button immediately
+                setTimeout(() => {
+                    testMicrophoneSetup();
+                }, 100);
+            } else {
+                console.error('❌ Voice button not found!'); // Debug
+                setTimeout(() => {
+                    // Try to find the button again after DOM is fully loaded
+                    const retryBtn = document.getElementById('voiceBtn');
+                    if (retryBtn) {
+                        console.log('✅ Voice button found on retry'); // Debug
+                        retryBtn.addEventListener('click', toggleVoiceRecognition);
+                        testMicrophoneSetup();
+                    } else {
+                        console.error('❌ Voice button still not found after retry'); // Debug
+                    }
+                }, 1000);
+            }
+            
             document.getElementById('prevMonth').addEventListener('click', previousPeriod);
             document.getElementById('nextMonth').addEventListener('click', nextPeriod);
             
@@ -1490,12 +4834,22 @@
             document.getElementById('monthViewBtn').addEventListener('click', () => switchView('month'));
             
             // Voice input enter key
-            document.getElementById('voiceInput').addEventListener('keypress', function(e) {
+            const voiceInput = document.getElementById('voiceInput');
+            if (voiceInput) {
+                voiceInput.addEventListener('keypress', function(e) {
+                    console.log('⌨️ Key pressed:', e.key); // Debug
                 if (e.key === 'Enter' && this.value.trim()) {
+                        console.log('✅ Enter pressed with text:', this.value.trim()); // Debug
+                        e.preventDefault(); // Prevent form submission
                     createReminderFromText(this.value.trim());
                 }
             });
+                console.log('✅ Enter key listener added to voice input'); // Debug
+            } else {
+                console.error('❌ Voice input element not found!'); // Debug
+            }
         }
     </script>
 </body>
+</html>
 </html>
