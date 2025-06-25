@@ -2550,6 +2550,12 @@
                 console.log('🧹 Cleaning any demo events...');
                 clearDemoEvents();
                 
+                console.log('💾 Loading localStorage events during initialization...');
+                // CRITICAL FIX: Always load localStorage events on app startup
+                if (currentUserEmail) {
+                    loadEventsFromLocalStorage();
+                }
+                
                 console.log('🔄 Calendar initialized - clean state');
                 
                 console.log('✅ App initialization complete!'); // Debug
@@ -2851,10 +2857,20 @@
             document.getElementById('subscriptionStatus').style.display = 'block';
             loadSubscriptionStatus();
             
-            // Load events for the authenticated user
+            // CRITICAL FIX: Load events for the authenticated user in proper order
             setTimeout(() => {
+                console.log('🔄 Loading user events in sequence...');
+                
+                // 1. First load localStorage events (immediate, always available)
+                console.log('1️⃣ Loading localStorage events first...');
                 loadEventsFromLocalStorage();
-                loadCalendarEvents();
+                
+                // 2. Then load from backend API (may fail, but won't overwrite localStorage)
+                setTimeout(() => {
+                    console.log('2️⃣ Loading backend events second...');
+                    loadCalendarEvents();
+                }, 200);
+                
             }, 100);
         }
 
@@ -3542,9 +3558,16 @@
             const grid = document.getElementById('weekView');
             grid.innerHTML = '';
             
-            // Get the start of the week (Sunday)
-            const startOfWeek = new Date(currentDate);
+            // Get the start of the week (Sunday) - FIXED: More precise calculation
+            const startOfWeek = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
             startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
+            
+            console.log('📅 Week view generation:', {
+                currentDate: currentDate.toDateString(),
+                currentDay: currentDate.getDay(),
+                startOfWeek: startOfWeek.toDateString(),
+                weekRange: `${startOfWeek.toDateString()} to ${new Date(startOfWeek.getTime() + 6 * 24 * 60 * 60 * 1000).toDateString()}`
+            });
             
             // Add empty corner cell
             const corner = document.createElement('div');
@@ -3930,8 +3953,26 @@
         }
 
         function addEventToCalendar(event) {
-            calendarEvents.push(event);
-            generateCalendar(); // Regenerate the current view to show the new event
+            console.log('📅 Adding event to calendar:', event.title);
+            
+            // Check if event already exists to avoid duplicates
+            const existingIndex = calendarEvents.findIndex(e => e.id === event.id);
+            if (existingIndex !== -1) {
+                console.log('🔄 Updating existing event:', event.title);
+                calendarEvents[existingIndex] = event;
+            } else {
+                console.log('➕ Adding new event:', event.title);
+                calendarEvents.push(event);
+            }
+            
+            // CRITICAL: Save to localStorage for persistence
+            saveEventToLocalStorage(event);
+            
+            // Regenerate the current view to show the new event
+            generateCalendar();
+            loadUpcomingEvents();
+            
+            console.log('✅ Event added to calendar. Total events:', calendarEvents.length);
         }
 
         function addEventsToWeekView(startOfWeek) {
@@ -3939,17 +3980,46 @@
                 const eventDate = new Date(event.startTime);
                 const eventHour = eventDate.getHours();
                 
-                // Calculate which day of the week this event falls on
-                const dayOfWeek = Math.floor((eventDate - startOfWeek) / (1000 * 60 * 60 * 24));
+                // FIXED: More reliable day of week calculation to prevent timezone issues
+                // Create normalized dates (set to midnight) for accurate day comparison
+                const eventDateNormalized = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
+                const startOfWeekNormalized = new Date(startOfWeek.getFullYear(), startOfWeek.getMonth(), startOfWeek.getDate());
+                
+                // Calculate which day of the week this event falls on (0 = Sunday, 6 = Saturday)
+                const dayOfWeek = Math.floor((eventDateNormalized - startOfWeekNormalized) / (1000 * 60 * 60 * 24));
+                
+                console.log('🗓️ Week view event mapping:', {
+                    eventTitle: event.title,
+                    eventDate: eventDate.toDateString(),
+                    eventTime: eventDate.toLocaleTimeString(),
+                    startOfWeek: startOfWeek.toDateString(),
+                    calculatedDayOfWeek: dayOfWeek,
+                    eventHour: eventHour
+                });
                 
                 if (dayOfWeek >= 0 && dayOfWeek < 7) {
                     const cells = document.querySelectorAll(`.hour-cell[data-hour="${eventHour}"][data-day="${dayOfWeek}"]`);
+                    console.log(`🎯 Found ${cells.length} cells for day ${dayOfWeek}, hour ${eventHour}`);
+                    
                     cells.forEach(cell => {
                         const eventEl = document.createElement('div');
                         eventEl.className = 'event-in-cell';
                         eventEl.textContent = event.title;
                         eventEl.title = `${event.title} - ${new Date(event.startTime).toLocaleTimeString()}`;
+                        
+                        // Add click handler for editing
+                        eventEl.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            showEventDetails(event);
+                        });
+                        
                         cell.appendChild(eventEl);
+                    });
+                } else {
+                    console.log('⚠️ Event outside week range:', {
+                        eventTitle: event.title,
+                        dayOfWeek: dayOfWeek,
+                        eventDate: eventDate.toDateString()
                     });
                 }
             });
@@ -3959,6 +4029,18 @@
             calendarEvents.forEach(event => {
                 const eventDate = new Date(event.startTime);
                 
+                console.log('📅 Day view event check:', {
+                    eventTitle: event.title,
+                    eventDate: eventDate.toDateString(),
+                    currentDate: currentDate.toDateString(),
+                    eventDay: eventDate.getDate(),
+                    currentDay: currentDate.getDate(),
+                    eventMonth: eventDate.getMonth(),
+                    currentMonth: currentDate.getMonth(),
+                    eventYear: eventDate.getFullYear(),
+                    currentYear: currentDate.getFullYear()
+                });
+                
                 // Only show events for the current day
                 if (eventDate.getDate() === currentDate.getDate() &&
                     eventDate.getMonth() === currentDate.getMonth() &&
@@ -3967,12 +4049,27 @@
                     const eventHour = eventDate.getHours();
                     const cells = document.querySelectorAll(`.hour-cell[data-hour="${eventHour}"]`);
                     
+                    console.log(`🎯 Day view: Adding event "${event.title}" to hour ${eventHour}`);
+                    
                     cells.forEach(cell => {
                         const eventEl = document.createElement('div');
                         eventEl.className = 'event-in-cell';
                         eventEl.textContent = event.title;
                         eventEl.title = `${event.title} - ${new Date(event.startTime).toLocaleTimeString()}`;
+                        
+                        // Add click handler for editing
+                        eventEl.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            showEventDetails(event);
+                        });
+                        
                         cell.appendChild(eventEl);
+                    });
+                } else {
+                    console.log('⚠️ Event not for current day:', {
+                        eventTitle: event.title,
+                        eventDate: eventDate.toDateString(),
+                        currentDate: currentDate.toDateString()
                     });
                 }
             });
@@ -4035,8 +4132,9 @@
             }, 50);
         }
 
-        // Load calendar events
+        // Load calendar events from backend API
         async function loadCalendarEvents() {
+            console.log('📡 Loading calendar events from backend API...');
             try {
                 // Use the correct API endpoint that matches the backend
                 const response = await fetch('/api/reminders', {
@@ -4048,28 +4146,49 @@
                 });
                 
                 if (!response.ok) {
-                    console.error('Failed to load reminders:', response.status, response.statusText);
+                    console.warn('⚠️ Backend API failed:', response.status, response.statusText);
+                    console.log('💾 Falling back to localStorage events only');
                     return;
                 }
                 
                 const result = await response.json();
                 
-                if (result.success && result.reminders) {
-                    console.log(`📅 Loaded ${result.reminders.length} reminders for user:`, currentUserEmail);
-                    // Clear existing events before loading new ones
-                    calendarEvents = [];
-                    calendarEvents = result.reminders;
+                if (result.success && result.reminders && result.reminders.length > 0) {
+                    console.log(`📅 Loaded ${result.reminders.length} reminders from backend for user:`, currentUserEmail);
+                    
+                    // FIXED: Don't overwrite existing localStorage events - merge them instead
+                    const backendEvents = result.reminders;
+                    const localEvents = calendarEvents.slice(); // Copy current events from localStorage
+                    
+                    // Merge backend events with local events (backend takes precedence for duplicates)
+                    const mergedEvents = [...localEvents];
+                    
+                    backendEvents.forEach(backendEvent => {
+                        const existingIndex = mergedEvents.findIndex(e => e.id === backendEvent.id);
+                        if (existingIndex !== -1) {
+                            // Update existing event with backend version
+                            mergedEvents[existingIndex] = backendEvent;
+                        } else {
+                            // Add new backend event
+                            mergedEvents.push(backendEvent);
+                        }
+                    });
+                    
+                    calendarEvents = mergedEvents;
+                    console.log(`✅ Merged calendar: ${mergedEvents.length} total events (${backendEvents.length} from backend, ${localEvents.length} from localStorage)`);
+                    
                     loadUpcomingEvents();
                     generateCalendar(); // Refresh the calendar display
                 } else {
-                    console.log('📅 No reminders found for user:', currentUserEmail);
-                    calendarEvents = [];
+                    console.log('📅 No reminders found in backend for user:', currentUserEmail);
+                    console.log('💾 Keeping existing localStorage events');
+                    // DON'T clear calendarEvents - keep localStorage events
                     generateCalendar();
                 }
             } catch (error) {
-                console.error('Error loading events:', error);
-                // Don't show cached events on error
-                calendarEvents = [];
+                console.error('❌ Error loading events from backend:', error);
+                console.log('💾 Keeping existing localStorage events due to backend error');
+                // DON'T clear calendarEvents on error - keep localStorage events
                 generateCalendar();
             }
         }
@@ -4447,9 +4566,13 @@
                     // Save to localStorage
                     this.saveToLocalStorage(eventData);
                     
+                    // CRITICAL FIX: Also use the main calendar persistence system
+                    saveEventToLocalStorage(eventData);
+                    
                     // Close modal and refresh calendar
                     this.closeModal();
                     generateCalendar();
+                    loadUpcomingEvents();
                     
                     alert('Event saved successfully!');
                 },
@@ -5264,8 +5387,102 @@
             };
         }
 
-        // Make debug function available globally for console access
+        // Week view debugging function
+        function debugWeekView() {
+            console.log('🔍 WEEK VIEW DEBUG:');
+            console.log('==================');
+            
+            const startOfWeek = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+            startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
+            
+            console.log('📅 Current Date:', currentDate.toDateString());
+            console.log('📅 Start of Week:', startOfWeek.toDateString());
+            
+            // Show each day of the week
+            for (let i = 0; i < 7; i++) {
+                const weekDay = new Date(startOfWeek.getFullYear(), startOfWeek.getMonth(), startOfWeek.getDate() + i);
+                console.log(`📅 Day ${i}: ${weekDay.toDateString()}`);
+            }
+            
+            console.log('🎯 Events in Week:');
+            calendarEvents.forEach(event => {
+                const eventDate = new Date(event.startTime);
+                const eventDateNormalized = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
+                const startOfWeekNormalized = new Date(startOfWeek.getFullYear(), startOfWeek.getMonth(), startOfWeek.getDate());
+                const dayOfWeek = Math.floor((eventDateNormalized - startOfWeekNormalized) / (1000 * 60 * 60 * 24));
+                
+                console.log(`  📅 "${event.title}": ${eventDate.toDateString()} at ${eventDate.toLocaleTimeString()} → Day ${dayOfWeek}`);
+            });
+            
+            console.log('==================');
+        }
+
+        // Event persistence debugging function
+        function debugEventPersistence() {
+            console.log('🔍 EVENT PERSISTENCE DEBUG:');
+            console.log('===========================');
+            
+            console.log('📧 Current User:', currentUserEmail || 'Not authenticated');
+            console.log('📅 In-Memory Events:', calendarEvents.length);
+            
+            if (currentUserEmail) {
+                const userStorageKey = `ai-reminder-events-${currentUserEmail}`;
+                const storedEvents = JSON.parse(localStorage.getItem(userStorageKey) || '[]');
+                console.log('💾 LocalStorage Events:', storedEvents.length);
+                
+                console.log('📋 Event Comparison:');
+                console.log('  In-Memory Events:', calendarEvents.map(e => `"${e.title}" (${e.id})`));
+                console.log('  LocalStorage Events:', storedEvents.map(e => `"${e.title}" (${e.id})`));
+                
+                // Check for persistence issues
+                if (calendarEvents.length > 0 && storedEvents.length === 0) {
+                    console.warn('⚠️ PERSISTENCE ISSUE: Events in memory but not in localStorage!');
+                }
+                if (calendarEvents.length === 0 && storedEvents.length > 0) {
+                    console.warn('⚠️ LOADING ISSUE: Events in localStorage but not loaded to memory!');
+                }
+                if (calendarEvents.length === storedEvents.length) {
+                    console.log('✅ Event persistence looks good!');
+                }
+            }
+            
+            console.log('===========================');
+            
+            return {
+                userEmail: currentUserEmail,
+                memoryEvents: calendarEvents.length,
+                localStorageEvents: currentUserEmail ? JSON.parse(localStorage.getItem(`ai-reminder-events-${currentUserEmail}`) || '[]').length : 0,
+                events: calendarEvents
+            };
+        }
+
+        // Force save all current events to localStorage
+        function forceSaveAllEvents() {
+            console.log('🔄 Force saving all events to localStorage...');
+            
+            if (!currentUserEmail) {
+                console.error('❌ No current user - cannot save');
+                return false;
+            }
+            
+            const userStorageKey = `ai-reminder-events-${currentUserEmail}`;
+            const eventsToSave = calendarEvents.map(event => ({
+                ...event,
+                userEmail: currentUserEmail,
+                startTime: event.startTime instanceof Date ? event.startTime.toISOString() : event.startTime,
+                endTime: event.endTime instanceof Date ? event.endTime.toISOString() : event.endTime
+            }));
+            
+            localStorage.setItem(userStorageKey, JSON.stringify(eventsToSave));
+            console.log(`✅ Saved ${eventsToSave.length} events to localStorage`);
+            return true;
+        }
+
+        // Make debug functions available globally for console access
         window.debugCalendarState = debugCalendarState;
+        window.debugWeekView = debugWeekView;
+        window.debugEventPersistence = debugEventPersistence;
+        window.forceSaveAllEvents = forceSaveAllEvents;
     </script>
 </body>
 </html>
