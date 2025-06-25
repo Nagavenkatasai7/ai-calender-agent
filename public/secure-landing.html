@@ -55,6 +55,24 @@
             text-decoration: none;
         }
 
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            margin-left: auto;
+            margin-right: 2rem;
+        }
+
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: white;
+        }
+
         .nav-buttons {
             display: flex;
             gap: 1rem;
@@ -441,6 +459,223 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
+        /* Pricing Section */
+        .pricing {
+            padding: 4rem 5%;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        .pricing-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .pricing h2 {
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .pricing-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+        }
+
+        .trial-banner {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2rem auto 3rem;
+            max-width: 600px;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .pricing-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2.5rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-8px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .pricing-card.popular {
+            border: 2px solid #10b981;
+            transform: scale(1.05);
+        }
+
+        .pricing-card.popular::before {
+            content: 'MOST POPULAR';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .tier-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: white;
+        }
+
+        .tier-description {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 2rem;
+        }
+
+        .price {
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .price-amount {
+            font-size: 3rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .price-period {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-left: 8px;
+        }
+
+        .trial-badge {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 12px;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .pricing-features li {
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .pricing-features li::before {
+            content: '✓';
+            color: #10b981;
+            font-weight: bold;
+            margin-right: 12px;
+            font-size: 1.1rem;
+        }
+
+        .pricing-cta {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .pricing-cta.primary {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .pricing-cta.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .pricing-cta.secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .pricing-cta.secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* FAQ Section */
+        .faq {
+            padding: 4rem 5%;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .faq-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .faq h2 {
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .faq-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            text-align: left;
+        }
+
+        .faq-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .faq-question {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+            color: #10b981;
+        }
+
+        .faq-answer {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+
         /* Footer */
         .footer {
             padding: 2rem 5%;
@@ -460,9 +695,21 @@
                 align-items: center;
             }
 
+            .nav-links {
+                display: none;
+            }
+
             .nav-buttons {
                 flex-direction: column;
                 gap: 0.5rem;
+            }
+
+            .pricing-grid, .faq-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pricing-card.popular {
+                transform: none;
             }
         }
 
@@ -477,6 +724,11 @@
     <nav class="navbar">
         <div class="nav-container">
             <a href="/" class="logo">🤖 AI Reminder</a>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#security">Security</a>
+            </div>
             <div class="nav-buttons">
                 <button class="btn btn-outline" onclick="openAuthModal('login')">Sign In</button>
                 <button class="btn btn-primary" onclick="openAuthModal('signup')">Get Started</button>
@@ -498,7 +750,7 @@
     </section>
 
     <!-- Features Section -->
-    <section class="features">
+    <section class="features" id="features">
         <div class="features-container">
             <h2>Why Choose AI Reminder?</h2>
             <div class="features-grid">
@@ -536,8 +788,126 @@
         </div>
     </section>
 
+    <!-- Pricing Section -->
+    <section class="pricing" id="pricing">
+        <div class="pricing-container">
+            <h2>Choose Your Plan</h2>
+            <p class="pricing-subtitle">Start with our free plan and upgrade as your productivity needs grow. All plans include our core AI calendar features.</p>
+            
+            <div class="trial-banner">
+                <strong>🎉 New users get a 14-day free trial with Pro features!</strong><br>
+                <small>Start with unlimited AI events, smart scheduling, and advanced features. No credit card required.</small>
+            </div>
+
+            <div class="pricing-grid">
+                <!-- Free Tier -->
+                <div class="pricing-card">
+                    <div class="tier-name">Free</div>
+                    <div class="tier-description">Perfect for personal use and getting started</div>
+                    <div class="price">
+                        <span class="price-amount">$0</span>
+                        <span class="price-period">/month</span>
+                    </div>
+                    <ul class="pricing-features">
+                        <li>Up to 10 AI events per month</li>
+                        <li>Basic calendar view (month/week)</li>
+                        <li>Email reminders</li>
+                        <li>Manual event creation</li>
+                        <li>Single calendar</li>
+                        <li>Basic export (.ics)</li>
+                        <li>Voice-to-text input</li>
+                        <li>Smart date/time parsing</li>
+                    </ul>
+                    <a href="/auth/google" class="pricing-cta secondary">Start Free Trial</a>
+                </div>
+
+                <!-- Pro Tier -->
+                <div class="pricing-card popular">
+                    <div class="tier-name">Pro</div>
+                    <div class="tier-description">Enhanced productivity for professionals</div>
+                    <div class="price">
+                        <span class="price-amount">$1</span>
+                        <span class="price-period">/month</span>
+                        <span class="trial-badge">14-day free trial</span>
+                    </div>
+                    <ul class="pricing-features">
+                        <li>Up to 1,000 AI events per month</li>
+                        <li>Advanced natural language processing</li>
+                        <li>Up to 5 calendars</li>
+                        <li>Smart scheduling suggestions</li>
+                        <li>SMS & push notifications</li>
+                        <li>Recurring events ("every Tuesday")</li>
+                        <li>Calendar sharing</li>
+                        <li>Google Calendar & Outlook sync</li>
+                        <li>Priority email support</li>
+                        <li>Everything in Free</li>
+                    </ul>
+                    <button class="pricing-cta primary" onclick="startSubscription('pro')">Choose Pro Plan</button>
+                </div>
+
+                <!-- Max Tier -->
+                <div class="pricing-card">
+                    <div class="tier-name">Max</div>
+                    <div class="tier-description">Unlimited power for teams and power users</div>
+                    <div class="price">
+                        <span class="price-amount">$3</span>
+                        <span class="price-period">/month</span>
+                    </div>
+                    <ul class="pricing-features">
+                        <li>Unlimited AI events</li>
+                        <li>Advanced AI with context understanding</li>
+                        <li>Unlimited calendars</li>
+                        <li>Team calendar management</li>
+                        <li>Meeting room booking</li>
+                        <li>Availability sharing</li>
+                        <li>Slack, Teams, Zoom integration</li>
+                        <li>CRM integration</li>
+                        <li>Analytics & productivity insights</li>
+                        <li>Phone & chat support</li>
+                        <li>Custom AI training</li>
+                        <li>Everything in Pro</li>
+                    </ul>
+                    <button class="pricing-cta primary" onclick="startSubscription('max')">Choose Max Plan</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq">
+        <div class="faq-container">
+            <h2>Frequently Asked Questions</h2>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <div class="faq-question">How does the 14-day trial work?</div>
+                    <div class="faq-answer">All new users get a 14-day trial with full access to Pro features. No credit card required. After the trial, you'll be moved to the Free plan unless you choose to upgrade.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">Can I change plans anytime?</div>
+                    <div class="faq-answer">Yes! You can upgrade or downgrade your plan at any time. Changes take effect immediately, and we'll prorate any charges.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">What payment methods do you accept?</div>
+                    <div class="faq-answer">We accept all major credit cards (Visa, MasterCard, American Express) and PayPal through our secure Stripe payment system.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">How accurate is the AI parsing?</div>
+                    <div class="faq-answer">Our AI achieves 90%+ accuracy in parsing natural language into calendar events. We also have intelligent fallbacks to ensure your events are always created correctly.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">Do you offer refunds?</div>
+                    <div class="faq-answer">Yes, we offer a 30-day money-back guarantee for all paid plans. If you're not satisfied, we'll refund your payment, no questions asked.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">Is my data secure?</div>
+                    <div class="faq-answer">Absolutely. We use enterprise-grade encryption and never store your calendar data permanently. We only access your Google Calendar with your explicit permission to create events.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Security Section -->
-    <section class="security-section">
+    <section class="security-section" id="security">
         <div class="security-container">
             <h2>Your Security is Our Priority</h2>
             <p>We implement industry-leading security measures to protect your data and privacy.</p>
@@ -851,6 +1221,90 @@
             if (e.target === this) {
                 closeAuthModal();
             }
+        });
+
+        // Handle subscription selection
+        async function startSubscription(tierId) {
+            try {
+                // Show loading state
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = 'Loading...';
+                button.disabled = true;
+
+                // Check if user is authenticated first
+                const authResponse = await fetch('/api/user/subscription');
+                
+                if (!authResponse.ok) {
+                    // User not authenticated, redirect to login with plan selection
+                    alert('Please log in first to select your plan. You\'ll be redirected to payment after authentication.');
+                    window.location.href = `/auth/google?plan=${tierId}`;
+                    return;
+                }
+
+                // User is authenticated, check trial status
+                const userData = await authResponse.json();
+                
+                if (userData.isTrialActive) {
+                    // User is in trial, show message and redirect to payment
+                    const planName = tierId === 'pro' ? 'Pro' : 'Max';
+                    const price = tierId === 'pro' ? '$1' : '$3';
+                    
+                    if (confirm(`You're currently on a 14-day free trial with Pro features. Would you like to upgrade to ${planName} (${price}/month) now?`)) {
+                        await createCheckoutSession(tierId);
+                    } else {
+                        // Restore button state
+                        button.textContent = originalText;
+                        button.disabled = false;
+                    }
+                } else {
+                    // Trial ended or user is on paid plan
+                    await createCheckoutSession(tierId);
+                }
+
+            } catch (error) {
+                console.error('Subscription error:', error);
+                alert('Something went wrong. Please try again or contact support.');
+                
+                // Restore button state
+                const button = event.target;
+                button.textContent = originalText;
+                button.disabled = false;
+            }
+        }
+
+        // Create Stripe checkout session
+        async function createCheckoutSession(tierId) {
+            const response = await fetch('/api/subscription/checkout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ tierId })
+            });
+
+            const data = await response.json();
+
+            if (data.success && data.checkoutUrl) {
+                // Redirect to Stripe checkout
+                window.location.href = data.checkoutUrl;
+            } else {
+                throw new Error(data.error || 'Failed to create checkout session');
+            }
+        }
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
         });
 
         // Smooth scrolling for navigation

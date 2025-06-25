@@ -27,6 +27,12 @@ declare module 'express-session' {
       token_type?: string;
       expiry_date?: number;
     };
+    pendingTwoFactor?: boolean;
+    twoFactorUserId?: string;
+    twoFactorVerified?: boolean;
+    sessionId?: string;
+    loginTime?: Date;
+    lastActivity?: Date;
   }
 }
 
@@ -163,9 +169,9 @@ export class AIReminderApp {
       res.redirect('/');
     });
 
-    // Pricing page
+    // Pricing page (redirect to landing page with pricing anchor)
     this.app.get('/pricing', (req: Request, res: Response) => {
-      res.sendFile(path.join(__dirname, '..', 'public', 'pricing.html'));
+      res.redirect('/#pricing');
     });
 
     // Health check
@@ -568,6 +574,21 @@ export class AIReminderApp {
           console.log(`✅ New OAuth user created: ${user.email} (${user.subscription_tier} tier)`);
         } else {
           console.log(`✅ Existing OAuth user authenticated: ${user.email} (${user.subscription_tier} tier)`);
+          
+          // Auto-sync subscription with Stripe on login
+          console.log('🔄 Auto-syncing subscription with Stripe on login...');
+          try {
+            const synced = await this.subscriptionService.syncUserSubscriptionWithStripe(user.email);
+            if (synced) {
+              console.log(`✅ Subscription synced for ${user.email} on login`);
+              // Refresh user data after sync
+              user = await this.database.getUserByEmail(user.email) || user;
+              console.log(`🔄 Updated user subscription status: ${user.subscription_tier} tier`);
+            }
+          } catch (syncError) {
+            console.error('⚠️ Failed to sync subscription on login:', syncError);
+            // Continue with login even if sync fails
+          }
         }
 
         // Set session variables directly for compatibility
@@ -640,6 +661,8 @@ export class AIReminderApp {
         }
         // Mark email verified
         await this.database.markEmailVerified(user.id);
+        console.log(`✅ Email verified for user: ${user.email}`);
+        
         // Auto-login: set session and create secure session
         req.session.userEmail = user.email;
         req.session.userId = user.id;
@@ -654,11 +677,77 @@ export class AIReminderApp {
           if (err) {
             console.error('Session save error after email verification:', err);
           }
-          return res.redirect('/app');
+          return res.redirect('/app?verified=true');
         });
       } catch (error) {
         console.error('Email verification error:', error);
         return res.redirect('/?error=verification_failed');
+      }
+    });
+
+    // Resend verification email
+    this.app.post('/api/auth/resend-verification', async (req: Request, res: Response) => {
+      try {
+        const { email } = req.body;
+
+        if (!email) {
+          return res.status(400).json({
+            success: false,
+            error: 'Email address is required'
+          });
+        }
+
+        // Get user
+        const user = await this.database.getUserByEmail(email);
+        if (!user) {
+          // Don't reveal if user exists or not for security
+          return res.json({
+            success: true,
+            message: 'If an account with this email exists and is unverified, a verification email has been sent.'
+          });
+        }
+
+        // Check if already verified
+        if (user.email_verified) {
+          return res.status(400).json({
+            success: false,
+            error: 'This email address is already verified'
+          });
+        }
+
+        // Generate new verification token
+        const verification = this.authService.generateEmailVerificationToken();
+        await this.database.updateEmailVerificationToken(user.id, verification.token, verification.expires);
+
+        // Try to send verification email
+        try {
+          await this.emailService.sendVerificationEmail(user.email, user.name || 'User', verification.token);
+          console.log(`✅ Verification email resent to ${user.email}`);
+          
+          res.json({
+            success: true,
+            message: 'Verification email sent! Please check your inbox and spam folder.'
+          });
+        } catch (emailError) {
+          console.error('❌ Failed to resend verification email:', emailError);
+          
+          // Provide fallback verification URL for development
+          const baseUrl = req.protocol + '://' + req.get('host');
+          const verificationUrl = `${baseUrl}/api/auth/verify-email/${verification.token}`;
+          console.log(`📧 Verification URL: ${verificationUrl}`);
+          
+          res.status(500).json({
+            success: false,
+            error: 'Failed to send verification email. Please contact support.',
+            verificationUrl: process.env.NODE_ENV === 'development' ? verificationUrl : undefined
+          });
+        }
+      } catch (error) {
+        console.error('Resend verification error:', error);
+        res.status(500).json({
+          success: false,
+          error: 'Failed to resend verification email'
+        });
       }
     });
 
@@ -785,11 +874,14 @@ export class AIReminderApp {
   }
 
   private setupProtectedRoutes() {
-    // Use the legacy auth middleware for compatibility with existing OAuth flow
-    const legacyAuth = this.requireAuth.bind(this);
+    // Use the enhanced auth middleware with email verification for all protected routes
+    // OAuth users are automatically marked as verified, so this won't affect them
+    const authMiddleware = this.authService.createAuthMiddleware({
+      requireEmailVerification: true
+    });
 
     // Calendar app (requires authentication)
-    this.app.get('/app', legacyAuth, (req: Request, res: Response) => {
+    this.app.get('/app', authMiddleware, (req: Request, res: Response) => {
       console.log('🔍 App access attempt - Session status:', {
         userEmail: req.session.userEmail,
         userId: req.session.userId,
@@ -807,18 +899,18 @@ export class AIReminderApp {
     });
 
     // Settings page (requires authentication)
-    this.app.get('/settings', legacyAuth, (req: Request, res: Response) => {
+    this.app.get('/settings', authMiddleware, (req: Request, res: Response) => {
       res.sendFile(path.join(__dirname, '..', 'public', 'settings.html'));
     });
 
-    // User profile and settings routes (using legacy auth for now)
-    this.setupUserRoutes(legacyAuth);
+    // User profile and settings routes (using enhanced auth with email verification)
+    this.setupUserRoutes(authMiddleware);
     
-    // Calendar and reminder routes (using legacy auth for now)
-    this.setupReminderRoutes(legacyAuth);
+    // Calendar and reminder routes (using enhanced auth with email verification)
+    this.setupReminderRoutes(authMiddleware);
     
-    // Subscription routes (using legacy auth for now)
-    this.setupSubscriptionRoutes(legacyAuth);
+    // Subscription routes (using enhanced auth with email verification)
+    this.setupSubscriptionRoutes(authMiddleware);
   }
 
   private setupUserRoutes(authMiddleware: any) {
@@ -923,6 +1015,32 @@ export class AIReminderApp {
         });
       }
     });
+
+    // Get user's feature summary (Pro vs Free features)
+    this.app.get('/api/user/features', authMiddleware, async (req: Request, res: Response) => {
+      try {
+        const userId = req.session.userId!;
+        const featureSummary = await this.subscriptionService.getUserFeatureSummary(userId);
+        
+        if (!featureSummary) {
+          return res.status(404).json({
+            success: false,
+            error: 'User not found'
+          });
+        }
+
+        res.json({
+          success: true,
+          features: featureSummary
+        });
+      } catch (error) {
+        console.error('Error fetching user features:', error);
+        res.status(500).json({
+          success: false,
+          error: 'Failed to fetch features'
+        });
+      }
+    });
   }
 
   private setupReminderRoutes(authMiddleware: any) {
@@ -946,14 +1064,45 @@ export class AIReminderApp {
           return res.status(403).json({
             success: false,
             error: canCreate.reason,
-            needsUpgrade: true
+            needsUpgrade: canCreate.needsUpgrade || false,
+            currentTier: canCreate.currentTier,
+            recommendedTier: canCreate.recommendedTier,
+            upgradeMessage: canCreate.upgradeMessage,
+            upgradeUrl: canCreate.recommendedTier ? `/#pricing` : undefined
           });
         }
 
+        // Check if user can access advanced NLP features
+        const hasAdvancedNLP = await this.subscriptionService.canUseAdvancedNLP(userId);
+        console.log(`🧠 Advanced NLP available for user: ${hasAdvancedNLP.allowed}`);
+
+        // Check recurring events permission for Pro users
+        const canCreateRecurring = await this.subscriptionService.canCreateRecurringEvents(userId);
+        console.log(`🔄 Recurring events available for user: ${canCreateRecurring.allowed}`);
+
         // Parse reminder with AI (fallback included)
         console.log('🤖 Parsing reminder with AI:', reminderText);
-        const parsedReminder = await this.aiParser.parseReminder(reminderText);
+        console.log(`🔧 Using ${hasAdvancedNLP.allowed ? 'Advanced' : 'Basic'} AI parsing`);
+        
+        const parsedReminder = await this.aiParser.parseReminder(reminderText, hasAdvancedNLP.allowed);
         console.log('✅ Parsed reminder:', parsedReminder);
+
+        // Pro feature validation: Check if user tried to create recurring event without permission
+        if (parsedReminder.isRecurring && !canCreateRecurring.allowed) {
+          return res.status(403).json({
+            success: false,
+            error: canCreateRecurring.reason,
+            needsUpgrade: true,
+            feature: 'recurring_events',
+            upgradeMessage: 'Upgrade to Pro for recurring events like "every Tuesday" or "daily standup"',
+            upgradeUrl: '/#pricing'
+          });
+        }
+
+        // Show smart suggestions for Pro users
+        if (hasAdvancedNLP.allowed && parsedReminder.smartSuggestions) {
+          console.log('💡 Smart suggestions generated:', parsedReminder.smartSuggestions);
+        }
         
         // Get user's calendars
         let calendars = [];
@@ -1010,13 +1159,17 @@ export class AIReminderApp {
           created_via: 'ai',
           ai_confidence: parsedReminder.confidence,
           original_input: reminderText,
+          recurrence_rule: parsedReminder.recurrenceRule,
+          attendees: parsedReminder.attendees,
+          location: parsedReminder.location,
           calendarEventId: calendarResponse?.id
         });
 
         // Track usage
         await this.database.trackUsage(userId, 'ai_event_created');
 
-        res.json({
+        // Prepare enhanced response for Pro users
+        const response: any = {
           success: true,
           message: `✅ Reminder created: "${reminder.title}"`,
           reminder: {
@@ -1025,7 +1178,14 @@ export class AIReminderApp {
             description: reminder.description,
             startTime: reminder.startTime,
             endTime: reminder.endTime,
-            timezone: reminder.timezone
+            timezone: reminder.timezone,
+            alertMinutes: reminder.alertMinutes,
+            ...(hasAdvancedNLP.allowed && {
+              location: parsedReminder.location,
+              attendees: parsedReminder.attendees,
+              isRecurring: parsedReminder.isRecurring,
+              recurrenceRule: parsedReminder.recurrenceRule
+            })
           },
           calendarEvent: calendarResponse ? {
             id: calendarResponse.id,
@@ -1033,7 +1193,30 @@ export class AIReminderApp {
             summary: calendarResponse.summary
           } : null,
           parsedDetails: parsedReminder
-        });
+        };
+
+        // Add Pro features to response
+        if (hasAdvancedNLP.allowed) {
+          response.proFeatures = {
+            advancedNLP: true,
+            smartSuggestions: parsedReminder.smartSuggestions,
+            recurringEvents: canCreateRecurring.allowed,
+            featureUpgrades: {
+              smartScheduling: true,
+              locationDetection: !!parsedReminder.location,
+              attendeeDetection: parsedReminder.attendees && parsedReminder.attendees.length > 0,
+              durationOptimization: true
+            }
+          };
+        } else {
+          response.upgradePrompts = {
+            recurringEvents: !canCreateRecurring.allowed ? 'Upgrade to Pro for recurring events' : null,
+            advancedNLP: 'Upgrade to Pro for advanced natural language processing',
+            smartSuggestions: 'Upgrade to Pro for smart scheduling suggestions'
+          };
+        }
+
+        res.json(response);
 
       } catch (error) {
         console.error('Error creating reminder:', error);
@@ -1112,6 +1295,28 @@ export class AIReminderApp {
       }
     });
 
+    // Get user subscription for pricing buttons (this endpoint checks auth and returns subscription info)
+    this.app.get('/api/user/subscription', authMiddleware, async (req: Request, res: Response) => {
+      try {
+        const userId = req.session.userId!;
+        const status = await this.subscriptionService.getUserSubscriptionStatus(userId);
+        
+        res.json({
+          success: true,
+          isAuthenticated: true,
+          tier: status.tier,
+          isTrialActive: status.isTrialActive,
+          daysUntilTrialEnd: status.daysUntilTrialEnd
+        });
+      } catch (error) {
+        console.error('Error fetching user subscription:', error);
+        res.status(500).json({
+          success: false,
+          error: 'Failed to fetch subscription'
+        });
+      }
+    });
+
     // Cancel subscription
     this.app.post('/api/subscription/cancel', authMiddleware, async (req: Request, res: Response) => {
       try {
@@ -1132,10 +1337,283 @@ export class AIReminderApp {
       }
     });
 
-    // Stripe webhook
+    // Stripe webhook - Handle payment events
     this.app.post('/api/subscription/webhook', express.raw({ type: 'application/json' }), async (req: Request, res: Response) => {
-      // Enhanced webhook handling would go here
-      res.status(200).send('OK');
+      const sig = req.headers['stripe-signature'] as string;
+      const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+      if (!webhookSecret) {
+        console.error('❌ Stripe webhook secret not configured');
+        return res.status(400).send('Webhook secret not configured');
+      }
+
+      let event: any;
+
+      try {
+        // Verify webhook signature
+        event = require('stripe').webhooks.constructEvent(req.body, sig, webhookSecret);
+        console.log('✅ Stripe webhook signature verified:', event.type);
+      } catch (err: any) {
+        console.error('❌ Webhook signature verification failed:', err.message);
+        return res.status(400).send(`Webhook Error: ${err.message}`);
+      }
+
+      try {
+        // Handle the event
+        await this.subscriptionService.handleWebhook(event);
+        console.log(`✅ Successfully processed webhook event: ${event.type}`);
+      } catch (error) {
+        console.error('❌ Error processing webhook:', error);
+        return res.status(500).send('Webhook processing failed');
+      }
+
+      res.status(200).json({ received: true });
+    });
+
+    // Manual subscription sync endpoint (admin/debug)
+    this.app.post('/api/subscription/sync', authMiddleware, async (req: Request, res: Response) => {
+      try {
+        const userEmail = req.session.userEmail!;
+        console.log(`🔄 Manual sync requested for ${userEmail}`);
+        
+        const synced = await this.subscriptionService.syncUserSubscriptionWithStripe(userEmail);
+        
+        if (synced) {
+          res.json({
+            success: true,
+            message: 'Subscription synced successfully with Stripe'
+          });
+        } else {
+          res.json({
+            success: false,
+            message: 'No active subscription found in Stripe'
+          });
+        }
+      } catch (error) {
+        console.error('Error syncing subscription:', error);
+        res.status(500).json({
+          success: false,
+          error: 'Failed to sync subscription'
+        });
+      }
+    });
+
+    // Admin endpoint to sync all subscriptions
+    this.app.post('/api/admin/sync-all-subscriptions', async (req: Request, res: Response) => {
+      try {
+        // Simple authentication check (you might want to add proper admin auth)
+        const authHeader = req.headers.authorization;
+        if (authHeader !== `Bearer ${process.env.ADMIN_SECRET_KEY}`) {
+          return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        await this.subscriptionService.syncAllSubscriptionsWithStripe();
+        
+        res.json({
+          success: true,
+          message: 'All subscriptions synced with Stripe'
+        });
+      } catch (error) {
+        console.error('Error syncing all subscriptions:', error);
+        res.status(500).json({
+          success: false,
+          error: 'Failed to sync all subscriptions'
+        });
+      }
+    });
+
+    // Downgrade subscription
+    this.app.post('/api/subscription/downgrade', authMiddleware, async (req: Request, res: Response) => {
+      try {
+        const { targetTier } = req.body;
+        const userId = req.session.userId!;
+        const userEmail = req.session.userEmail!;
+
+        if (!targetTier || !['free', 'pro'].includes(targetTier)) {
+          return res.status(400).json({
+            success: false,
+            error: 'Invalid target tier. Must be "free" or "pro"'
+          });
+        }
+
+        // Get current subscription status
+        const currentStatus = await this.subscriptionService.getUserSubscriptionStatus(userId);
+        
+        // Validate downgrade path
+        const validDowngrades: Record<string, string[]> = {
+          'max': ['pro', 'free'],
+          'pro': ['free']
+        };
+
+        if (!validDowngrades[currentStatus.tier]?.includes(targetTier)) {
+          return res.status(400).json({
+            success: false,
+            error: `Cannot downgrade from ${currentStatus.tier} to ${targetTier}`
+          });
+        }
+
+        console.log(`⬇️ Downgrade request: ${userEmail} from ${currentStatus.tier} to ${targetTier}`);
+
+        // Perform the actual downgrade
+        const result = await this.subscriptionService.downgradeUserSubscription(userId, userEmail, targetTier as 'free' | 'pro');
+        
+        res.json({
+          success: true,
+          message: result.message,
+          newTier: targetTier,
+          effectiveDate: result.effectiveDate
+        });
+      } catch (error) {
+        console.error('Error downgrading subscription:', error);
+        res.status(500).json({
+          success: false,
+          error: error instanceof Error ? error.message : 'Failed to downgrade subscription'
+        });
+      }
+    });
+
+    // Get billing information and invoices
+    this.app.get('/api/subscription/billing', authMiddleware, async (req: Request, res: Response) => {
+      try {
+        const userId = req.session.userId!;
+        const userEmail = req.session.userEmail!;
+        
+        // Get subscription status
+        const subscription = await this.subscriptionService.getUserSubscriptionStatus(userId);
+        
+        // Simulate billing information (in real app, fetch from Stripe)
+        const nextBillingDate = new Date();
+        nextBillingDate.setMonth(nextBillingDate.getMonth() + 1);
+        
+        const billingInfo = {
+          currentPlan: subscription.tier,
+          status: subscription.status,
+          nextBillingDate: subscription.tier !== 'free' ? nextBillingDate.toISOString() : null,
+          amount: subscription.tier === 'pro' ? 100 : subscription.tier === 'max' ? 300 : 0,
+          currency: 'usd',
+          paymentMethod: {
+            type: 'card',
+            last4: '4242', // Simulated
+            brand: 'visa',
+            expMonth: 12,
+            expYear: 2025
+          },
+          invoices: [
+            // Simulated invoice history
+            {
+              id: 'inv_001',
+              date: new Date(Date.now() - 30*24*60*60*1000).toISOString(),
+              amount: subscription.tier === 'pro' ? 100 : 300,
+              status: 'paid',
+              downloadUrl: '/api/subscription/invoice/inv_001'
+            }
+          ]
+        };
+        
+        res.json({
+          success: true,
+          billing: billingInfo
+        });
+      } catch (error) {
+        console.error('Error fetching billing information:', error);
+        res.status(500).json({
+          success: false,
+          error: 'Failed to fetch billing information'
+        });
+      }
+    });
+
+    // Download invoice (placeholder)
+    this.app.get('/api/subscription/invoice/:invoiceId', authMiddleware, async (req: Request, res: Response) => {
+      try {
+        const { invoiceId } = req.params;
+        
+        // In a real implementation, this would fetch the invoice from Stripe
+        // and return the PDF or redirect to Stripe's hosted invoice page
+        
+        res.json({
+          success: true,
+          message: 'Invoice download feature',
+          invoiceId,
+          downloadUrl: `https://dashboard.stripe.com/invoices/${invoiceId}`, // Placeholder
+          note: 'In production, this would provide actual invoice download'
+        });
+      } catch (error) {
+        console.error('Error downloading invoice:', error);
+        res.status(500).json({
+          success: false,
+          error: 'Failed to download invoice'
+        });
+      }
+    });
+
+    // Update payment method (redirect to Stripe Customer Portal)
+    this.app.post('/api/subscription/update-payment', authMiddleware, async (req: Request, res: Response) => {
+      try {
+        const userEmail = req.session.userEmail!;
+        
+        // In a real implementation, this would create a Stripe Customer Portal session
+        // const portalSession = await stripe.billingPortal.sessions.create({
+        //   customer: stripeCustomerId,
+        //   return_url: `${process.env.FRONTEND_URL}/settings`,
+        // });
+        
+        res.json({
+          success: true,
+          message: 'Payment method update feature',
+          redirectUrl: 'https://billing.stripe.com/session/...',  // Placeholder
+          note: 'In production, this would redirect to Stripe Customer Portal'
+        });
+      } catch (error) {
+        console.error('Error updating payment method:', error);
+        res.status(500).json({
+          success: false,
+          error: 'Failed to update payment method'
+        });
+      }
+    });
+
+    // Reactivate canceled subscription
+    this.app.post('/api/subscription/reactivate', authMiddleware, async (req: Request, res: Response) => {
+      try {
+        const { tierId } = req.body;
+        const userId = req.session.userId!;
+        const userEmail = req.session.userEmail!;
+
+        if (!tierId || !['pro', 'max'].includes(tierId)) {
+          return res.status(400).json({
+            success: false,
+            error: 'Invalid tier ID'
+          });
+        }
+
+        // Check current status
+        const currentStatus = await this.subscriptionService.getUserSubscriptionStatus(userId);
+        
+        if (currentStatus.status === 'active') {
+          return res.status(400).json({
+            success: false,
+            error: 'Subscription is already active'
+          });
+        }
+
+        // Create new checkout session for reactivation
+        const checkoutUrl = await this.subscriptionService.createCheckoutSession(userId, tierId);
+        
+        console.log(`🔄 Reactivation checkout created for ${userEmail} - ${tierId} tier`);
+        
+        res.json({
+          success: true,
+          checkoutUrl,
+          message: 'Reactivation checkout session created'
+        });
+      } catch (error) {
+        console.error('Error reactivating subscription:', error);
+        res.status(500).json({
+          success: false,
+          error: 'Failed to reactivate subscription'
+        });
+      }
     });
   }
 
@@ -1183,7 +1661,7 @@ export class AIReminderApp {
       } catch (error) {
         console.error('Error in reminder scheduler:', error);
       }
-    }, 60000); // Check every minute
+    }, 300000); // Check every 5 minutes (reduced to prevent rate limiting)
   }
 
   public start() {

@@ -270,7 +270,9 @@ export class AuthService {
   }
 
   // Security middleware
-  createAuthMiddleware() {
+  createAuthMiddleware(options: { requireEmailVerification?: boolean } = {}) {
+    const { requireEmailVerification = true } = options;
+    
     return async (req: Request, res: Response, next: NextFunction) => {
       try {
         // Check for JWT token in Authorization header
@@ -307,6 +309,22 @@ export class AuthService {
           return res.status(401).json({
             success: false,
             error: 'User not found'
+          });
+        }
+        
+        // ⚠️ SECURITY: Check email verification status
+        if (requireEmailVerification && !user.email_verified) {
+          console.warn(`🚫 Access denied for unverified user: ${user.email}`);
+          
+          // Clear the session for unverified users
+          await this.invalidateSession(req);
+          
+          return res.status(403).json({
+            success: false,
+            error: 'Email verification required',
+            code: 'EMAIL_NOT_VERIFIED',
+            message: 'Please verify your email address before accessing this feature. Check your inbox for the verification email.',
+            action: 'verify_email'
           });
         }
         

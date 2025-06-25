@@ -154,6 +154,14 @@ export class Database {
       )
     `);
 
+    // Fix existing database schema if needed - update any incorrectly verified users
+    await this.run(`
+      UPDATE users 
+      SET email_verified = FALSE 
+      WHERE email_verification_token IS NOT NULL 
+      AND email_verified = TRUE
+    `);
+
     // Subscriptions table
     await this.run(`
       CREATE TABLE IF NOT EXISTS subscriptions (
@@ -409,7 +417,7 @@ export class Database {
         };
       case 'pro':
         return {
-          maxAIEventsPerMonth: 100,
+          maxAIEventsPerMonth: 1000,
           maxCalendars: 5,
           hasAdvancedFeatures: true,
           hasTeamFeatures: false
@@ -534,6 +542,22 @@ export class Database {
               settings: JSON.parse(row.settings),
               created_at: new Date(row.created_at)
             })));
+          }
+        }
+      );
+    });
+  }
+
+  async getUserCalendarCount(userId: string): Promise<number> {
+    return new Promise((resolve, reject) => {
+      this.db.get(
+        'SELECT COUNT(*) as count FROM calendars WHERE user_id = ?',
+        [userId],
+        (err, row: any) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(row.count || 0);
           }
         }
       );

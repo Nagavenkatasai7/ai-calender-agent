@@ -7,6 +7,20 @@
     <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
     
     <style>
+        /* CSS Custom Properties for Responsive Design */
+        :root {
+            --container-padding: clamp(1rem, 4vw, 2rem);
+            --header-padding: clamp(1.5rem, 4vw, 2rem);
+            --content-padding: clamp(1rem, 3vw, 2rem);
+            --sidebar-width: clamp(250px, 25vw, 300px);
+            --font-size-base: clamp(14px, 1.5vw, 16px);
+            --font-size-h1: clamp(1.8rem, 4vw, 2.5rem);
+            --font-size-h2: clamp(1.3rem, 2.5vw, 1.8rem);
+            --font-size-h3: clamp(1.1rem, 2vw, 1.4rem);
+            --border-radius: clamp(8px, 1.5vw, 20px);
+            --card-gap: clamp(1rem, 2vw, 1.5rem);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -15,75 +29,284 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            font-size: var(--font-size-base);
             line-height: 1.6;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 2rem;
+            margin: 0;
+            position: relative;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
+        /* Enhanced Top Navigation Bar */
+        .top-navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(20px);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            overflow: hidden;
-        }
-
-        .header {
-            padding: 2rem;
-            text-align: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .header h1 {
-            color: white;
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .header p {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 1.1rem;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 clamp(1rem, 4vw, 2rem);
         }
 
         .back-link {
-            position: absolute;
-            top: 2rem;
-            left: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
             color: white;
             text-decoration: none;
-            font-size: 1.1rem;
-            padding: 0.5rem 1rem;
+            font-size: clamp(0.9rem, 1.5vw, 1rem);
+            padding: 0.6rem 1rem;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
+            border-radius: 10px;
             transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-weight: 500;
         }
 
         .back-link:hover {
             background: rgba(255, 255, 255, 0.2);
+            transform: translateX(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .navbar-title {
+            color: white;
+            font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+            font-weight: 600;
+            margin: 0;
+            text-align: center;
+            flex: 1;
+        }
+
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Profile Dropdown Styles */
+        .profile-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .profile-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4285f4, #34a853);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .profile-icon:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .profile-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            min-width: 280px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .profile-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .profile-info {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4285f4, #34a853);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.5rem;
+            margin: 0 auto 0.8rem;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .profile-name {
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .profile-email {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            word-break: break-word;
+        }
+
+        .profile-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .profile-menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transform: translateX(4px);
+        }
+
+        .profile-menu-item:first-of-type {
+            border-radius: 0;
+        }
+
+        .profile-menu-item:last-of-type {
+            border-radius: 0 0 12px 12px;
+        }
+
+        .profile-menu-item.danger {
+            color: #ff6b6b;
+        }
+
+        .profile-menu-item.danger:hover {
+            background: rgba(255, 107, 107, 0.1);
+            color: #ff5252;
+        }
+
+        .menu-icon {
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .subscription-badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #333;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-left: 0.5rem;
+        }
+
+        .subscription-badge.free {
+            background: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .subscription-badge.pro {
+            background: linear-gradient(135deg, #4285f4, #34a853);
+            color: white;
+        }
+
+        .subscription-badge.max {
+            background: linear-gradient(135deg, #ff6b6b, #ffd700);
+            color: white;
+        }
+
+        .container {
+            max-width: min(1200px, 95vw);
+            margin: 0 auto;
+            margin-top: 70px; /* Account for fixed navbar */
+            padding: var(--container-padding);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            width: calc(100% - 2 * var(--container-padding));
+        }
+
+        .header {
+            padding: var(--header-padding);
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+        }
+
+        .header h1 {
+            color: white;
+            font-size: var(--font-size-h1);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            margin: 0;
         }
 
         .settings-grid {
             display: grid;
-            grid-template-columns: 300px 1fr;
-            min-height: 70vh;
+            grid-template-columns: var(--sidebar-width) 1fr;
+            min-height: min(70vh, 800px);
         }
 
         .sidebar {
             background: rgba(255, 255, 255, 0.05);
-            padding: 2rem 0;
+            padding: var(--content-padding) 0;
             border-right: 1px solid rgba(255, 255, 255, 0.1);
+            overflow-y: auto;
         }
 
         .nav-item {
             display: block;
-            padding: 1rem 2rem;
+            padding: clamp(0.8rem, 2vw, 1rem) clamp(1.5rem, 3vw, 2rem);
             color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
             transition: all 0.3s ease;
             border-left: 3px solid transparent;
+            font-size: clamp(0.9rem, 1.5vw, 1rem);
         }
 
         .nav-item:hover,
@@ -94,49 +317,61 @@
         }
 
         .content {
-            padding: 2rem;
+            padding: var(--content-padding);
             overflow-y: auto;
+            max-height: 80vh;
         }
 
         .section {
             display: none;
             color: white;
+            animation: fadeIn 0.3s ease-in-out;
         }
 
         .section.active {
             display: block;
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .section h2 {
-            margin-bottom: 1.5rem;
-            font-size: 1.8rem;
+            margin-bottom: var(--card-gap);
+            font-size: var(--font-size-h2);
+            font-weight: 600;
         }
 
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: var(--card-gap);
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 0.5rem;
+            margin-bottom: clamp(0.3rem, 1vw, 0.5rem);
             color: rgba(255, 255, 255, 0.9);
             font-weight: 500;
+            font-size: clamp(0.85rem, 1.5vw, 0.95rem);
         }
 
         .form-control {
             width: 100%;
-            padding: 0.75rem;
+            padding: clamp(0.6rem, 1.5vw, 0.75rem);
             border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
+            border-radius: clamp(6px, 1vw, 8px);
             background: rgba(255, 255, 255, 0.1);
             color: white;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
+            font-size: clamp(0.9rem, 1.5vw, 1rem);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
         }
 
         .form-control:focus {
             outline: none;
             border-color: #4285f4;
+            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+            transform: translateY(-1px);
         }
 
         .form-control::placeholder {
@@ -144,16 +379,18 @@
         }
 
         .btn {
-            padding: 0.75rem 1.5rem;
+            padding: clamp(0.6rem, 1.5vw, 0.75rem) clamp(1.2rem, 2.5vw, 1.5rem);
             border: none;
-            border-radius: 8px;
+            border-radius: clamp(6px, 1vw, 8px);
             font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
             text-decoration: none;
             display: inline-block;
             text-align: center;
-            font-size: 1rem;
+            font-size: clamp(0.85rem, 1.5vw, 1rem);
+            min-height: 44px; /* Touch target for mobile */
+            white-space: nowrap;
         }
 
         .btn-primary {
@@ -188,14 +425,24 @@
         .card {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
+            border-radius: var(--border-radius);
+            padding: var(--card-gap);
+            margin-bottom: var(--card-gap);
+            backdrop-filter: blur(15px);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
 
         .card h3 {
-            margin-bottom: 1rem;
+            margin-bottom: clamp(0.8rem, 2vw, 1rem);
             color: white;
+            font-size: var(--font-size-h3);
+            font-weight: 600;
         }
 
         .status-badge {
@@ -365,19 +612,436 @@
             display: none;
         }
 
-        @media (max-width: 768px) {
+        /* Modal styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 1.5rem 2rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            color: white;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-body {
+            padding: 2rem;
+            color: white;
+        }
+
+        .modal-footer {
+            padding: 1rem 2rem 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        /* Plan card styles */
+        .plan-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .plan-card.current {
+            border-color: #4285f4;
+            background: rgba(66, 133, 244, 0.1);
+        }
+
+        .plan-card.current::before {
+            content: '✓ Current Plan';
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: #4285f4;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.8rem;
+            border-radius: 0 12px 0 12px;
+        }
+
+        .plan-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .plan-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+
+        .plan-price {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #4285f4;
+            text-align: right;
+        }
+
+        .plan-price-small {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            display: block;
+        }
+
+        .plan-features {
+            list-style: none;
+            margin: 1rem 0;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .plan-features li {
+            padding: 0.25rem 0;
+            position: relative;
+            padding-left: 1.5rem;
+        }
+
+        .plan-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #34a853;
+            font-weight: bold;
+        }
+
+        .plan-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-upgrade {
+            background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+            color: white;
+            border: none;
+        }
+
+        .btn-upgrade:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
+        }
+
+        .btn-downgrade {
+            background: rgba(255, 193, 7, 0.8);
+            color: #212529;
+            border: none;
+        }
+
+        .btn-downgrade:hover {
+            background: rgba(255, 193, 7, 1);
+        }
+
+        .btn-cancel {
+            background: rgba(220, 53, 69, 0.8);
+            color: white;
+            border: none;
+        }
+
+        .btn-cancel:hover {
+            background: rgba(220, 53, 69, 1);
+        }
+
+        .warning-box {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            color: #fff3cd;
+        }
+
+        .danger-box {
+            background: rgba(220, 53, 69, 0.1);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            color: #f8d7da;
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.hidden {
+            display: none;
+        }
+
+        .modal-content {
+            background: rgba(23, 25, 35, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            padding: 1.5rem 1.5rem 1rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: #ffffff;
+            font-size: 1.25rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+        }
+
+        .modal-body p {
+            margin: 0.5rem 0;
+        }
+
+        .modal-body ul {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .modal-body li {
+            margin: 0.5rem 0;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem 1.5rem 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .modal-footer .btn {
+            min-width: 100px;
+        }
+
+        /* Comprehensive Responsive Design System */
+        
+        /* Extra Large Screens (1400px+) */
+        @media (min-width: 1400px) {
+            :root {
+                --sidebar-width: 350px;
+                --content-padding: 3rem;
+            }
+            
+            .container {
+                max-width: 1400px;
+            }
+        }
+
+        /* Large Screens (1200px - 1399px) */
+        @media (max-width: 1199px) {
+            :root {
+                --sidebar-width: clamp(250px, 20vw, 280px);
+            }
+        }
+
+        /* Medium Screens (992px - 1199px) */
+        @media (max-width: 991px) {
+            :root {
+                --sidebar-width: 240px;
+                --font-size-h1: clamp(1.6rem, 3.5vw, 2rem);
+            }
+            
+            .back-link {
+                position: relative;
+                top: auto;
+                left: auto;
+                margin-bottom: 1rem;
+                display: inline-block;
+            }
+            
+            .header {
+                padding-top: 1rem;
+            }
+        }
+
+        /* Tablet Portrait (768px - 991px) */
+        @media (max-width: 767px) {
+            :root {
+                --container-padding: 1rem;
+                --header-padding: 1.5rem 1rem;
+                --content-padding: 1.5rem;
+            }
+
+            .top-navbar {
+                height: 60px;
+                padding: 0 1rem;
+            }
+
+            .container {
+                margin-top: 60px;
+            }
+
+            .navbar-title {
+                font-size: 1.1rem;
+            }
+
+            .back-link span:last-child {
+                display: none;
+            }
+
+            .navbar-actions button {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.9rem;
+            }
+
+            .profile-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 1rem;
+            }
+
+            .profile-menu {
+                min-width: 260px;
+                right: -10px;
+            }
+
+            .profile-info {
+                padding: 1.2rem;
+            }
+
+            .profile-avatar {
+                width: 50px;
+                height: 50px;
+                font-size: 1.3rem;
+            }
+
             .settings-grid {
                 grid-template-columns: 1fr;
+                min-height: auto;
             }
 
             .sidebar {
                 border-right: none;
                 border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                padding: 1rem 0;
+                display: flex;
+                overflow-x: auto;
+                overflow-y: visible;
+                background: rgba(255, 255, 255, 0.08);
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+            }
+
+            .sidebar::-webkit-scrollbar {
+                display: none;
             }
 
             .nav-item {
                 border-left: none;
                 border-bottom: 3px solid transparent;
+                white-space: nowrap;
+                flex-shrink: 0;
+                padding: 0.8rem 1.5rem;
+                min-width: fit-content;
             }
 
             .nav-item:hover,
@@ -385,15 +1049,393 @@
                 border-left: none;
                 border-bottom-color: #4285f4;
             }
+
+            .content {
+                max-height: none;
+            }
+
+            .plan-header {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: center;
+                text-align: center;
+            }
+
+            .plan-actions {
+                justify-content: center;
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .plan-actions .btn {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 1rem;
+                max-height: 90vh;
+            }
+
+            .modal-body {
+                padding: 1.5rem;
+            }
+
+            .modal-footer {
+                flex-direction: column-reverse;
+                gap: 0.5rem;
+            }
+
+            .modal-footer .btn {
+                width: 100%;
+            }
+        }
+
+        /* Mobile Landscape (576px - 767px) */
+        @media (max-width: 575px) {
+            :root {
+                --container-padding: 0.5rem;
+                --header-padding: 1rem;
+                --content-padding: 1rem;
+                --card-gap: 1rem;
+            }
+
+            body {
+                padding: var(--container-padding);
+            }
+
+            .top-navbar {
+                height: 55px;
+                padding: 0 0.8rem;
+            }
+
+            .container {
+                margin-top: 55px;
+                border-radius: 12px;
+                max-width: 100%;
+            }
+
+            .navbar-title {
+                font-size: 1rem;
+            }
+
+            .back-link {
+                font-size: 0.9rem;
+                padding: 0.4rem 0.8rem;
+            }
+
+            .profile-icon {
+                width: 34px;
+                height: 34px;
+                font-size: 0.9rem;
+            }
+
+            .profile-menu {
+                min-width: 240px;
+                right: -15px;
+            }
+
+            .profile-menu-item {
+                padding: 0.7rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .profile-info {
+                padding: 1rem;
+            }
+
+            .profile-avatar {
+                width: 45px;
+                height: 45px;
+                font-size: 1.2rem;
+            }
+
+            .header h1 {
+                font-size: 1.6rem;
+            }
+
+            .sidebar {
+                padding: 0.5rem 0;
+                gap: 0.5rem;
+            }
+
+            .nav-item {
+                padding: 0.6rem 1rem;
+                font-size: 0.85rem;
+            }
+
+            .form-control {
+                padding: 0.6rem;
+                font-size: 0.9rem;
+            }
+
+            .btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.85rem;
+                min-height: 40px;
+            }
+
+            .backup-codes {
+                grid-template-columns: 1fr;
+            }
+
+            .connected-account,
+            .subscription-tier {
+                flex-direction: column;
+                gap: 0.8rem;
+                text-align: center;
+            }
+
+            .account-info {
+                justify-content: center;
+            }
+        }
+
+        /* Small Mobile (375px - 575px) */
+        @media (max-width: 374px) {
+            :root {
+                --container-padding: 0.25rem;
+                --header-padding: 0.8rem;
+                --content-padding: 0.8rem;
+            }
+
+            .top-navbar {
+                height: 50px;
+                padding: 0 0.6rem;
+            }
+
+            .container {
+                margin-top: 50px;
+            }
+
+            .navbar-title {
+                font-size: 0.9rem;
+            }
+
+            .back-link {
+                padding: 0.3rem 0.5rem;
+                font-size: 0.8rem;
+            }
+
+            .navbar-actions button {
+                padding: 0.3rem 0.5rem;
+                font-size: 0.8rem;
+            }
+
+            .profile-icon {
+                width: 30px;
+                height: 30px;
+                font-size: 0.8rem;
+            }
+
+            .profile-menu {
+                min-width: 220px;
+                right: -20px;
+            }
+
+            .profile-menu-item {
+                padding: 0.6rem 0.8rem;
+                font-size: 0.85rem;
+            }
+
+            .profile-info {
+                padding: 0.8rem;
+            }
+
+            .profile-avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+
+            .profile-name {
+                font-size: 1rem;
+            }
+
+            .profile-email {
+                font-size: 0.8rem;
+            }
+
+            .header h1 {
+                font-size: 1.4rem;
+            }
+
+            .nav-item {
+                padding: 0.5rem 0.8rem;
+                font-size: 0.8rem;
+            }
+
+            .card {
+                padding: 1rem;
+            }
+        }
+
+        /* Landscape Orientation Adjustments */
+        @media (orientation: landscape) and (max-height: 600px) {
+            .top-navbar {
+                height: 45px;
+            }
+
+            .container {
+                margin-top: 45px;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+
+            .content {
+                max-height: 55vh;
+            }
+
+            .header {
+                padding: 0.8rem;
+            }
+
+            .header h1 {
+                font-size: 1.3rem;
+                margin-bottom: 0.25rem;
+            }
+
+            .header p {
+                font-size: 0.85rem;
+            }
+
+            .navbar-title {
+                font-size: 1rem;
+            }
+
+            .back-link {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* High DPI Displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .card,
+            .form-control,
+            .btn {
+                border-width: 0.5px;
+            }
+        }
+
+        /* Touch Device Optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .btn,
+            .nav-item,
+            .form-control {
+                min-height: 44px;
+            }
+
+            .card:hover {
+                transform: none;
+            }
+
+            .btn:hover {
+                transform: none;
+            }
+
+            .nav-item:hover {
+                background: rgba(255, 255, 255, 0.05);
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+
+            .container {
+                background: white;
+                border: 1px solid #ddd;
+            }
+
+            .back-link,
+            .btn,
+            .nav-item {
+                display: none;
+            }
+
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
-    <a href="/app" class="back-link">← Back to Calendar</a>
+    <!-- Enhanced Top Navigation Bar -->
+    <nav class="top-navbar">
+        <a href="/app" class="back-link">
+            <span>←</span>
+            <span>Back to Calendar</span>
+        </a>
+        
+        <h1 class="navbar-title">⚙️ Settings</h1>
+        
+        <div class="navbar-actions">
+            <div class="profile-dropdown">
+                <div class="profile-icon" onclick="toggleProfileMenu()" id="profileIcon">
+                    👤
+                </div>
+                <div class="profile-menu" id="profileMenu">
+                    <div class="profile-info">
+                        <div class="profile-avatar" id="profileAvatar">👤</div>
+                        <div class="profile-name" id="profileName">Loading...</div>
+                        <div class="profile-email" id="profileEmailDropdown">Loading...</div>
+                        <span class="subscription-badge" id="subscriptionBadge">Free</span>
+                    </div>
+                    
+                    <a href="#profile" class="profile-menu-item" onclick="showSection('profile'); closeProfileMenu();">
+                        <span class="menu-icon">👤</span>
+                        <span>Profile & Account</span>
+                    </a>
+                    
+                    <a href="#subscription" class="profile-menu-item" onclick="showSection('subscription'); closeProfileMenu();">
+                        <span class="menu-icon">💳</span>
+                        <span>Subscription</span>
+                    </a>
+                    
+                    <button class="profile-menu-item" onclick="syncSubscription()">
+                        <span class="menu-icon">🔄</span>
+                        <span>Sync Subscription</span>
+                    </button>
+                    
+                    <a href="#security" class="profile-menu-item" onclick="showSection('security'); closeProfileMenu();">
+                        <span class="menu-icon">🔒</span>
+                        <span>Security Settings</span>
+                    </a>
+                    
+                    <a href="#preferences" class="profile-menu-item" onclick="showSection('preferences'); closeProfileMenu();">
+                        <span class="menu-icon">🎨</span>
+                        <span>Preferences</span>
+                    </a>
+                    
+                    <a href="/app" class="profile-menu-item">
+                        <span class="menu-icon">📅</span>
+                        <span>Back to Calendar</span>
+                    </a>
+                    
+                    <button class="profile-menu-item danger" onclick="logout()">
+                        <span class="menu-icon">🚪</span>
+                        <span>Logout</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
     
     <div class="container">
         <div class="header">
-            <h1>⚙️ Settings</h1>
+            <h1>
+                <span>⚙️</span>
+                <span>Settings</span>
+            </h1>
             <p>Manage your account, security, and preferences</p>
         </div>
 
@@ -540,6 +1582,10 @@
                         <div id="currentPlan">
                             <!-- Plan info will be loaded here -->
                         </div>
+                        
+                        <div id="subscriptionActions" style="margin-top: 1rem;">
+                            <!-- Subscription action buttons will be loaded here -->
+                        </div>
                     </div>
 
                     <div class="card">
@@ -550,9 +1596,51 @@
                     </div>
 
                     <div class="card">
-                        <h3>Available Plans</h3>
-                        <div id="availablePlans">
-                            <!-- Available plans will be loaded here -->
+                        <h3>Plan Comparison</h3>
+                        <div id="planComparison">
+                            <!-- Plan comparison will be loaded here -->
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Billing & Payment</h3>
+                        <div id="billingInfo">
+                            <p style="color: rgba(255,255,255,0.8); margin-bottom: 1rem;">
+                                Manage your payment method and billing information.
+                            </p>
+                            
+                            <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                                <button class="btn btn-secondary" onclick="updatePaymentMethod()">
+                                    💳 Update Payment Method
+                                </button>
+                                <button class="btn btn-secondary" onclick="downloadInvoices()">
+                                    📄 Download Invoices
+                                </button>
+                                <button class="btn btn-secondary" onclick="viewBillingHistory()">
+                                    📊 Billing History
+                                </button>
+                            </div>
+                            
+                            <div id="nextBilling" style="padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                                <!-- Next billing info will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Subscription Change Confirmation Modal -->
+                    <div id="subscriptionModal" class="modal hidden">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3 id="modalTitle"></h3>
+                                <button class="modal-close" onclick="closeSubscriptionModal()">&times;</button>
+                            </div>
+                            <div class="modal-body">
+                                <div id="modalContent"></div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-secondary" onclick="closeSubscriptionModal()">Cancel</button>
+                                <button class="btn btn-primary" id="confirmAction" onclick="confirmSubscriptionChange()">Confirm</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -630,6 +1718,150 @@
         let currentUser = null;
         let backupCodes = [];
 
+        // Profile Dropdown Management
+        function toggleProfileMenu() {
+            const menu = document.getElementById('profileMenu');
+            menu.classList.toggle('show');
+        }
+
+        function closeProfileMenu() {
+            const menu = document.getElementById('profileMenu');
+            menu.classList.remove('show');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.querySelector('.profile-dropdown');
+            if (!dropdown.contains(event.target)) {
+                closeProfileMenu();
+            }
+        });
+
+        // Generate user initials for avatar
+        function getUserInitials(name, email) {
+            if (name && name.trim()) {
+                return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+            }
+            if (email) {
+                return email.substring(0, 2).toUpperCase();
+            }
+            return '👤';
+        }
+
+        // Update profile display
+        function updateProfileDisplay(user) {
+            const initials = getUserInitials(user.name, user.email);
+            
+            // Update profile icons and info
+            document.getElementById('profileIcon').textContent = initials;
+            document.getElementById('profileAvatar').textContent = initials;
+            document.getElementById('profileName').textContent = user.name || 'User';
+            document.getElementById('profileEmailDropdown').textContent = user.email;
+            
+            // Update subscription badge
+            const badge = document.getElementById('subscriptionBadge');
+            const tier = user.subscription_tier || 'free';
+            badge.textContent = tier.charAt(0).toUpperCase() + tier.slice(1);
+            badge.className = `subscription-badge ${tier}`;
+        }
+
+        // Sync subscription function
+        async function syncSubscription() {
+            closeProfileMenu();
+            
+            try {
+                const response = await fetch('/api/subscription/sync', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Show success message
+                    showMessage('Subscription synced successfully!', 'success');
+                    
+                    // Reload user data
+                    await loadUserData();
+                    
+                    // Update subscription display if on subscription tab
+                    if (document.getElementById('subscription').classList.contains('active')) {
+                        loadSubscriptionStatus();
+                    }
+                } else {
+                    showMessage(result.message || 'Failed to sync subscription', 'error');
+                }
+            } catch (error) {
+                console.error('Sync error:', error);
+                showMessage('Failed to sync subscription', 'error');
+            }
+        }
+
+        // Logout function
+        async function logout() {
+            closeProfileMenu();
+            
+            if (confirm('Are you sure you want to logout?')) {
+                try {
+                    await fetch('/api/auth/logout', { 
+                        method: 'POST',
+                        credentials: 'include'
+                    });
+                    
+                    // Redirect to home page
+                    window.location.href = '/';
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    window.location.href = '/';
+                }
+            }
+        }
+
+        // Show message function
+        function showMessage(message, type = 'info') {
+            // Create or update a message element
+            let messageEl = document.getElementById('globalMessage');
+            if (!messageEl) {
+                messageEl = document.createElement('div');
+                messageEl.id = 'globalMessage';
+                messageEl.style.position = 'fixed';
+                messageEl.style.top = '80px';
+                messageEl.style.right = '20px';
+                messageEl.style.zIndex = '9999';
+                messageEl.style.padding = '1rem 1.5rem';
+                messageEl.style.borderRadius = '8px';
+                messageEl.style.backdropFilter = 'blur(20px)';
+                messageEl.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+                messageEl.style.color = 'white';
+                messageEl.style.fontWeight = '500';
+                messageEl.style.transform = 'translateX(100%)';
+                messageEl.style.transition = 'transform 0.3s ease';
+                document.body.appendChild(messageEl);
+            }
+            
+            // Set message and style based on type
+            messageEl.textContent = message;
+            if (type === 'success') {
+                messageEl.style.background = 'rgba(40, 167, 69, 0.9)';
+            } else if (type === 'error') {
+                messageEl.style.background = 'rgba(220, 53, 69, 0.9)';
+            } else {
+                messageEl.style.background = 'rgba(66, 133, 244, 0.9)';
+            }
+            
+            // Show message
+            setTimeout(() => {
+                messageEl.style.transform = 'translateX(0)';
+            }, 100);
+            
+            // Hide message after 3 seconds
+            setTimeout(() => {
+                messageEl.style.transform = 'translateX(100%)';
+            }, 3000);
+        }
+
         // Navigation
         function showSection(sectionName) {
             // Hide all sections
@@ -646,7 +1878,11 @@
             document.getElementById(sectionName).classList.add('active');
             
             // Add active class to clicked nav item
-            event.target.classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(item => {
+                if (item.getAttribute('href') === `#${sectionName}`) {
+                    item.classList.add('active');
+                }
+            });
         }
 
         // Load user data
@@ -690,6 +1926,9 @@
                 document.getElementById('pushNotifications').checked = user.settings.notification_preferences?.push ?? false;
                 document.getElementById('smsNotifications').checked = user.settings.notification_preferences?.sms ?? false;
             }
+            
+            // Update profile dropdown display
+            updateProfileDisplay(user);
         }
 
         function updateSecurityStatus(user) {
@@ -903,13 +2142,19 @@
         }
 
         // Load subscription data
+        let currentSubscriptionData = null;
+        let pendingAction = null;
+
         async function loadSubscriptionData() {
             try {
                 const response = await fetch('/api/user/dashboard');
                 const data = await response.json();
                 
                 if (data.success) {
+                    currentSubscriptionData = data;
                     displaySubscriptionInfo(data);
+                    displayPlanComparison(data);
+                    displayBillingInfo(data);
                 }
             } catch (error) {
                 console.error('Error loading subscription data:', error);
@@ -917,17 +2162,47 @@
         }
 
         function displaySubscriptionInfo(data) {
-            // Current plan
+            // Current plan with enhanced display
             const currentPlan = document.getElementById('currentPlan');
             currentPlan.innerHTML = `
-                <div class="subscription-tier">
-                    <div class="tier-info">
-                        <h4>${data.currentTier.name}</h4>
-                        <p>${data.currentTier.description}</p>
+                <div class="plan-card current">
+                    <div class="plan-header">
+                        <div>
+                            <div class="plan-title">${data.currentTier.name}</div>
+                            <p style="margin: 0; opacity: 0.8;">${data.currentTier.description}</p>
+                        </div>
+                        <div class="plan-price">
+                            ${data.currentTier.price === 0 ? 'Free' : `$${(data.currentTier.price / 100).toFixed(2)}`}
+                            ${data.currentTier.price > 0 ? '<span class="plan-price-small">/month</span>' : ''}
+                        </div>
                     </div>
-                    <div class="tier-price">
-                        ${data.currentTier.price === 0 ? 'Free' : `$${(data.currentTier.price / 100).toFixed(2)}/month`}
-                    </div>
+                    <ul class="plan-features">
+                        ${data.currentTier.features.slice(0, 4).map(feature => `<li>${feature}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+            
+            // Subscription actions based on current tier
+            const actionsContainer = document.getElementById('subscriptionActions');
+            const actions = [];
+            
+            // Sync button - always available
+            actions.push('<button class="btn btn-secondary" onclick="syncSubscription()">🔄 Sync with Stripe</button>');
+            
+            if (data.currentTier.id === 'free') {
+                actions.push('<button class="btn btn-upgrade" onclick="showUpgradeOptions()">⬆️ Upgrade Plan</button>');
+            } else if (data.currentTier.id === 'pro') {
+                actions.push('<button class="btn btn-upgrade" onclick="upgradeToMax()">⬆️ Upgrade to Max</button>');
+                actions.push('<button class="btn btn-downgrade" onclick="showDowngradeConfirmation(\'free\')">⬇️ Downgrade to Free</button>');
+                actions.push('<button class="btn btn-cancel" onclick="showCancelConfirmation()">❌ Cancel Subscription</button>');
+            } else if (data.currentTier.id === 'max') {
+                actions.push('<button class="btn btn-downgrade" onclick="showDowngradeOptions()">⬇️ Downgrade Plan</button>');
+                actions.push('<button class="btn btn-cancel" onclick="showCancelConfirmation()">❌ Cancel Subscription</button>');
+            }
+            
+            actionsContainer.innerHTML = `
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    ${actions.join('')}
                 </div>
             `;
             
@@ -937,10 +2212,10 @@
                 <div style="margin-bottom: 1rem;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                         <span>AI Events Created</span>
-                        <span>${data.usage.ai_events_created} / ${data.currentTier.limits.maxAIEventsPerMonth === -1 ? '∞' : data.currentTier.limits.maxAIEventsPerMonth}</span>
+                        <span>${data.usage.ai_events_created} / ${data.currentTier.limits.maxAIEventsPerMonth === -1 ? '∞' : data.currentTier.limits.maxAIEventsPerMonth.toLocaleString()}</span>
                     </div>
                     <div class="usage-bar">
-                        <div class="usage-fill" style="width: ${data.usage.percentage_used}%"></div>
+                        <div class="usage-fill" style="width: ${Math.min(data.usage.percentage_used, 100)}%"></div>
                     </div>
                 </div>
                 <div>
@@ -949,39 +2224,371 @@
                         <span>${data.usage.calendars_used} / ${data.currentTier.limits.maxCalendars === -1 ? '∞' : data.currentTier.limits.maxCalendars}</span>
                     </div>
                 </div>
+                
+                ${data.suggestions && data.suggestions.length > 0 ? `
+                    <div style="margin-top: 1rem; padding: 1rem; background: rgba(66, 133, 244, 0.1); border-radius: 8px;">
+                        <h4 style="margin: 0 0 0.5rem 0; color: #4285f4;">💡 Suggestions</h4>
+                        ${data.suggestions.map(suggestion => `<p style="margin: 0.25rem 0; font-size: 0.9rem;">${suggestion}</p>`).join('')}
+                    </div>
+                ` : ''}
             `;
+        }
+
+        function displayPlanComparison(data) {
+            const allTiers = [
+                { id: 'free', name: 'Free Tier', price: 0, description: 'Perfect for personal use', features: ['Up to 10 AI events per month', 'Basic calendar view', 'Email reminders', 'Single calendar'] },
+                { id: 'pro', name: 'Pro Tier', price: 100, description: 'Enhanced productivity features', features: ['Up to 1,000 AI events per month', 'Advanced natural language processing', 'Up to 5 calendars', 'Smart scheduling suggestions', 'SMS & push notifications', 'Recurring events'] },
+                { id: 'max', name: 'Max Tier', price: 300, description: 'Unlimited power for teams', features: ['Unlimited AI events', 'Advanced AI with context understanding', 'Unlimited calendars', 'Team calendar management', 'All Pro features included', 'Priority support'] }
+            ];
             
-            // Available plans
-            const availablePlans = document.getElementById('availablePlans');
-            if (data.upgradeOptions.length > 0) {
-                availablePlans.innerHTML = data.upgradeOptions.map(tier => `
-                    <div class="subscription-tier">
-                        <div class="tier-info">
-                            <h4>${tier.name}</h4>
-                            <p>${tier.description}</p>
-                            <ul style="margin: 0.5rem 0; font-size: 0.9rem;">
-                                ${tier.features.slice(0, 3).map(feature => `<li>${feature}</li>`).join('')}
-                            </ul>
+            const planComparison = document.getElementById('planComparison');
+            planComparison.innerHTML = allTiers.map(tier => {
+                const isCurrent = tier.id === data.currentTier.id;
+                const canUpgrade = !isCurrent && (
+                    (data.currentTier.id === 'free' && tier.id !== 'free') ||
+                    (data.currentTier.id === 'pro' && tier.id === 'max')
+                );
+                const canDowngrade = !isCurrent && (
+                    (data.currentTier.id === 'max' && tier.id !== 'max') ||
+                    (data.currentTier.id === 'pro' && tier.id === 'free')
+                );
+                
+                let actionButtons = '';
+                if (isCurrent) {
+                    actionButtons = '<div style="color: #4285f4; font-weight: bold;">✓ Current Plan</div>';
+                } else if (canUpgrade) {
+                    actionButtons = `<button class="btn btn-upgrade" onclick="confirmUpgrade('${tier.id}')">Upgrade to ${tier.name}</button>`;
+                } else if (canDowngrade) {
+                    actionButtons = `<button class="btn btn-downgrade" onclick="showDowngradeConfirmation('${tier.id}')">Downgrade to ${tier.name}</button>`;
+                }
+                
+                return `
+                    <div class="plan-card ${isCurrent ? 'current' : ''}">
+                        <div class="plan-header">
+                            <div>
+                                <div class="plan-title">${tier.name}</div>
+                                <p style="margin: 0; opacity: 0.8;">${tier.description}</p>
+                            </div>
+                            <div class="plan-price">
+                                ${tier.price === 0 ? 'Free' : `$${(tier.price / 100).toFixed(2)}`}
+                                ${tier.price > 0 ? '<span class="plan-price-small">/month</span>' : ''}
+                            </div>
                         </div>
-                        <div>
-                            <div class="tier-price">$${(tier.price / 100).toFixed(2)}/month</div>
-                            <button class="btn btn-primary" onclick="upgradeSubscription('${tier.id}')">Upgrade</button>
+                        <ul class="plan-features">
+                            ${tier.features.map(feature => `<li>${feature}</li>`).join('')}
+                        </ul>
+                        <div class="plan-actions">
+                            ${actionButtons}
                         </div>
                     </div>
-                `).join('');
+                `;
+            }).join('');
+        }
+
+        function displayBillingInfo(data) {
+            const nextBilling = document.getElementById('nextBilling');
+            
+            if (data.currentTier.id === 'free') {
+                nextBilling.innerHTML = `
+                    <div style="text-align: center; opacity: 0.7;">
+                        <p>💳 No billing information - You're on the free plan</p>
+                        <p>Upgrade to a paid plan to access premium features!</p>
+                    </div>
+                `;
             } else {
-                availablePlans.innerHTML = '<p style="color: rgba(255,255,255,0.7);">You have the highest tier subscription!</p>';
+                // Simulate next billing date (in real app, this would come from Stripe)
+                const nextBillingDate = new Date();
+                nextBillingDate.setMonth(nextBillingDate.getMonth() + 1);
+                
+                nextBilling.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h4 style="margin: 0 0 0.5rem 0;">Next Billing</h4>
+                            <p style="margin: 0; opacity: 0.8;">
+                                ${nextBillingDate.toLocaleDateString()} - $${(data.currentTier.price / 100).toFixed(2)}
+                            </p>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="color: #34a853; font-weight: bold;">Active</div>
+                            <div style="font-size: 0.9rem; opacity: 0.7;">Auto-renewal enabled</div>
+                        </div>
+                    </div>
+                `;
             }
         }
 
-        async function upgradeSubscription(tierId) {
+        // Subscription management functions
+        async function syncSubscription() {
+            try {
+                const response = await fetch('/api/subscription/sync', {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('✅ Subscription synced successfully!');
+                    await loadSubscriptionData(); // Reload to show updated info
+                } else {
+                    alert('❌ Sync failed: ' + data.error);
+                }
+            } catch (error) {
+                alert('❌ Failed to sync subscription');
+            }
+        }
+
+        function showUpgradeOptions() {
+            if (!currentSubscriptionData) {
+                alert('Please wait for subscription data to load');
+                return;
+            }
+            
+            const currentTier = currentSubscriptionData.currentTier.id;
+            let upgradeOptions = '';
+            
+            if (currentTier === 'free') {
+                upgradeOptions = `
+                    <div style="display: flex; gap: 1rem; margin: 1.5rem 0; flex-wrap: wrap;">
+                        <div class="plan-card" style="flex: 1; min-width: 200px;">
+                            <div class="plan-header">
+                                <div class="plan-title">Pro Tier</div>
+                                <div class="plan-price">$1<span class="plan-price-small">/month</span></div>
+                            </div>
+                            <ul class="plan-features" style="font-size: 0.9rem;">
+                                <li>Up to 1,000 AI events/month</li>
+                                <li>Advanced NLP</li>
+                                <li>Up to 5 calendars</li>
+                                <li>Smart scheduling</li>
+                                <li>SMS & push notifications</li>
+                                <li>Recurring events</li>
+                            </ul>
+                            <button class="btn btn-upgrade" onclick="confirmUpgrade('pro')" style="width: 100%; margin-top: 1rem;">
+                                Upgrade to Pro
+                            </button>
+                        </div>
+                        <div class="plan-card" style="flex: 1; min-width: 200px;">
+                            <div class="plan-header">
+                                <div class="plan-title">Max Tier</div>
+                                <div class="plan-price">$3<span class="plan-price-small">/month</span></div>
+                            </div>
+                            <ul class="plan-features" style="font-size: 0.9rem;">
+                                <li>Unlimited AI events</li>
+                                <li>Advanced AI with context</li>
+                                <li>Unlimited calendars</li>
+                                <li>Team collaboration</li>
+                                <li>All Pro features</li>
+                                <li>Priority support</li>
+                            </ul>
+                            <button class="btn btn-upgrade" onclick="confirmUpgrade('max')" style="width: 100%; margin-top: 1rem;">
+                                Upgrade to Max
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else if (currentTier === 'pro') {
+                upgradeOptions = `
+                    <div style="display: flex; justify-content: center; margin: 1.5rem 0;">
+                        <div class="plan-card" style="max-width: 300px;">
+                            <div class="plan-header">
+                                <div class="plan-title">Max Tier</div>
+                                <div class="plan-price">$3<span class="plan-price-small">/month</span></div>
+                            </div>
+                            <ul class="plan-features" style="font-size: 0.9rem;">
+                                <li>Unlimited AI events</li>
+                                <li>Advanced AI with context</li>
+                                <li>Unlimited calendars</li>
+                                <li>Team collaboration</li>
+                                <li>Meeting room booking</li>
+                                <li>Priority support</li>
+                            </ul>
+                            <button class="btn btn-upgrade" onclick="confirmUpgrade('max')" style="width: 100%; margin-top: 1rem;">
+                                Upgrade to Max
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            showSubscriptionModal(
+                'Upgrade Your Plan',
+                `<p>Choose a plan to unlock more features and increase your usage limits:</p>
+                 <div class="warning-box">
+                     <strong>💡 Tip:</strong> You can upgrade at any time and will only be charged for the remaining days in your billing cycle.
+                 </div>
+                 ${upgradeOptions}`,
+                'Cancel',
+                closeSubscriptionModal
+            );
+        }
+
+        function confirmUpgrade(tierId) {
+            const tierNames = { pro: 'Pro Tier ($1/month)', max: 'Max Tier ($3/month)' };
+            
+            pendingAction = { type: 'upgrade', tierId };
+            
+            showSubscriptionModal(
+                `Upgrade to ${tierNames[tierId]}`,
+                `<p>You're about to upgrade your plan. Here's what will happen:</p>
+                 <ul style="margin: 1rem 0; padding-left: 1.5rem;">
+                     <li>Immediate access to all ${tierId} features</li>
+                     <li>Billing starts immediately</li>
+                     <li>You can downgrade or cancel at any time</li>
+                 </ul>
+                 <div class="warning-box">
+                     <strong>Note:</strong> You'll be redirected to Stripe for secure payment processing.
+                 </div>`,
+                'Upgrade Now',
+                executeUpgrade
+            );
+        }
+
+        function showDowngradeOptions() {
+            if (!currentSubscriptionData) {
+                alert('Please wait for subscription data to load');
+                return;
+            }
+            
+            const currentTier = currentSubscriptionData.currentTier.id;
+            let downgradeOptions = '';
+            
+            if (currentTier === 'max') {
+                downgradeOptions = `
+                    <div style="display: flex; gap: 1rem; margin: 1.5rem 0; flex-wrap: wrap;">
+                        <div class="plan-card" style="flex: 1; min-width: 200px;">
+                            <div class="plan-header">
+                                <div class="plan-title">Pro Tier</div>
+                                <div class="plan-price">$1<span class="plan-price-small">/month</span></div>
+                            </div>
+                            <ul class="plan-features" style="font-size: 0.9rem;">
+                                <li>Up to 1,000 AI events/month</li>
+                                <li>Advanced NLP</li>
+                                <li>Up to 5 calendars</li>
+                                <li>Smart scheduling</li>
+                            </ul>
+                            <button class="btn btn-downgrade" onclick="showDowngradeConfirmation('pro')" style="width: 100%; margin-top: 1rem;">
+                                Downgrade to Pro
+                            </button>
+                        </div>
+                        <div class="plan-card" style="flex: 1; min-width: 200px;">
+                            <div class="plan-header">
+                                <div class="plan-title">Free Tier</div>
+                                <div class="plan-price">Free</div>
+                            </div>
+                            <ul class="plan-features" style="font-size: 0.9rem;">
+                                <li>Up to 10 AI events/month</li>
+                                <li>Basic calendar view</li>
+                                <li>Email reminders</li>
+                                <li>Single calendar</li>
+                            </ul>
+                            <button class="btn btn-cancel" onclick="showDowngradeConfirmation('free')" style="width: 100%; margin-top: 1rem;">
+                                Downgrade to Free
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else if (currentTier === 'pro') {
+                downgradeOptions = `
+                    <div style="display: flex; justify-content: center; margin: 1.5rem 0;">
+                        <div class="plan-card" style="max-width: 300px;">
+                            <div class="plan-header">
+                                <div class="plan-title">Free Tier</div>
+                                <div class="plan-price">Free</div>
+                            </div>
+                            <ul class="plan-features" style="font-size: 0.9rem;">
+                                <li>Up to 10 AI events/month</li>
+                                <li>Basic calendar view</li>
+                                <li>Email reminders</li>
+                                <li>Single calendar</li>
+                            </ul>
+                            <button class="btn btn-cancel" onclick="showDowngradeConfirmation('free')" style="width: 100%; margin-top: 1rem;">
+                                Downgrade to Free
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            showSubscriptionModal(
+                'Downgrade Your Plan',
+                `<p>Choose a lower tier plan. Downgrades take effect immediately, and you'll be refunded the prorated amount.</p>
+                 <div class="warning-box">
+                     <strong>⚠️ Important:</strong> Downgrading will limit your access to premium features. Make sure you're within the new plan's limits.
+                 </div>
+                 ${downgradeOptions}`,
+                'Cancel',
+                closeSubscriptionModal
+            );
+        }
+
+        function showDowngradeConfirmation(targetTier) {
+            const tierNames = { free: 'Free Tier', pro: 'Pro Tier ($1/month)' };
+            const current = currentSubscriptionData.currentTier;
+            
+            pendingAction = { type: 'downgrade', tierId: targetTier };
+            
+            let featureLoss = '';
+            if (targetTier === 'free') {
+                featureLoss = `
+                    <ul style="margin: 1rem 0; padding-left: 1.5rem; color: #ff6b6b;">
+                        <li>AI events limited to 10 per month (currently: ${current.limits.maxAIEventsPerMonth === -1 ? 'unlimited' : current.limits.maxAIEventsPerMonth.toLocaleString()})</li>
+                        <li>Only 1 calendar allowed (currently: ${current.limits.maxCalendars === -1 ? 'unlimited' : current.limits.maxCalendars})</li>
+                        <li>Loss of advanced AI features</li>
+                        <li>No SMS notifications or smart scheduling</li>
+                    </ul>
+                `;
+            } else if (targetTier === 'pro') {
+                featureLoss = `
+                    <ul style="margin: 1rem 0; padding-left: 1.5rem; color: #ff6b6b;">
+                        <li>AI events limited to 1,000 per month (currently: unlimited)</li>
+                        <li>Calendars limited to 5 (currently: unlimited)</li>
+                        <li>Loss of team collaboration features</li>
+                    </ul>
+                `;
+            }
+            
+            showSubscriptionModal(
+                `Downgrade to ${tierNames[targetTier]}`,
+                `<p>You're about to downgrade from ${current.name} to ${tierNames[targetTier]}.</p>
+                 <div class="danger-box">
+                     <strong>You will lose access to:</strong>
+                     ${featureLoss}
+                 </div>
+                 <p><strong>When:</strong> Changes take effect at your next billing cycle (${new Date(Date.now() + 30*24*60*60*1000).toLocaleDateString()})</p>`,
+                'Confirm Downgrade',
+                executeDowngrade
+            );
+        }
+
+        function showCancelConfirmation() {
+            pendingAction = { type: 'cancel' };
+            
+            showSubscriptionModal(
+                'Cancel Subscription',
+                `<div class="danger-box">
+                     <strong>⚠️ Are you sure you want to cancel your subscription?</strong>
+                     <ul style="margin: 1rem 0 0 0; padding-left: 1.5rem;">
+                         <li>You'll lose access to premium features</li>
+                         <li>Your account will be downgraded to Free tier</li>
+                         <li>Cancellation takes effect at the end of your current billing period</li>
+                         <li>You can resubscribe at any time</li>
+                     </ul>
+                 </div>
+                 <p>Your subscription will remain active until ${new Date(Date.now() + 30*24*60*60*1000).toLocaleDateString()}</p>`,
+                'Cancel Subscription',
+                executeCancel
+            );
+        }
+
+        async function executeUpgrade() {
+            if (!pendingAction || pendingAction.type !== 'upgrade') return;
+            
             try {
                 const response = await fetch('/api/subscription/checkout', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ tierId })
+                    body: JSON.stringify({ tierId: pendingAction.tierId })
                 });
                 
                 const data = await response.json();
@@ -994,6 +2601,98 @@
             } catch (error) {
                 alert('Failed to upgrade subscription');
             }
+            
+            closeSubscriptionModal();
+        }
+
+        async function executeDowngrade() {
+            if (!pendingAction || pendingAction.type !== 'downgrade') return;
+            
+            try {
+                const response = await fetch('/api/subscription/downgrade', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ targetTier: pendingAction.tierId })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('✅ Downgrade scheduled successfully! Changes will take effect at your next billing cycle.');
+                    await loadSubscriptionData();
+                } else {
+                    alert('❌ Failed to downgrade: ' + data.error);
+                }
+            } catch (error) {
+                alert('❌ Failed to downgrade subscription');
+            }
+            
+            closeSubscriptionModal();
+        }
+
+        async function executeCancel() {
+            if (!pendingAction || pendingAction.type !== 'cancel') return;
+            
+            try {
+                const response = await fetch('/api/subscription/cancel', {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('✅ Subscription canceled successfully! You\'ll retain access until the end of your billing period.');
+                    await loadSubscriptionData();
+                } else {
+                    alert('❌ Failed to cancel: ' + data.error);
+                }
+            } catch (error) {
+                alert('❌ Failed to cancel subscription');
+            }
+            
+            closeSubscriptionModal();
+        }
+
+        // Billing management functions
+        function updatePaymentMethod() {
+            // In a real implementation, this would redirect to Stripe's customer portal
+            alert('🔄 Redirecting to payment method update...\n\nIn a production app, this would open Stripe\'s secure customer portal.');
+        }
+
+        function downloadInvoices() {
+            // In a real implementation, this would fetch invoices from Stripe
+            alert('📄 Invoice download feature\n\nIn a production app, this would fetch and download your billing history from Stripe.');
+        }
+
+        function viewBillingHistory() {
+            alert('📊 Billing history feature\n\nIn a production app, this would show a detailed billing history with all past invoices and payments.');
+        }
+
+        // Modal functions
+        function showSubscriptionModal(title, content, confirmText, confirmAction) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalContent').innerHTML = content;
+            document.getElementById('confirmAction').textContent = confirmText;
+            document.getElementById('confirmAction').onclick = confirmAction;
+            document.getElementById('subscriptionModal').classList.remove('hidden');
+        }
+
+        function closeSubscriptionModal() {
+            document.getElementById('subscriptionModal').classList.add('hidden');
+            pendingAction = null;
+        }
+
+        function confirmSubscriptionChange() {
+            const confirmButton = document.getElementById('confirmAction');
+            if (confirmButton.onclick) {
+                confirmButton.onclick();
+            }
+        }
+
+        function upgradeToMax() {
+            confirmUpgrade('max');
         }
 
         // Initialize
