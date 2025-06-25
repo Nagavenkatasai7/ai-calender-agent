@@ -554,6 +554,10 @@ export class AIReminderApp {
           return res.status(400).send('Authorization code not found');
         }
 
+        // CRITICAL FIX: Clear any existing OAuth credentials to prevent contamination
+        console.log('🧹 Clearing any existing OAuth credentials to prevent user contamination');
+        this.oauth2Client.setCredentials({});
+
         const { tokens } = await this.oauth2Client.getToken(code as string);
         this.oauth2Client.setCredentials(tokens);
 
@@ -591,6 +595,34 @@ export class AIReminderApp {
           }
         }
 
+        // CRITICAL FIX: Properly destroy and regenerate session to prevent data contamination  
+        const originalSessionId = req.sessionID;
+        console.log(`🧹 Clearing session data for user switch: ${originalSessionId}`);
+        
+        // Use promisified session destruction for proper async handling
+        await new Promise<void>((resolve, reject) => {
+          req.session.destroy((err) => {
+            if (err) {
+              console.warn('⚠️ Session destruction failed:', err);
+              return reject(err);
+            }
+            console.log('✅ Session destroyed successfully');
+            resolve();
+          });
+        });
+        
+        // Regenerate a completely new session
+        await new Promise<void>((resolve, reject) => {
+          req.session.regenerate((err) => {
+            if (err) {
+              console.error('❌ Session regeneration failed:', err);
+              return reject(err);
+            }
+            console.log(`🔐 New session created: ${req.sessionID} for user: ${user.email}`);
+            resolve();
+          });
+        });
+        
         // Set session variables directly for compatibility
         req.session.userEmail = user.email;
         req.session.userId = user.id;
@@ -610,6 +642,10 @@ export class AIReminderApp {
           token_type: tokens.token_type || undefined,
           expiry_date: tokens.expiry_date || undefined
         };
+
+        // Clear the shared OAuth client credentials after storing in session
+        console.log('🧹 Clearing shared OAuth client after token storage');
+        this.oauth2Client.setCredentials({});
 
         // Update last login
         await this.database.updateLastLogin(user.id);
@@ -632,7 +668,8 @@ export class AIReminderApp {
         console.log('✅ OAuth successful - Session created:', {
           userId: req.session.userId,
           userEmail: req.session.userEmail,
-          hasTokens: !!req.session.tokens
+          hasTokens: !!req.session.tokens,
+          sessionId: req.sessionID
         });
 
         // Ensure session is persisted before redirecting
@@ -844,6 +881,10 @@ export class AIReminderApp {
       try {
         // Log the logout attempt
         console.log('🚪 Logout attempt for session:', req.session.sessionId || 'unknown');
+        
+        // CRITICAL FIX: Clear OAuth credentials to prevent contamination
+        console.log('🧹 Clearing OAuth credentials on logout');
+        this.oauth2Client.setCredentials({});
         
         // Clear session server-side
         await this.authService.invalidateSession(req);
@@ -1125,9 +1166,20 @@ export class AIReminderApp {
         try {
           const tokens = req.session.tokens;
           if (tokens) {
-            this.oauth2Client.setCredentials(tokens);
+            // CRITICAL FIX: Create isolated OAuth client for this user to prevent contamination
+            console.log('🔐 Creating isolated OAuth client for calendar event creation');
+            const userOAuth2Client = new google.auth.OAuth2(
+              process.env.GOOGLE_CLIENT_ID,
+              process.env.GOOGLE_CLIENT_SECRET,
+              process.env.GOOGLE_REDIRECT_URI
+            );
+            userOAuth2Client.setCredentials(tokens);
             
-            calendarResponse = await this.calendarService.createEvent({
+            // Create calendar service with isolated client
+            const userCalendarService = new CalendarService();
+            await userCalendarService.authenticate(tokens);
+            
+            calendarResponse = await userCalendarService.createEvent({
               title: parsedReminder.title,
               description: parsedReminder.description,
               startTime: parsedReminder.startTime,
@@ -1620,6 +1672,73 @@ export class AIReminderApp {
   private setupAdminRoutes() {
     // Admin routes can be added here if needed
     // These would require additional admin authentication middleware
+    
+    // Debug endpoint to clear user data (for testing data isolation)
+    this.app.post('/api/debug/clear-user-data', async (req: Request, res: Response) => {
+      try {
+        const { userEmail, adminKey } = req.body;
+        
+        // Simple admin key check (in production, use proper admin auth)
+        if (adminKey !== process.env.ADMIN_SECRET_KEY) {
+          return res.status(401).json({ error: 'Unauthorized' });
+        }
+        
+        if (!userEmail) {
+          return res.status(400).json({ error: 'User email required' });
+        }
+        
+        console.log(`🗑️ Clearing all data for user: ${userEmail}`);
+        
+        // Get user
+        const user = await this.database.getUserByEmail(userEmail);
+        if (!user) {
+          return res.status(404).json({ error: 'User not found' });
+        }
+        
+        // Clear user reminders from database
+        await this.database.clearUserReminders(user.id);
+        
+        console.log(`✅ Cleared all data for user: ${userEmail}`);
+        
+        res.json({
+          success: true,
+          message: `All data cleared for user: ${userEmail}`
+        });
+        
+      } catch (error) {
+        console.error('Error clearing user data:', error);
+        res.status(500).json({
+          success: false,
+          error: 'Failed to clear user data'
+        });
+      }
+    });
+
+    // Debug endpoint to check current session user
+    this.app.get('/api/debug/current-user', (req: Request, res: Response) => {
+      try {
+        const sessionInfo = {
+          userEmail: req.session.userEmail || null,
+          userId: req.session.userId || null,
+          sessionId: req.sessionID,
+          hasTokens: !!req.session.tokens,
+          timestamp: new Date().toISOString()
+        };
+        
+        console.log('🔍 Current session info:', sessionInfo);
+        
+        res.json({
+          success: true,
+          session: sessionInfo
+        });
+      } catch (error) {
+        console.error('Error checking current user:', error);
+        res.status(500).json({
+          success: false,
+          error: 'Failed to check current user'
+        });
+      }
+    });
   }
 
   // Legacy auth method for compatibility

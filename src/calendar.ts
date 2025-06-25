@@ -27,15 +27,23 @@ export class CalendarService {
       process.env.GOOGLE_REDIRECT_URI
     );
     
-    this.calendar = google.calendar({ version: 'v3', auth: this.oauth2Client });
+    // Initialize without auth - will be set in authenticate method
+    this.calendar = null;
   }
 
   async authenticate(tokens: any) {
     this.oauth2Client.setCredentials(tokens);
+    // Create calendar API instance with authenticated client
+    this.calendar = google.calendar({ version: 'v3', auth: this.oauth2Client });
   }
 
   async createEvent(eventDetails: EventDetails, userEmail?: string) {
     try {
+      // Ensure calendar API is initialized
+      if (!this.calendar) {
+        throw new Error('Calendar service not authenticated. Call authenticate() first.');
+      }
+
       // If userEmail is provided, we need to authenticate with user tokens
       if (userEmail) {
         // This would require getting the user's tokens from the database

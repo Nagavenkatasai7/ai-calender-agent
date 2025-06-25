@@ -674,6 +674,12 @@ export class Database {
     });
   }
 
+  async clearUserReminders(userId: string): Promise<void> {
+    console.log(`🗑️ Clearing all reminders for user ID: ${userId}`);
+    await this.run('DELETE FROM reminders WHERE user_id = ?', [userId]);
+    console.log(`✅ All reminders cleared for user ID: ${userId}`);
+  }
+
   private async initializeUsageTracking(userId: string): Promise<void> {
     const month = new Date().toISOString().slice(0, 7);
     await this.run(

@@ -61,7 +61,8 @@
             align-items: center;
             justify-content: space-between;
             gap: 16px;
-            z-index: 100;
+            z-index: 1000;
+            position: relative;
             min-height: 80px;
         }
 
@@ -513,9 +514,10 @@
             display: flex !important;
             flex-direction: column;
             min-width: 0;
-            min-height: 600px;
+            min-height: 500px;
+            height: calc(100vh - 120px);
             position: relative;
-            overflow: visible;
+            overflow: hidden;
         }
 
         /* Calendar header - Ultra transparent for immersion */
@@ -622,13 +624,15 @@
             flex: 1;
             padding: 20px;
             overflow: hidden;
-            display: block; /* Allow grid children to size correctly */
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 200px); /* Fixed height calculation */
         }
 
         .month-view {
             display: none; /* Will be set to grid by JavaScript */
             grid-template-columns: repeat(7, 1fr);
-            grid-template-rows: 40px repeat(6, 1fr); /* Even row heights */
+            grid-template-rows: 40px repeat(6, minmax(100px, 1fr)); /* Minimum height with flex */
             gap: 0;
             background: rgba(32, 32, 34, 0.15);
             backdrop-filter: blur(5px) saturate(1.1);
@@ -636,8 +640,7 @@
             border-radius: 12px;
             overflow: hidden;
             height: 100%;
-            min-height: 600px;
-            flex: 1;
+            min-height: 500px;
             border: 1px solid rgba(99, 99, 102, 0.1);
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
         }
@@ -666,7 +669,8 @@
             background: rgba(44, 44, 46, 0.1);
             backdrop-filter: blur(2px);
             -webkit-backdrop-filter: blur(2px);
-            min-height: 140px;
+            min-height: 120px;
+            height: 100%;
             padding: 8px;
             position: relative;
             transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -675,6 +679,7 @@
             border-right: 1px solid rgba(99, 99, 102, 0.08);
             border-bottom: 1px solid rgba(99, 99, 102, 0.08);
             cursor: pointer;
+            overflow: hidden;
         }
 
         .day-cell:nth-child(7n) {
@@ -812,7 +817,7 @@
         .week-view {
             display: none;
             grid-template-columns: 60px repeat(7, 1fr);
-            grid-template-rows: 40px repeat(24, minmax(30px, 1fr));
+            grid-template-rows: 40px repeat(24, minmax(25px, 1fr)); /* Minimum time slot height */
             gap: 1px;
             background: rgba(56, 56, 58, 0.6);
             backdrop-filter: blur(8px);
@@ -820,13 +825,12 @@
             border-radius: 12px;
             overflow: hidden;
             height: 100%;
-            flex: 1;
         }
 
         .day-view {
             display: none;
             grid-template-columns: 60px 1fr;
-            grid-template-rows: 40px repeat(24, minmax(30px, 1fr));
+            grid-template-rows: 40px repeat(24, minmax(25px, 1fr)); /* Minimum time slot height */
             gap: 1px;
             background: rgba(56, 56, 58, 0.6);
             backdrop-filter: blur(8px);
@@ -834,7 +838,6 @@
             border-radius: 12px;
             overflow: hidden;
             height: 100%;
-            flex: 1;
         }
 
         .time-slot {
@@ -1799,7 +1802,8 @@
 
         /* Ensure header stays on top when a picture background is applied */
         body.has-background .header {
-            z-index: 100;
+            z-index: 1000;
+            position: relative;
         }
     </style>
 </head>
@@ -2277,21 +2281,36 @@
                 }
             })
             .then(response => {
-                if (!response.ok) {
+                if (response.ok) {
+                    return response.json();
+                } else {
                     console.log('❌ Authentication check failed - redirecting to login');
-                    // Force redirect to home page
                     window.location.replace('/');
-                    return;
+                    return null;
                 }
-                return response.json();
             })
             .then(data => {
-                if (data && data.success && data.user) {
-                    console.log('✅ Authentication verified for user:', data.user.email);
+                if (data && data.user) {
+                    console.log('✅ User authenticated:', data.user.email);
+                    
+                    // Check if this is a different user than cached
+                    if (currentUserEmail && currentUserEmail !== data.user.email) {
+                        console.log(`🔄 User changed: ${currentUserEmail} → ${data.user.email}`);
+                        // Clear all cached data from previous user
+                        calendarEvents = [];
+                        clearLocalStorageEvents();
+                        generateCalendar();
+                    }
+                    
                     currentUserEmail = data.user.email;
-                } else {
-                    console.log('❌ Invalid user data - redirecting to login');
-                    window.location.replace('/');
+                    
+                    // Update profile display immediately
+                    if (document.getElementById('profileEmail')) {
+                        document.getElementById('profileEmail').textContent = currentUserEmail;
+                        document.getElementById('profileName').textContent = currentUserEmail.split('@')[0];
+                    }
+                } else if (data === null) {
+                    // Already redirected, do nothing
                 }
             })
             .catch(error => {
@@ -2304,13 +2323,20 @@
         function saveEventToLocalStorage(event) {
             console.log('💾 Saving event to localStorage:', event); // Debug
             try {
-                let storedEvents = JSON.parse(localStorage.getItem('ai-reminder-events') || '[]');
+                // Use user-specific localStorage key to prevent data mixing
+                if (!currentUserEmail) {
+                    console.warn('⚠️ No current user - using fallback storage');
+                    return;
+                }
+                const userStorageKey = `ai-reminder-events-${currentUserEmail}`;
+                let storedEvents = JSON.parse(localStorage.getItem(userStorageKey) || '[]');
                 
                 // Ensure event has proper structure
                 const eventToSave = {
                     ...event,
                     id: event.id || `local-${Date.now()}-${Math.random()}`,
                     createdAt: new Date().toISOString(),
+                    userEmail: currentUserEmail, // Associate event with user
                     // Ensure dates are serializable
                     startTime: event.startTime instanceof Date ? event.startTime.toISOString() : event.startTime,
                     endTime: event.endTime instanceof Date ? event.endTime.toISOString() : event.endTime
@@ -2326,7 +2352,7 @@
                     console.log('➕ Added new event to localStorage'); // Debug
                 }
                 
-                localStorage.setItem('ai-reminder-events', JSON.stringify(storedEvents));
+                localStorage.setItem(userStorageKey, JSON.stringify(storedEvents));
                 console.log('✅ Event saved to localStorage with ID:', eventToSave.id); // Debug
             } catch (error) {
                 console.error('❌ Failed to save event to localStorage:', error); // Debug
@@ -2336,11 +2362,44 @@
         function loadEventsFromLocalStorage() {
             console.log('📂 Loading events from localStorage'); // Debug
             try {
-                const storedEvents = JSON.parse(localStorage.getItem('ai-reminder-events') || '[]');
+                // Only load events for current authenticated user
+                if (!currentUserEmail) {
+                    console.log('⚠️ No authenticated user - skipping localStorage load');
+                    return [];
+                }
+                
+                const userStorageKey = `ai-reminder-events-${currentUserEmail}`;
+                let storedEvents = JSON.parse(localStorage.getItem(userStorageKey) || '[]');
                 console.log('📋 Found stored events:', storedEvents.length); // Debug
                 
+                // Filter events to only include ones for current user (extra safety) and exclude demo events
+                const userEvents = storedEvents.filter(event => {
+                    // Check if it's a user-specific event
+                    if (event.userEmail && event.userEmail !== currentUserEmail) {
+                        return false;
+                    }
+                    
+                    // Filter out demo/test events
+                    const isDemoEvent = 
+                        event.id?.includes('test-') ||
+                        event.title?.includes('Team Meeting') ||
+                        event.title?.includes('Doctor Appointment') ||
+                        event.title?.includes('Lunch with Sarah') ||
+                        event.description?.includes('Weekly team sync') ||
+                        event.location?.includes('Conference Room') ||
+                        event.location?.includes('Medical Center') ||
+                        event.location?.includes('Downtown Cafe');
+                    
+                    if (isDemoEvent) {
+                        console.log('🗑️ Filtering out demo event during load:', event.title);
+                        return false;
+                    }
+                    
+                    return true;
+                });
+                
                 // Add stored events to calendar with proper structure
-                storedEvents.forEach(event => {
+                userEvents.forEach(event => {
                     // Ensure event has proper structure and ID
                     if (!event.id) {
                         event.id = `local-${Date.now()}-${Math.random()}`;
@@ -2363,7 +2422,7 @@
                 
                 // Regenerate calendar to show events
                 generateCalendar();
-                return storedEvents;
+                return userEvents;
             } catch (error) {
                 console.error('❌ Failed to load events from localStorage:', error); // Debug
                 return [];
@@ -2371,8 +2430,28 @@
         }
 
         function clearLocalStorageEvents() {
-            localStorage.removeItem('ai-reminder-events');
-            console.log('🗑️ Local storage events cleared'); // Debug
+            // Clear events for current user only
+            if (currentUserEmail) {
+                const userStorageKey = `ai-reminder-events-${currentUserEmail}`;
+                localStorage.removeItem(userStorageKey);
+                console.log('🗑️ Local storage events cleared for user:', currentUserEmail); // Debug
+            } else {
+                // Fallback: clear global storage if no user
+                localStorage.removeItem('ai-reminder-events');
+                console.log('🗑️ Global local storage events cleared'); // Debug
+            }
+        }
+
+        // Clear calendar events when switching users
+        function clearCalendarForUserSwitch() {
+            console.log('🔄 Clearing calendar for user switch');
+            calendarEvents = []; // Clear in-memory events
+            
+            // Clear any demo events from localStorage
+            clearDemoEvents();
+            
+            generateCalendar(); // Refresh display
+            console.log('✅ Calendar cleared for new user');
         }
 
         // Diagnostic function to check calendar visibility
@@ -2445,7 +2524,7 @@
                 setupBackgroundModal();
                 
                 console.log('💾 Loading events from local storage...'); // Debug
-                loadEventsFromLocalStorage();
+                // Note: loadEventsFromLocalStorage() is now called after authentication in showAuthenticatedState()
                 
                 console.log('🖱️ Setting up day click handlers...'); // Debug
                 setupDayClickHandlers();
@@ -2468,8 +2547,10 @@
                 console.log('🗂️ Loading tab content...');
                 loadTabContent('upcoming');
                 
-                console.log('🧪 Adding test events if none exist...');
-                addTestEventsIfNeeded();
+                console.log('🧹 Cleaning any demo events...');
+                clearDemoEvents();
+                
+                console.log('🔄 Calendar initialized - clean state');
                 
                 console.log('✅ App initialization complete!'); // Debug
                 
@@ -2719,42 +2800,62 @@
             const plan = urlParams.get('plan');
 
             if (success && email) {
+                // Clear all data before setting new user to prevent contamination
+                console.log('🔄 New user authentication detected - clearing all data');
+                const previousUser = currentUserEmail;
+                if (previousUser && previousUser !== decodeURIComponent(email)) {
+                    console.log(`🧹 User switch detected: ${previousUser} → ${decodeURIComponent(email)}`);
+                    // Force complete data clearing for user switch
+                    clearCalendarForUserSwitch();
+                    
+                    // Also clear any cached Google Calendar data
+                    console.log('🗑️ Clearing cached Google Calendar data');
+                    calendarEvents = [];
+                    generateCalendar();
+                }
+                
                 currentUserEmail = decodeURIComponent(email);
-                showAuthenticatedState();
-                showMessage('Successfully connected to Google Calendar!', 'success');
-                window.history.replaceState({}, document.title, '/app');
+                
+                // Show authenticated state
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('userInfo').style.display = 'block';
+                document.getElementById('logoutBtn').style.display = 'inline-block';
+                document.getElementById('userEmail').textContent = currentUserEmail;
+                document.getElementById('subscriptionStatus').style.display = 'block';
+                loadSubscriptionStatus();
+                
+                // CRITICAL FIX: Load user-specific events after authentication
+                console.log('📅 Loading events for authenticated user:', currentUserEmail);
                 loadCalendarEvents();
+                
+                window.history.replaceState({}, document.title, '/app');
             } else if (error) {
-                showMessage('Authentication failed. Please try again.', 'error');
-                window.history.replaceState({}, document.title, '/app');
-            }
-
-            // Handle payment success
-            if (payment === 'success' && plan) {
-                const planName = plan === 'pro' ? 'Pro' : 'Max';
-                showMessage(`🎉 Welcome to ${planName}! Your subscription is now active. Enjoy unlimited AI calendar features!`, 'success');
-                
-                // Refresh subscription status
-                setTimeout(() => {
-                    loadSubscriptionStatus();
-                }, 1000);
-                
-                // Clean up URL
-                window.history.replaceState({}, document.title, '/app');
-            } else if (payment === 'cancel') {
-                showMessage('Payment was canceled. You can upgrade anytime from your subscription settings.', 'info');
-                window.history.replaceState({}, document.title, '/app');
+                console.error('Authentication error:', error);
+                showAuthenticatedState = false;
+            } else if (payment && plan) {
+                console.log('Payment completed for plan:', plan);
+                // Show success message or redirect to appropriate page
             }
         }
 
         // Show authenticated state
         function showAuthenticatedState() {
+            // Clear calendar events from previous user before loading new user's events
+            console.log('🔄 User authenticated - clearing previous user data');
+            clearCalendarForUserSwitch();
+            
             document.getElementById('loginSection').style.display = 'none';
             document.getElementById('userInfo').style.display = 'block';
             document.getElementById('logoutBtn').style.display = 'inline-block';
             document.getElementById('userEmail').textContent = currentUserEmail;
             document.getElementById('subscriptionStatus').style.display = 'block';
             loadSubscriptionStatus();
+            
+            // Load events for the authenticated user
+            setTimeout(() => {
+                loadEventsFromLocalStorage();
+                loadCalendarEvents();
+            }, 100);
         }
 
         // Load subscription status
@@ -3888,9 +3989,18 @@
             
             console.log('📅 View elements found:', { monthView, weekView, dayView }); // Debug
             
-            if (monthView) monthView.style.display = 'none';
-            if (weekView) weekView.style.display = 'none';
-            if (dayView) dayView.style.display = 'none';
+            if (monthView) {
+                monthView.style.display = 'none';
+                monthView.style.position = '';
+            }
+            if (weekView) {
+                weekView.style.display = 'none';
+                weekView.style.position = '';
+            }
+            if (dayView) {
+                dayView.style.display = 'none';
+                dayView.style.position = '';
+            }
             
             // Remove active class from all buttons
             document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
@@ -3904,6 +4014,9 @@
             
             if (selectedView) {
                 selectedView.style.display = 'grid';
+                selectedView.style.position = 'relative';
+                selectedView.style.width = '100%';
+                selectedView.style.height = '100%';
                 console.log('✅ View displayed:', `${newView}View`); // Debug
             } else {
                 console.error('❌ Selected view not found:', `${newView}View`); // Debug
@@ -3916,21 +4029,48 @@
                 console.error('❌ Selected button not found:', `${newView}ViewBtn`); // Debug
             }
             
-            generateCalendar();
+            // Force regenerate calendar after short delay to ensure proper display
+            setTimeout(() => {
+                generateCalendar();
+            }, 50);
         }
 
         // Load calendar events
         async function loadCalendarEvents() {
             try {
-                const response = await fetch(`/reminders/${encodeURIComponent(currentUserEmail)}`);
+                // Use the correct API endpoint that matches the backend
+                const response = await fetch('/api/reminders', {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate'
+                    }
+                });
+                
+                if (!response.ok) {
+                    console.error('Failed to load reminders:', response.status, response.statusText);
+                    return;
+                }
+                
                 const result = await response.json();
                 
-                if (result.reminders) {
+                if (result.success && result.reminders) {
+                    console.log(`📅 Loaded ${result.reminders.length} reminders for user:`, currentUserEmail);
+                    // Clear existing events before loading new ones
+                    calendarEvents = [];
                     calendarEvents = result.reminders;
                     loadUpcomingEvents();
+                    generateCalendar(); // Refresh the calendar display
+                } else {
+                    console.log('📅 No reminders found for user:', currentUserEmail);
+                    calendarEvents = [];
+                    generateCalendar();
                 }
             } catch (error) {
                 console.error('Error loading events:', error);
+                // Don't show cached events on error
+                calendarEvents = [];
+                generateCalendar();
             }
         }
 
@@ -4182,9 +4322,14 @@
                          calendarEvents.splice(index, 1);
                          
                          // Remove from localStorage
-                         const storedEvents = JSON.parse(localStorage.getItem('ai-reminder-events') || '[]');
+                         if (!currentUserEmail) {
+                             console.warn('⚠️ No current user for localStorage deletion');
+                             return;
+                         }
+                         const userStorageKey = `ai-reminder-events-${currentUserEmail}`;
+                         const storedEvents = JSON.parse(localStorage.getItem(userStorageKey) || '[]');
                          const filteredEvents = storedEvents.filter(e => e.id !== eventId);
-                         localStorage.setItem('ai-reminder-events', JSON.stringify(filteredEvents));
+                         localStorage.setItem(userStorageKey, JSON.stringify(filteredEvents));
                          
                          generateCalendar();
                          alert('Event deleted successfully!');
@@ -4322,9 +4467,12 @@
                         }
                         
                         // Remove from localStorage
-                        const storedEvents = JSON.parse(localStorage.getItem('ai-reminder-events') || '[]');
-                        const filteredEvents = storedEvents.filter(e => e.id !== currentEditingEvent.id);
-                        localStorage.setItem('ai-reminder-events', JSON.stringify(filteredEvents));
+                        if (currentUserEmail) {
+                            const userStorageKey = `ai-reminder-events-${currentUserEmail}`;
+                            const storedEvents = JSON.parse(localStorage.getItem(userStorageKey) || '[]');
+                            const filteredEvents = storedEvents.filter(e => e.id !== currentEditingEvent.id);
+                            localStorage.setItem(userStorageKey, JSON.stringify(filteredEvents));
+                        }
                         
                         this.closeModal();
                         generateCalendar();
@@ -4334,24 +4482,32 @@
                 
                 // Save to localStorage
                 saveToLocalStorage: function(eventData) {
-                    let storedEvents = JSON.parse(localStorage.getItem('ai-reminder-events') || '[]');
+                    if (!currentUserEmail) {
+                        console.warn('⚠️ No current user - cannot save to localStorage');
+                        return;
+                    }
+                    
+                    const userStorageKey = `ai-reminder-events-${currentUserEmail}`;
+                    let storedEvents = JSON.parse(localStorage.getItem(userStorageKey) || '[]');
                     
                     const existingIndex = storedEvents.findIndex(e => e.id === eventData.id);
                     if (existingIndex !== -1) {
                         storedEvents[existingIndex] = {
                             ...eventData,
+                            userEmail: currentUserEmail,
                             startTime: eventData.startTime.toISOString(),
                             endTime: eventData.endTime.toISOString()
                         };
                     } else {
                         storedEvents.push({
                             ...eventData,
+                            userEmail: currentUserEmail,
                             startTime: eventData.startTime.toISOString(),
                             endTime: eventData.endTime.toISOString()
                         });
                     }
                     
-                    localStorage.setItem('ai-reminder-events', JSON.stringify(storedEvents));
+                    localStorage.setItem(userStorageKey, JSON.stringify(storedEvents));
                     debugLog('Saved to localStorage', eventData.title);
                 }
             };
@@ -4668,68 +4824,43 @@
             debugLog('Navigated to today');
         }
 
-        // Add test events if calendar is empty (for testing edit functionality)
-        function addTestEventsIfNeeded() {
-            if (calendarEvents.length === 0) {
-                debugLog('No events found, adding test events');
+        // REMOVED: Demo events function - users should start with empty calendar
+
+        // Clear any existing demo/test events from localStorage
+        function clearDemoEvents() {
+            console.log('🧹 Clearing any existing demo events');
+            
+            // Clear all user-specific localStorage keys that might contain demo data
+            if (currentUserEmail) {
+                const userStorageKey = `ai-reminder-events-${currentUserEmail}`;
+                const existingEvents = JSON.parse(localStorage.getItem(userStorageKey) || '[]');
                 
-                const now = new Date();
-                const today = new Date(now);
-                const tomorrow = new Date(now);
-                tomorrow.setDate(now.getDate() + 1);
-                
-                const testEvents = [
-                    {
-                        id: `test-1-${Date.now()}`,
-                        title: 'Team Meeting',
-                        description: 'Weekly team sync meeting',
-                        location: 'Conference Room A',
-                        startTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 10, 0),
-                        endTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 11, 0),
-                        isPrivate: false,
-                        timeZone: 'America/New_York',
-                        alertMinutes: [15, 60]
-                    },
-                    {
-                        id: `test-2-${Date.now()}`,
-                        title: 'Doctor Appointment',
-                        description: 'Annual checkup',
-                        location: 'Medical Center',
-                        startTime: new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate(), 14, 30),
-                        endTime: new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate(), 15, 30),
-                        isPrivate: true,
-                        timeZone: 'America/New_York',
-                        alertMinutes: [60]
-                    },
-                    {
-                        id: `test-3-${Date.now()}`,
-                        title: 'Lunch with Sarah',
-                        description: 'Catch up over lunch',
-                        location: 'Downtown Cafe',
-                        startTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12, 30),
-                        endTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 13, 30),
-                        isPrivate: false,
-                        timeZone: 'America/New_York',
-                        alertMinutes: [30]
+                // Filter out any test/demo events (those with test IDs or demo titles)
+                const cleanEvents = existingEvents.filter(event => {
+                    const isDemoEvent = 
+                        event.id?.includes('test-') ||
+                        event.title?.includes('Team Meeting') ||
+                        event.title?.includes('Doctor Appointment') ||
+                        event.title?.includes('Lunch with Sarah') ||
+                        event.description?.includes('Weekly team sync') ||
+                        event.location?.includes('Conference Room') ||
+                        event.location?.includes('Medical Center') ||
+                        event.location?.includes('Downtown Cafe');
+                    
+                    if (isDemoEvent) {
+                        console.log('🗑️ Removing demo event:', event.title);
                     }
-                ];
-                
-                testEvents.forEach(event => {
-                    calendarEvents.push(event);
-                    if (ManualEventSystem) {
-                        ManualEventSystem.saveToLocalStorage(event);
-                    }
+                    
+                    return !isDemoEvent;
                 });
                 
-                debugLog('Test events added', testEvents.length);
-                
-                // Regenerate calendar and sidebar to show test events
-                generateCalendar();
-                generateMiniCalendar();
-                loadTabContent('upcoming');
-            } else {
-                debugLog('Events already exist, skipping test events');
+                // Save cleaned events back
+                localStorage.setItem(userStorageKey, JSON.stringify(cleanEvents));
+                console.log(`✅ Cleaned ${existingEvents.length - cleanEvents.length} demo events from localStorage`);
             }
+            
+            // Also clear any old global storage keys
+            localStorage.removeItem('ai-reminder-events');
         }
 
         // Setup additional event listeners
@@ -4950,6 +5081,10 @@
         async function logout() {
             try {
                 console.log('🚪 Logging out...');
+                // Clear calendar events from memory to prevent data leakage
+                console.log('🗑️ Clearing calendar data for logout');
+                clearCalendarForUserSwitch();
+                
                 await fetch('/api/auth/logout', { 
                     method: 'POST',
                     credentials: 'include',
@@ -4963,6 +5098,11 @@
             } finally {
                 // Clear any cached data
                 currentUserEmail = null;
+                
+                // Additional cleanup - clear all calendar state
+                calendarEvents = [];
+                generateCalendar();
+                
                 // Force redirect to home page (replaces current history entry)
                 window.location.replace('/');
             }
@@ -5030,6 +5170,102 @@
             loadSubscriptionStatus();
             updateProfileInfo();
         }
+
+        // Add critical session validation to detect user changes
+        function validateUserSession() {
+            // Check if we have a current user
+            if (!currentUserEmail) {
+                console.log('⚠️ No current user - checking authentication');
+                return;
+            }
+            
+            // Verify with server that this user is still authenticated
+            fetch('/api/debug/current-user', {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Cache-Control': 'no-cache, no-store, must-revalidate'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.session) {
+                    const serverUserEmail = data.session.userEmail;
+                    
+                    // Check if user has changed on server side
+                    if (serverUserEmail && serverUserEmail !== currentUserEmail) {
+                        console.log(`🔄 User mismatch detected! Frontend: ${currentUserEmail}, Server: ${serverUserEmail}`);
+                        console.log('🧹 Clearing data and switching to correct user');
+                        
+                        // Clear all data from previous user
+                        clearCalendarForUserSwitch();
+                        calendarEvents = [];
+                        
+                        // Set correct user
+                        currentUserEmail = serverUserEmail;
+                        document.getElementById('userEmail').textContent = currentUserEmail;
+                        
+                        // Reload user-specific data
+                        generateCalendar();
+                        loadCalendarEvents();
+                        loadSubscriptionStatus();
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Session validation error:', error);
+            });
+        }
+
+        // Run session validation every 10 seconds
+        setInterval(validateUserSession, 10000);
+
+        // Debug function to check current calendar state
+        function debugCalendarState() {
+            console.log('🔍 CALENDAR DEBUG STATE:');
+            console.log('========================');
+            console.log('📧 Current User:', currentUserEmail || 'Not authenticated');
+            console.log('🔑 Has Tokens:', !!req?.session?.tokens || 'Unknown');
+            console.log('📅 In-Memory Events:', calendarEvents.length);
+            console.log('🗂️ Event Details:', calendarEvents.map(e => ({
+                id: e.id,
+                title: e.title,
+                location: e.location,
+                startTime: e.startTime
+            })));
+            
+            // Check localStorage
+            if (currentUserEmail) {
+                const userStorageKey = `ai-reminder-events-${currentUserEmail}`;
+                const storedEvents = JSON.parse(localStorage.getItem(userStorageKey) || '[]');
+                console.log('💾 LocalStorage Events:', storedEvents.length);
+                console.log('📋 Stored Event Details:', storedEvents.map(e => ({
+                    id: e.id,
+                    title: e.title,
+                    location: e.location
+                })));
+            }
+            
+            // Check for demo events
+            const hasDemoEvents = calendarEvents.some(event => 
+                event.title?.includes('Lunch with Sarah') ||
+                event.title?.includes('Doctor Appointment') ||
+                event.title?.includes('Team Meeting')
+            );
+            
+            console.log('🚨 Has Demo Events:', hasDemoEvents ? 'YES - BUG EXISTS!' : 'NO - Clean!');
+            console.log('========================');
+            
+            return {
+                userEmail: currentUserEmail,
+                eventCount: calendarEvents.length,
+                hasDemoEvents,
+                events: calendarEvents
+            };
+        }
+
+        // Make debug function available globally for console access
+        window.debugCalendarState = debugCalendarState;
     </script>
 </body>
 </html>
