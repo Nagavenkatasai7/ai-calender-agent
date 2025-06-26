@@ -8,16 +8,27 @@
     "start": "node dist/app.js",
     "dev": "ts-node src/app.ts",
     "build": "tsc",
-    "watch": "tsc -w"
+    "watch": "tsc -w",
+    "vercel-build": "npm run build",
+    "deploy:vercel": "vercel --prod",
+    "deploy:railway": "railway deploy",
+    "deploy:heroku": "git push heroku main"
   },
   "keywords": [
     "ai",
     "reminder",
     "calendar",
-    "agent"
+    "agent",
+    "voice-control",
+    "google-calendar",
+    "typescript",
+    "express"
   ],
   "author": "Your Name",
   "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/express-session": "^1.18.2",
