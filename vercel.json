@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "dist/app.js",
+      "src": "dist/serverlessApp.js",
       "use": "@vercel/node",
       "config": {
         "maxLambdaSize": "10mb"
@@ -11,28 +11,16 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/dist/app.js"
+      "src": "/health",
+      "dest": "/dist/serverlessApp.js"
     },
     {
-      "src": "/auth/(.*)",
-      "dest": "/dist/app.js"
-    },
-    {
-      "src": "/app",
-      "dest": "/dist/app.js"
-    },
-    {
-      "src": "/settings",
-      "dest": "/dist/app.js"
-    },
-    {
-      "src": "/ai-voice",
-      "dest": "/dist/app.js"
+      "src": "/api/voice/(.*)",
+      "dest": "/dist/serverlessApp.js"
     },
     {
       "src": "/(.*)",
-      "dest": "/dist/app.js"
+      "dest": "/dist/serverlessApp.js"
     }
   ],
   "env": {

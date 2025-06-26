@@ -79,10 +79,38 @@ Respond in JSON format with confidence score.`;
 
       try {
         const parsed = JSON.parse(response.text || '{}');
+        
+        // Ensure dates are properly formatted
+        let startTime = undefined;
+        let endTime = undefined;
+        
+        if (parsed.startTime) {
+          try {
+            startTime = new Date(parsed.startTime).toISOString();
+          } catch (e) {
+            console.warn('Invalid startTime, using fallback');
+          }
+        }
+        
+        if (parsed.endTime) {
+          try {
+            endTime = new Date(parsed.endTime).toISOString();
+          } catch (e) {
+            console.warn('Invalid endTime, using fallback');
+          }
+        }
+        
+        // If dates are missing, use fallback
+        if (!startTime || !endTime) {
+          const fallback = this.fallbackParseEvent(input);
+          startTime = startTime || fallback.startTime;
+          endTime = endTime || fallback.endTime;
+        }
+        
         return {
           title: parsed.title || input,
-          startTime: parsed.startTime ? new Date(parsed.startTime) : undefined,
-          endTime: parsed.endTime ? new Date(parsed.endTime) : undefined,
+          startTime: startTime,
+          endTime: endTime,
           location: parsed.location,
           description: parsed.description,
           category: parsed.category || 'general',
@@ -184,8 +212,8 @@ Respond in JSON format with confidence score.`;
     
     return {
       title: input,
-      startTime: startTime,
-      endTime: endTime,
+      startTime: startTime.toISOString(),
+      endTime: endTime.toISOString(),
       confidence: 0.5,
       category: 'general'
     };
