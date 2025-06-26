@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎤 AI Voice Calendar Assistant - GitHub Pages Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .notice-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        
+        .warning {
+            background: rgba(255, 193, 7, 0.2);
+            border-left: 4px solid #ffc107;
+            margin-bottom: 2rem;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .feature-card h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .deployment-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .deployment-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 1.5rem;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: transform 0.3s ease;
+        }
+        
+        .deployment-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .deployment-card.recommended {
+            border: 2px solid #00ff88;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+        
+        .deployment-card h4 {
+            color: #00ff88;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        
+        .deployment-card.recommended h4 {
+            color: #00ff88;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            border: none;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+        }
+        
+        .code-block {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.9rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-working { background: #00ff88; }
+        .status-limited { background: #ffc107; }
+        .status-not-working { background: #ff4757; }
+        
+        .footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 { font-size: 2rem; }
+            .container { padding: 1rem; }
+            .deployment-options { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎤 AI Voice Calendar Assistant</h1>
+            <p>Revolutionary AI-powered calendar management with voice commands</p>
+        </div>
+
+        <div class="notice-card warning">
+            <h2>⚠️ GitHub Pages - Limited Demo</h2>
+            <p><strong>You're viewing a static demo on GitHub Pages.</strong> This shows only the frontend interface. For the complete AI voice functionality, database operations, and backend features, please use one of the full deployment options below.</p>
+        </div>
+
+        <div class="notice-card">
+            <h2>🚀 Full Application Features</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🎤 Voice Commands</h3>
+                    <p><span class="status-indicator status-not-working"></span>Create events: "Schedule meeting tomorrow at 3pm"</p>
+                    <p><span class="status-indicator status-not-working"></span>Delete events: "Cancel my lunch appointment"</p>
+                    <p><span class="status-indicator status-not-working"></span>Query schedule: "What's on my calendar today?"</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>🤖 AI Integration</h3>
+                    <p><span class="status-indicator status-not-working"></span>OpenAI GPT for natural language processing</p>
+                    <p><span class="status-indicator status-not-working"></span>Cohere AI for event parsing</p>
+                    <p><span class="status-indicator status-not-working"></span>DeepSeek AI as fallback</p>
+                    <p><span class="status-indicator status-not-working"></span>HuggingFace models</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>📅 Calendar Features</h3>
+                    <p><span class="status-indicator status-not-working"></span>Google Calendar sync</p>
+                    <p><span class="status-indicator status-not-working"></span>Smart event creation</p>
+                    <p><span class="status-indicator status-not-working"></span>Recurring events (Pro)</p>
+                    <p><span class="status-indicator status-not-working"></span>Email reminders</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>🔐 User Features</h3>
+                    <p><span class="status-indicator status-limited"></span>Google OAuth login (frontend only)</p>
+                    <p><span class="status-indicator status-not-working"></span>Subscription tiers</p>
+                    <p><span class="status-indicator status-not-working"></span>User profiles</p>
+                    <p><span class="status-indicator status-not-working"></span>Settings management</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="notice-card">
+            <h2>🌐 Deploy with Full Functionality</h2>
+            <p>Choose a deployment option below to get the complete AI Voice Calendar Assistant with all features working:</p>
+            
+            <div class="deployment-options">
+                <div class="deployment-card recommended">
+                    <h4>🟢 Vercel (Recommended)</h4>
+                    <p><span class="status-indicator status-working"></span>Free tier available</p>
+                    <p><span class="status-indicator status-working"></span>Serverless functions</p>
+                    <p><span class="status-indicator status-working"></span>Automatic deployments</p>
+                    <p><span class="status-indicator status-working"></span>Global CDN</p>
+                    
+                    <div class="code-block">
+npm install -g vercel<br/>
+vercel --prod
+                    </div>
+                    
+                    <a href="https://vercel.com" class="btn btn-primary" target="_blank">Deploy to Vercel</a>
+                </div>
+                
+                <div class="deployment-card">
+                    <h4>🟡 Railway</h4>
+                    <p><span class="status-indicator status-working"></span>Built-in database</p>
+                    <p><span class="status-indicator status-working"></span>Easy deployment</p>
+                    <p><span class="status-indicator status-working"></span>Full-stack support</p>
+                    <p><span class="status-indicator status-limited"></span>Free tier limited</p>
+                    
+                    <div class="code-block">
+npm install -g @railway/cli<br/>
+railway deploy
+                    </div>
+                    
+                    <a href="https://railway.app" class="btn btn-secondary" target="_blank">Deploy to Railway</a>
+                </div>
+                
+                <div class="deployment-card">
+                    <h4>🔵 Heroku</h4>
+                    <p><span class="status-indicator status-working"></span>Mature platform</p>
+                    <p><span class="status-indicator status-working"></span>Add-ons ecosystem</p>
+                    <p><span class="status-indicator status-not-working"></span>No free tier</p>
+                    <p><span class="status-indicator status-limited"></span>More expensive</p>
+                    
+                    <div class="code-block">
+heroku create your-app<br/>
+git push heroku main
+                    </div>
+                    
+                    <a href="https://heroku.com" class="btn btn-secondary" target="_blank">Deploy to Heroku</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="notice-card">
+            <h2>🛠️ Frontend Demo Available</h2>
+            <p>You can still explore the user interface and design of the application:</p>
+            <div style="margin: 1rem 0;">
+                <a href="secure-landing.html" class="btn">🏠 Landing Page</a>
+                <a href="app.html" class="btn">📱 Main App (UI Only)</a>
+                <a href="ai-voice-interface.html" class="btn">🎤 Voice Interface (UI Only)</a>
+                <a href="settings.html" class="btn">⚙️ Settings (UI Only)</a>
+            </div>
+            <p><small>Note: These pages show the interface but backend functionality will not work on GitHub Pages.</small></p>
+        </div>
+
+        <div class="notice-card">
+            <h2>📚 Documentation</h2>
+            <div style="margin: 1rem 0;">
+                <a href="https://github.com/Nagavenkatasai7/ai-calender-agent" class="btn btn-primary" target="_blank">📖 GitHub Repository</a>
+                <a href="https://github.com/Nagavenkatasai7/ai-calender-agent/blob/main/DEPLOYMENT.md" class="btn" target="_blank">🚀 Deployment Guide</a>
+                <a href="https://github.com/Nagavenkatasai7/ai-calender-agent/blob/main/README.md" class="btn" target="_blank">📋 Features & Setup</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>🎉 <strong>Ready to experience the full AI Voice Calendar Assistant?</strong></p>
+            <p>Deploy with Vercel or Railway for complete functionality!</p>
+            <br>
+            <p><small>Built with ❤️ using TypeScript, Express.js, and cutting-edge AI technologies</small></p>
+        </div>
+    </div>
+
+    <script>
+        // Add some interactivity for demo purposes
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate deployment cards on hover
+            const cards = document.querySelectorAll('.deployment-card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-8px) scale(1.02)';
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // Add click tracking for demo
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    console.log('Button clicked:', this.textContent);
+                    // Could add analytics here in a real deployment
+                });
+            });
+        });
+    </script>
+</body>
+</html> 
