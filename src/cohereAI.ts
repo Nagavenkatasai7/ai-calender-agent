@@ -139,8 +139,53 @@ Respond in JSON format with confidence score.`;
   }
 
   private fallbackParseEvent(input: string): any {
+    // Basic pattern matching for date/time extraction
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    // Set default time to 2 PM if no time specified
+    let startTime = new Date(tomorrow);
+    startTime.setHours(14, 0, 0, 0);
+    
+    // Look for time patterns
+    const timeMatch = input.match(/(\d{1,2}):?(\d{2})?\s*(am|pm|a\.m\.|p\.m\.)/i);
+    if (timeMatch) {
+      let hours = parseInt(timeMatch[1]);
+      const minutes = parseInt(timeMatch[2] || '0');
+      const ampm = timeMatch[3].toLowerCase();
+      
+      if (ampm.includes('p') && hours !== 12) hours += 12;
+      if (ampm.includes('a') && hours === 12) hours = 0;
+      
+      startTime.setHours(hours, minutes, 0, 0);
+    }
+    
+    // Set end time 1 hour later
+    const endTime = new Date(startTime);
+    endTime.setHours(endTime.getHours() + 1);
+    
+    // Look for "today" vs "tomorrow"
+    if (input.toLowerCase().includes('today')) {
+      startTime = new Date(now);
+      startTime.setHours(startTime.getHours(), startTime.getMinutes(), 0, 0);
+      if (timeMatch) {
+        let hours = parseInt(timeMatch[1]);
+        const minutes = parseInt(timeMatch[2] || '0');
+        const ampm = timeMatch[3].toLowerCase();
+        
+        if (ampm.includes('p') && hours !== 12) hours += 12;
+        if (ampm.includes('a') && hours === 12) hours = 0;
+        
+        startTime.setHours(hours, minutes, 0, 0);
+      }
+      endTime.setTime(startTime.getTime() + 60 * 60 * 1000); // 1 hour later
+    }
+    
     return {
       title: input,
+      startTime: startTime,
+      endTime: endTime,
       confidence: 0.5,
       category: 'general'
     };

@@ -1907,7 +1907,7 @@ Be natural and conversational in responses. If unclear, set intent to "unknown" 
           }
         }
 
-        // Instead of using the complex AI voice interface on server, use Cohere directly
+        // Server-side voice processing - no browser APIs needed
         let response: any = {
           text: "I'll help you with that request.",
           suggestions: [],
