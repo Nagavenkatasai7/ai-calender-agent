@@ -12,6 +12,9 @@ import { CalendarService } from './calendar';
 import { EmailService } from './emailService';
 import { SubscriptionService } from './subscriptionService';
 import { AuthService, AuthConfig } from './auth';
+import { AIVoiceInterface, AIVoiceConfig } from './aiVoiceInterface';
+import { HuggingFaceMCPService } from './huggingFaceMCP';
+// import { CohereAIService } from './cohereAI';
 
 dotenv.config();
 
@@ -45,6 +48,9 @@ export class AIReminderApp {
   private subscriptionService: SubscriptionService;
   private authService: AuthService;
   private oauth2Client: OAuth2Client;
+  private aiVoiceInterface: AIVoiceInterface | null = null;
+  private hfMCPService: HuggingFaceMCPService | null = null;
+  private cohereService: any | null = null;
   private port: number;
 
   constructor() {
@@ -944,11 +950,19 @@ export class AIReminderApp {
       res.sendFile(path.join(__dirname, '..', 'public', 'settings.html'));
     });
 
+    // AI Voice Interface page (requires authentication)
+    this.app.get('/ai-voice', authMiddleware, (req: Request, res: Response) => {
+      res.sendFile(path.join(__dirname, '..', 'public', 'ai-voice-interface.html'));
+    });
+
     // User profile and settings routes (using enhanced auth with email verification)
     this.setupUserRoutes(authMiddleware);
     
     // Calendar and reminder routes (using enhanced auth with email verification)
     this.setupReminderRoutes(authMiddleware);
+    
+    // AI Voice routes (using enhanced auth with email verification)
+    this.setupAIVoiceRoutes(authMiddleware);
     
     // Subscription routes (using enhanced auth with email verification)
     this.setupSubscriptionRoutes(authMiddleware);
@@ -1289,6 +1303,1031 @@ export class AIReminderApp {
       } catch (error) {
         console.error('Error fetching reminders:', error);
         res.status(500).json({ success: false, error: 'Failed to fetch reminders' });
+      }
+    });
+
+    // OpenAI command analysis endpoint for voice commands
+    this.app.post('/api/ai/analyze-command', authMiddleware, async (req: Request, res: Response) => {
+      try {
+        const { transcript, context } = req.body;
+        
+        if (!transcript) {
+          return res.status(400).json({ error: 'Transcript is required' });
+        }
+
+        console.log('🤖 Analyzing voice command:', transcript);
+        
+        // Create a detailed prompt for command analysis
+        const analysisPrompt = `
+You are a smart calendar assistant. Analyze this voice command and extract the intent and details.
+
+Voice Command: "${transcript}"
+Current Context: ${JSON.stringify(context)}
+
+Respond with a JSON object containing:
+{
+    "intent": "create_event|query_events|delete_event|navigate|help|unknown",
+    "confidence": 0.0-1.0,
+    "response": "Natural response to user",
+    "eventDetails": {  // Only for create_event
+        "title": "Event title",
+        "startTime": "ISO date string",
+        "endTime": "ISO date string",
+        "location": "Location if mentioned",
+        "description": "Any additional details"
+    },
+    "queryType": "today|tomorrow|this_week|specific_time|general",  // Only for query_events
+    "eventToDelete": "Event name to delete",  // Only for delete_event
+    "navigationType": "today|tomorrow|view_change",  // Only for navigate
+    "viewType": "day|week|month",  // Only for view_change navigation
+    "needsConfirmation": true/false,
+    "summary": "Brief summary of what will be done",
+    "emptyResponse": "Response when no events found",
+    "errorResponse": "Response when operation fails",
+    "originalCommand": "${transcript}"
+}
+
+Examples:
+- "Schedule a meeting tomorrow at 3 PM" → intent: "create_event"
+- "What's on my calendar today?" → intent: "query_events", queryType: "today"
+- "Delete my dentist appointment" → intent: "delete_event", eventToDelete: "dentist appointment"
+- "Go to tomorrow" → intent: "navigate", navigationType: "tomorrow"
+- "Switch to week view" → intent: "navigate", navigationType: "view_change", viewType: "week"
+
+Be natural and conversational in responses. If unclear, set intent to "unknown" and ask for clarification.
+`;
+
+        try {
+          // Use OpenAI to analyze the command via a custom analysis method
+          const analysis = await this.analyzeCommandWithOpenAI(transcript, analysisPrompt);
+          console.log('🧠 AI Analysis Result:', analysis);
+          res.json(analysis);
+
+        } catch (openaiError) {
+          console.error('OpenAI analysis failed:', openaiError);
+          
+          // Try Cohere as backup
+          try {
+            if (process.env.COHERE_API_KEY) {
+              if (!this.cohereService) {
+                const { CohereAIService } = require('./cohereAI');
+                this.cohereService = new CohereAIService({
+                  apiKey: process.env.COHERE_API_KEY
+                });
+              }
+              
+              console.log('🤖 Using Cohere AI for command analysis...');
+              const cohereAnalysis = await this.cohereService.generateCalendarResponse(
+                `Analyze this voice command and provide intent: "${transcript}". Respond with JSON: {"intent": "create_event|query_events|delete_event|navigate|help", "confidence": 0.0-1.0, "response": "Natural response"}`
+              );
+              
+              try {
+                const parsed = JSON.parse(cohereAnalysis.text);
+                res.json({
+                  ...parsed,
+                  originalCommand: transcript,
+                  aiProvider: 'cohere'
+                });
+                return;
+              } catch (parseError) {
+                console.log('Cohere response not JSON, using text response');
+              }
+            }
+          } catch (cohereError) {
+            console.error('Cohere analysis failed:', cohereError);
+          }
+          
+          // Fallback to basic pattern matching
+          const fallbackAnalysis = {
+            intent: this.detectBasicIntent(transcript),
+            confidence: 0.5,
+            response: "I'll help you with that request.",
+            originalCommand: transcript,
+            aiProvider: 'fallback'
+          };
+          
+          res.json(fallbackAnalysis);
+        }
+
+      } catch (error) {
+        console.error('❌ Command analysis error:', error);
+        res.status(500).json({ 
+          error: 'Failed to analyze command',
+          details: error instanceof Error ? error.message : 'Unknown error'
+        });
+      }
+    });
+  }
+
+  // OpenAI command analysis method with DeepSeek fallback
+  private async analyzeCommandWithOpenAI(transcript: string, prompt: string): Promise<any> {
+    // Try OpenAI first
+    const openaiKey = process.env.OPENAI_API_KEY;
+    console.log('🔑 OpenAI API Key status:', openaiKey ? `Set (${openaiKey.substring(0, 10)}...)` : 'Not set');
+    
+    if (openaiKey) {
+      try {
+        const OpenAI = require('openai');
+        const openai = new OpenAI({
+          apiKey: openaiKey,
+        });
+
+        const response = await openai.chat.completions.create({
+          model: 'gpt-3.5-turbo',
+          messages: [
+            {
+              role: 'system',
+              content: 'You are a helpful calendar assistant that analyzes voice commands and extracts structured information. Always respond with valid JSON.'
+            },
+            {
+              role: 'user',
+              content: prompt
+            }
+          ],
+          temperature: 0.3,
+          max_tokens: 800
+        });
+
+        const analysisText = response.choices[0]?.message?.content?.trim();
+        
+        if (analysisText) {
+          try {
+            return JSON.parse(analysisText);
+          } catch (parseError) {
+            console.warn('Failed to parse OpenAI response, trying DeepSeek...');
+          }
+        }
+      } catch (error) {
+        console.warn('OpenAI API failed, trying DeepSeek...', error);
+      }
+    }
+
+    // Fallback to DeepSeek
+    const deepseekKey = process.env.DEEPSEEK_API_KEY;
+    if (deepseekKey) {
+      console.log('🤖 Using DeepSeek API as fallback...');
+      
+      try {
+        const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${deepseekKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'deepseek-chat',
+            messages: [
+              {
+                role: 'system',
+                content: 'You are a helpful calendar assistant that analyzes voice commands and extracts structured information. Always respond with valid JSON.'
+              },
+              {
+                role: 'user',
+                content: prompt
+              }
+            ],
+            max_tokens: 800,
+            temperature: 0.3
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const analysisText = data.choices[0]?.message?.content?.trim();
+          
+          if (analysisText) {
+            try {
+              return JSON.parse(analysisText);
+            } catch (parseError) {
+              console.error('Failed to parse DeepSeek response as JSON:', analysisText);
+            }
+          }
+        } else {
+          const errorData = await response.text();
+          console.error('DeepSeek API Error:', response.status, errorData);
+        }
+      } catch (error) {
+        console.error('DeepSeek API error:', error);
+      }
+    } else {
+      console.log('⚠️ DeepSeek API key not configured, trying HuggingFace...');
+    }
+
+    // Try Hugging Face as final AI fallback
+    const hfToken = process.env.HUGGING_FACE_TOKEN;
+    if (!hfToken) {
+      console.log('⚠️ HuggingFace token not configured, skipping HF fallback');
+      // Final fallback to basic intent detection
+      return {
+        intent: this.detectBasicIntent(transcript),
+        confidence: 0.5,
+        response: "I'll help you with that.",
+        originalCommand: transcript
+      };
+    }
+    console.log('🤗 Using Hugging Face API as final AI fallback...');
+    
+    try {
+      const response = await fetch('https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${hfToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          inputs: `You are a calendar assistant. Analyze this voice command and respond with JSON containing: intent (create_event, query_events, delete_event, navigate, help), confidence (0-1), and response. Command: "${transcript}"`
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('🤗 Hugging Face response:', data);
+        
+        // Try to extract structured response from HF
+        if (data && data.length > 0 && data[0].generated_text) {
+          const generatedText = data[0].generated_text;
+          try {
+            // Try to parse as JSON
+            const jsonMatch = generatedText.match(/\{.*\}/s);
+            if (jsonMatch) {
+              return JSON.parse(jsonMatch[0]);
+            }
+          } catch (parseError) {
+            console.log('HF response not JSON, using basic parsing...');
+          }
+        }
+      } else {
+        console.error('Hugging Face API Error:', response.status);
+      }
+    } catch (error) {
+      console.error('Hugging Face API error:', error);
+    }
+
+    // Final fallback to basic intent detection
+    console.log('🔄 Falling back to basic pattern matching...');
+    return {
+      intent: this.detectBasicIntent(transcript),
+      confidence: 0.5,
+      response: "I'll help you with that.",
+      originalCommand: transcript
+    };
+  }
+
+  // Basic intent detection fallback
+  private detectBasicIntent(transcript: string): string {
+    const command = transcript.toLowerCase();
+    
+    if (command.includes('schedule') || command.includes('create') || command.includes('add') || 
+        command.includes('book') || command.includes('plan') || command.includes('set up')) {
+      return 'create_event';
+    }
+    
+    if (command.includes('what') || command.includes('show') || command.includes('list') || 
+        command.includes('my schedule') || command.includes('today') || command.includes('tomorrow')) {
+      return 'query_events';
+    }
+    
+    if (command.includes('delete') || command.includes('cancel') || command.includes('remove')) {
+      return 'delete_event';
+    }
+    
+    if (command.includes('go to') || command.includes('navigate') || command.includes('view')) {
+      return 'navigate';
+    }
+    
+    if (command.includes('help') || command.includes('what can you do')) {
+      return 'help';
+    }
+    
+    return 'unknown';
+  }
+
+  // Create calendar event from parsed voice command
+  private async createEventFromParsing(eventParsing: any, userId: string, userEmail: string, tokens: any): Promise<{success: boolean, eventId?: string, calendarEventId?: string, error?: string}> {
+    try {
+      // Get user's calendars
+      let calendars = [];
+      let defaultCalendar = null;
+      try {
+        calendars = await this.database.getUserCalendars(userId);
+        defaultCalendar = calendars.find(c => c.is_default) || calendars[0];
+      } catch (error: any) {
+        console.log('⚠️ No calendars found in database, creating virtual calendar:', error?.message);
+      }
+
+      // Create calendar reminders based on default alert time
+      const calendarReminders = [{
+        method: 'email' as const,
+        minutes: 15 // Default 15 minute reminder
+      }];
+
+      // Try to create Google Calendar event
+      let calendarResponse = null;
+      try {
+        if (tokens) {
+          // Create isolated OAuth client for this user
+          console.log('🔐 Creating isolated OAuth client for calendar event creation');
+          const userOAuth2Client = new google.auth.OAuth2(
+            process.env.GOOGLE_CLIENT_ID,
+            process.env.GOOGLE_CLIENT_SECRET,
+            process.env.GOOGLE_REDIRECT_URI
+          );
+          userOAuth2Client.setCredentials(tokens);
+          
+          // Create calendar service with isolated client
+          const userCalendarService = new CalendarService();
+          await userCalendarService.authenticate(tokens);
+          
+          calendarResponse = await userCalendarService.createEvent({
+            title: eventParsing.title,
+            description: eventParsing.description || `Event created via voice command`,
+            startTime: eventParsing.startTime,
+            endTime: eventParsing.endTime,
+            timeZone: 'America/New_York',
+            reminders: {
+              useDefault: false,
+              overrides: calendarReminders
+            }
+          }, userEmail);
+          console.log('✅ Google Calendar event created:', calendarResponse?.id);
+        } else {
+          console.log('⚠️ No OAuth tokens available, skipping Google Calendar creation');
+        }
+      } catch (error: any) {
+        console.error('⚠️ Calendar event creation failed, continuing without it:', error?.message);
+      }
+
+      // Store reminder in database
+      const reminder = await this.database.addReminder({
+        user_id: userId,
+        calendar_id: defaultCalendar?.id || 'virtual',
+        title: eventParsing.title,
+        description: eventParsing.description || `Event created via voice command`,
+        startTime: eventParsing.startTime,
+        endTime: eventParsing.endTime,
+        timezone: 'America/New_York',
+        alertMinutes: [15], // Default 15 minute reminder
+        created_via: 'ai',
+        ai_confidence: eventParsing.confidence,
+        original_input: `Voice: ${eventParsing.originalText || 'Voice command'}`,
+        attendees: eventParsing.attendees || [],
+        location: eventParsing.location,
+        calendarEventId: calendarResponse?.id
+      });
+
+      // Track usage
+      await this.database.trackUsage(userId, 'voice_event_created');
+
+      return {
+        success: true,
+        eventId: reminder.id,
+        calendarEventId: calendarResponse?.id
+      };
+
+    } catch (error) {
+      console.error('Error creating event from voice:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error occurred'
+      };
+    }
+  }
+
+  // Delete event based on voice command
+  private async deleteEventFromVoice(transcript: string, userId: string, userEmail: string): Promise<{success: boolean, message: string, deletedCount?: number}> {
+    try {
+      // Get user's reminders
+      const reminders = await this.database.getUserReminders(userEmail);
+      
+      if (reminders.length === 0) {
+        return {
+          success: false,
+          message: "You don't have any events to delete."
+        };
+      }
+
+      // Extract event identifier from transcript
+      const command = transcript.toLowerCase();
+      let eventToDelete = null;
+      let deletedCount = 0;
+
+      // Look for specific event mentions
+      for (const reminder of reminders) {
+        const title = reminder.title.toLowerCase();
+        
+        // Check if the transcript mentions this event
+        if (command.includes(title) || title.includes(command.replace(/delete|cancel|remove/gi, '').trim())) {
+          eventToDelete = reminder;
+          break;
+        }
+      }
+
+      // If no specific event found, look for time-based deletion
+      if (!eventToDelete) {
+        if (command.includes('today')) {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const tomorrow = new Date(today);
+          tomorrow.setDate(tomorrow.getDate() + 1);
+          
+          const todayEvents = reminders.filter(r => {
+            const eventDate = new Date(r.startTime);
+            return eventDate >= today && eventDate < tomorrow;
+          });
+          
+          if (todayEvents.length > 0) {
+                         // Delete all today's events
+             for (const event of todayEvents) {
+               await this.database.deleteReminder(event.id, userEmail);
+               deletedCount++;
+             }
+            
+            return {
+              success: true,
+              message: `Deleted ${deletedCount} event(s) for today.`,
+              deletedCount
+            };
+          }
+        }
+      }
+
+      if (eventToDelete) {
+        // Delete the specific event
+        await this.database.deleteReminder(eventToDelete.id, userEmail);
+        
+        // Try to delete from Google Calendar if it exists
+        try {
+          if (eventToDelete.calendarEventId) {
+            // This would need proper calendar service implementation
+            console.log(`🗑️ Would delete Google Calendar event: ${eventToDelete.calendarEventId}`);
+          }
+        } catch (error) {
+          console.error('Failed to delete from Google Calendar:', error);
+        }
+
+        await this.database.trackUsage(userId, 'voice_event_deleted');
+        
+        return {
+          success: true,
+          message: `Deleted event: "${eventToDelete.title}"`,
+          deletedCount: 1
+        };
+      }
+
+      return {
+        success: false,
+        message: "I couldn't find that event. Please be more specific about which event to delete."
+      };
+
+    } catch (error) {
+      console.error('Error deleting event from voice:', error);
+      return {
+        success: false,
+        message: "Sorry, I couldn't delete the event. Please try again."
+      };
+    }
+  }
+
+  // Query events based on voice command
+  private async queryEventsFromVoice(transcript: string, userId: string, userEmail: string): Promise<{message: string, events: any[]}> {
+    try {
+      const command = transcript.toLowerCase();
+      const reminders = await this.database.getUserReminders(userEmail);
+      
+      let filteredEvents = reminders;
+      let timeDescription = "";
+
+      // Filter based on time references
+      if (command.includes('today')) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        
+        filteredEvents = reminders.filter(r => {
+          const eventDate = new Date(r.startTime);
+          return eventDate >= today && eventDate < tomorrow;
+        });
+        timeDescription = "today";
+      } else if (command.includes('tomorrow')) {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(0, 0, 0, 0);
+        const dayAfter = new Date(tomorrow);
+        dayAfter.setDate(dayAfter.getDate() + 1);
+        
+        filteredEvents = reminders.filter(r => {
+          const eventDate = new Date(r.startTime);
+          return eventDate >= tomorrow && eventDate < dayAfter;
+        });
+        timeDescription = "tomorrow";
+      } else if (command.includes('this week')) {
+        const now = new Date();
+        const startOfWeek = new Date(now);
+        startOfWeek.setDate(now.getDate() - now.getDay());
+        startOfWeek.setHours(0, 0, 0, 0);
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 7);
+        
+        filteredEvents = reminders.filter(r => {
+          const eventDate = new Date(r.startTime);
+          return eventDate >= startOfWeek && eventDate < endOfWeek;
+        });
+        timeDescription = "this week";
+      }
+
+      // Generate response message
+      let message = "";
+      if (filteredEvents.length === 0) {
+        message = timeDescription 
+          ? `You have no events scheduled for ${timeDescription}.`
+          : "You have no events in your calendar.";
+      } else {
+        const eventList = filteredEvents
+          .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
+          .slice(0, 5) // Limit to 5 events
+          .map(event => {
+            const date = new Date(event.startTime);
+            const time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const day = timeDescription === "this week" ? date.toLocaleDateString([], { weekday: 'short' }) : "";
+            return `${day} ${time}: ${event.title}`.trim();
+          })
+          .join(', ');
+
+        const moreText = filteredEvents.length > 5 ? ` and ${filteredEvents.length - 5} more` : "";
+        
+        message = timeDescription
+          ? `You have ${filteredEvents.length} event(s) ${timeDescription}: ${eventList}${moreText}.`
+          : `You have ${filteredEvents.length} event(s): ${eventList}${moreText}.`;
+      }
+
+      await this.database.trackUsage(userId, 'voice_schedule_queried');
+
+      return {
+        message,
+        events: filteredEvents.slice(0, 10) // Return up to 10 events
+      };
+
+    } catch (error) {
+      console.error('Error querying events from voice:', error);
+      return {
+        message: "Sorry, I couldn't retrieve your schedule. Please try again.",
+        events: []
+      };
+    }
+  }
+
+  private setupAIVoiceRoutes(authMiddleware: any) {
+    // Process voice command with enhanced AI
+    this.app.post('/api/voice/process', authMiddleware, async (req: Request, res: Response) => {
+      try {
+        const { transcript, config, hfToken } = req.body;
+        const userId = req.session.userId!;
+        const userEmail = req.session.userEmail!;
+
+        if (!transcript || transcript.trim().length === 0) {
+          return res.status(400).json({
+            success: false,
+            error: 'Voice transcript is required'
+          });
+        }
+
+        console.log(`🎤 Processing voice command for ${userEmail}: "${transcript}"`);
+
+        // Initialize AI services if needed
+        if (!this.hfMCPService && hfToken) {
+          try {
+            this.hfMCPService = new HuggingFaceMCPService({
+              huggingFaceToken: hfToken,
+              mcpServerUrl: 'https://huggingface.co/mcp'
+            });
+            console.log('✅ HuggingFace MCP service initialized');
+          } catch (error) {
+            console.error('❌ Failed to initialize HF MCP service:', error);
+          }
+        }
+
+        // Instead of using the complex AI voice interface on server, use Cohere directly
+        let response: any = {
+          text: "I'll help you with that request.",
+          suggestions: [],
+          transcript: transcript
+        };
+
+        // Analyze command intent and execute actions
+        try {
+          // First, determine the intent using AI or pattern matching
+          const intent = this.detectBasicIntent(transcript);
+          console.log(`🎯 Detected intent: ${intent}`);
+
+          if (intent === 'create_event') {
+            // Parse the event details using AI
+            if (process.env.COHERE_API_KEY) {
+              if (!this.cohereService) {
+                const { CohereAIService } = require('./cohereAI');
+                this.cohereService = new CohereAIService({
+                  apiKey: process.env.COHERE_API_KEY
+                });
+              }
+              
+              console.log('🤖 Using Cohere AI to parse event details...');
+              const eventParsing = await this.cohereService.parseNaturalLanguageEvent(transcript);
+              
+              if (eventParsing.confidence > 0.4) {
+                console.log('📅 Creating calendar event:', eventParsing);
+                
+                // Actually create the event
+                const createResult = await this.createEventFromParsing(eventParsing, userId, userEmail, req.session.tokens);
+                
+                if (createResult.success) {
+                  response = {
+                    text: `✅ Created event: "${eventParsing.title}" for ${new Date(eventParsing.startTime).toLocaleDateString()} at ${new Date(eventParsing.startTime).toLocaleTimeString()}`,
+                    suggestions: [
+                      "Create another event",
+                      "View my schedule",
+                      "Edit this event",
+                      "Set a reminder"
+                    ],
+                    actionTaken: 'event_created',
+                    eventId: createResult.eventId,
+                    calendarEventId: createResult.calendarEventId
+                  };
+                } else {
+                  response = {
+                    text: `❌ Sorry, I couldn't create the event. ${createResult.error}`,
+                    suggestions: [
+                      "Try rephrasing the request",
+                      "Be more specific about the date and time",
+                      "Check if you're logged in to Google Calendar"
+                    ],
+                    actionTaken: 'event_creation_failed'
+                  };
+                }
+              } else {
+                response = {
+                  text: "I understand you want to create an event, but I need more details. Please specify the title, date, and time.",
+                  suggestions: [
+                    "Try: 'Create meeting with John tomorrow at 3pm'",
+                    "Try: 'Schedule dinner Friday at 7pm'",
+                    "Try: 'Book appointment next Tuesday at 2pm'"
+                  ]
+                };
+              }
+            } else {
+              response.text = "I'd like to help you create an event. Please provide more details like the title, date, and time.";
+            }
+          } else if (intent === 'delete_event') {
+            // Handle event deletion
+            console.log('🗑️ Processing delete request...');
+            const deleteResult = await this.deleteEventFromVoice(transcript, userId, userEmail);
+            
+            if (deleteResult.success) {
+              response = {
+                text: `✅ ${deleteResult.message}`,
+                suggestions: [
+                  "Delete another event",
+                  "View my schedule",
+                  "Create a new event"
+                ],
+                actionTaken: 'event_deleted',
+                deletedCount: deleteResult.deletedCount
+              };
+            } else {
+              response = {
+                text: `❌ ${deleteResult.message}`,
+                suggestions: [
+                  "Try being more specific about which event to delete",
+                  "Say the exact event title",
+                  "View your schedule first"
+                ],
+                actionTaken: 'delete_failed'
+              };
+            }
+          } else if (intent === 'query_events') {
+            // Handle schedule queries
+            console.log('📋 Processing schedule query...');
+            const queryResult = await this.queryEventsFromVoice(transcript, userId, userEmail);
+            
+            response = {
+              text: queryResult.message,
+              suggestions: [
+                "Create a new event",
+                "Delete an event",
+                "View tomorrow's schedule"
+              ],
+              actionTaken: 'events_queried',
+              events: queryResult.events
+            };
+          } else {
+            // Use Cohere for general responses
+            if (process.env.COHERE_API_KEY) {
+              if (!this.cohereService) {
+                const { CohereAIService } = require('./cohereAI');
+                this.cohereService = new CohereAIService({
+                  apiKey: process.env.COHERE_API_KEY
+                });
+              }
+              
+              console.log('🤖 Using Cohere AI for general response...');
+              const cohereResponse = await this.cohereService.generateCalendarResponse(
+                `User said: "${transcript}". Provide a helpful response about their calendar request.`
+              );
+              response.text = cohereResponse.text || "I'm here to help with your calendar. You can ask me to create events, delete events, or check your schedule.";
+            } else {
+              response.text = "I'm here to help with your calendar. You can ask me to create events, delete events, or check your schedule.";
+            }
+            
+            response.suggestions = [
+              "Create a new event",
+              "Check my schedule",
+              "Delete an event",
+              "What can you do?"
+            ];
+          }
+        } catch (error) {
+          console.error('Voice command processing error:', error);
+          response = {
+            text: "I'm having trouble processing that request. Please try again or be more specific.",
+            suggestions: [
+              "Try: 'Create meeting tomorrow at 3pm'",
+              "Try: 'What's on my schedule today?'",
+              "Try: 'Delete my lunch appointment'"
+            ]
+          };
+        }
+
+        // Track usage
+        await this.database.trackUsage(userId, 'voice_command_processed');
+
+        res.json({
+          success: true,
+          response: response,
+          transcript: transcript,
+          timestamp: new Date().toISOString()
+        });
+
+      } catch (error) {
+        console.error('❌ Voice processing error:', error);
+        res.status(500).json({
+          success: false,
+          error: 'Failed to process voice command',
+          details: error instanceof Error ? error.message : String(error)
+        });
+      }
+    });
+
+    // Get AI capabilities
+    this.app.get('/api/ai/capabilities', authMiddleware, async (req: Request, res: Response) => {
+      try {
+        const capabilities = this.hfMCPService ? this.hfMCPService.getCapabilities() : [];
+        
+        res.json({
+          success: true,
+          capabilities: capabilities,
+          voiceSupported: true,
+          huggingFaceConnected: !!this.hfMCPService
+        });
+      } catch (error) {
+        console.error('Error fetching AI capabilities:', error);
+        res.status(500).json({
+          success: false,
+          error: 'Failed to fetch AI capabilities'
+        });
+      }
+    });
+
+    // Health check for AI services
+    this.app.post('/api/ai/health', authMiddleware, async (req: Request, res: Response) => {
+      try {
+        const { token } = req.body;
+        
+        let hfHealth: any = { status: 'down', error: 'Not initialized' };
+        
+        if (token) {
+          try {
+            if (!this.hfMCPService) {
+              this.hfMCPService = new HuggingFaceMCPService({
+                huggingFaceToken: token,
+                mcpServerUrl: 'https://huggingface.co/mcp'
+              });
+            }
+            
+            hfHealth = await this.hfMCPService.healthCheck();
+          } catch (error) {
+            hfHealth = { 
+              status: 'down', 
+              error: error instanceof Error ? error.message : String(error),
+              capabilities: []
+            };
+          }
+        }
+
+        // Check Cohere if available
+        let cohereHealth: any = { status: 'not_configured' };
+        if (process.env.COHERE_API_KEY) {
+          try {
+            if (!this.cohereService) {
+              const { CohereAIService } = require('./cohereAI');
+              this.cohereService = new CohereAIService({
+                apiKey: process.env.COHERE_API_KEY
+              });
+            }
+            cohereHealth = await this.cohereService.healthCheck();
+          } catch (error) {
+            cohereHealth = {
+              status: 'down',
+              error: error instanceof Error ? error.message : String(error)
+            };
+          }
+        }
+
+        res.json({
+          success: true,
+          health: {
+            huggingFace: hfHealth,
+            cohere: cohereHealth,
+            openAI: process.env.OPENAI_API_KEY ? 'available' : 'not_configured',
+            voiceInterface: 'server_mode'
+          }
+        });
+      } catch (error) {
+        console.error('Error checking AI health:', error);
+        res.status(500).json({
+          success: false,
+          error: 'Failed to check AI health'
+        });
+      }
+    });
+
+    // Enhance calendar event with AI
+    this.app.post('/api/ai/enhance-event', authMiddleware, async (req: Request, res: Response) => {
+      try {
+        const { eventDescription } = req.body;
+        
+        if (!eventDescription) {
+          return res.status(400).json({
+            success: false,
+            error: 'Event description is required'
+          });
+        }
+
+        if (!this.hfMCPService) {
+          return res.status(400).json({
+            success: false,
+            error: 'AI service not available. Please configure HuggingFace token.'
+          });
+        }
+
+        const enhancement = await this.hfMCPService.enhanceCalendarEvent(eventDescription);
+        
+        res.json({
+          success: true,
+          original: eventDescription,
+          enhanced: enhancement
+        });
+      } catch (error) {
+        console.error('Error enhancing event:', error);
+        res.status(500).json({
+          success: false,
+          error: 'Failed to enhance event'
+        });
+      }
+    });
+
+    // Summarize events with AI
+    this.app.post('/api/ai/summarize-events', authMiddleware, async (req: Request, res: Response) => {
+      try {
+        const { events } = req.body;
+        
+        if (!events || !Array.isArray(events)) {
+          return res.status(400).json({
+            success: false,
+            error: 'Events array is required'
+          });
+        }
+
+        if (!this.hfMCPService) {
+          return res.status(400).json({
+            success: false,
+            error: 'AI service not available. Please configure HuggingFace token.'
+          });
+        }
+
+        const summary = await this.hfMCPService.summarizeEvents(events);
+        
+        res.json({
+          success: true,
+          eventCount: events.length,
+          summary: summary
+        });
+      } catch (error) {
+        console.error('Error summarizing events:', error);
+        res.status(500).json({
+          success: false,
+          error: 'Failed to summarize events'
+        });
+      }
+    });
+
+    // Translate content with AI
+    this.app.post('/api/ai/translate', authMiddleware, async (req: Request, res: Response) => {
+      try {
+        const { text, targetLanguage } = req.body;
+        
+        if (!text || !targetLanguage) {
+          return res.status(400).json({
+            success: false,
+            error: 'Text and target language are required'
+          });
+        }
+
+        if (!this.hfMCPService) {
+          return res.status(400).json({
+            success: false,
+            error: 'AI service not available. Please configure HuggingFace token.'
+          });
+        }
+
+        const translatedText = await this.hfMCPService.translateEvent(text, {
+          targetLanguage: targetLanguage
+        });
+        
+        res.json({
+          success: true,
+          original: text,
+          translated: translatedText,
+          targetLanguage: targetLanguage
+        });
+      } catch (error) {
+        console.error('Error translating text:', error);
+        res.status(500).json({
+          success: false,
+          error: 'Failed to translate text'
+        });
+      }
+    });
+
+    // Answer questions about calendar
+    this.app.post('/api/ai/ask-question', authMiddleware, async (req: Request, res: Response) => {
+      try {
+        const { question } = req.body;
+        const userId = req.session.userId!;
+        
+        if (!question) {
+          return res.status(400).json({
+            success: false,
+            error: 'Question is required'
+          });
+        }
+
+        if (!this.hfMCPService) {
+          return res.status(400).json({
+            success: false,
+            error: 'AI service not available. Please configure HuggingFace token.'
+          });
+        }
+
+        // Get user's recent events for context
+        const userEmail = req.session.userEmail!;
+        const recentReminders = await this.database.getUserReminders(userEmail);
+        
+        const context = recentReminders.map(r => 
+          `${r.title} on ${new Date(r.startTime).toLocaleDateString()} at ${new Date(r.startTime).toLocaleTimeString()}`
+        ).join('. ');
+
+        const answer = await this.hfMCPService.answerCalendarQuestion(question, context);
+        
+        res.json({
+          success: true,
+          question: question,
+          answer: answer,
+          context: `Based on ${recentReminders.length} recent events`
+        });
+      } catch (error) {
+        console.error('Error answering question:', error);
+        res.status(500).json({
+          success: false,
+          error: 'Failed to answer question'
+        });
+      }
+    });
+
+    // Get conversation history
+    this.app.get('/api/voice/history', authMiddleware, async (req: Request, res: Response) => {
+      try {
+        // For now, return empty history since we're using server-side processing
+        const history: any[] = [];
+        
+        res.json({
+          success: true,
+          history: history.slice(-20) // Last 20 commands
+        });
+      } catch (error) {
+        console.error('Error fetching voice history:', error);
+        res.status(500).json({
+          success: false,
+          error: 'Failed to fetch voice history'
+        });
       }
     });
   }
@@ -1792,6 +2831,8 @@ export class AIReminderApp {
       console.log('📋 Configuration Status:');
       console.log(`   Google OAuth: ${process.env.GOOGLE_CLIENT_ID ? '✅' : '❌'}`);
       console.log(`   OpenAI API: ${process.env.OPENAI_API_KEY ? '✅' : '❌'}`);
+      console.log(`   DeepSeek API: ${process.env.DEEPSEEK_API_KEY ? '✅ (fallback)' : '❌'}`);
+      console.log(`   Hugging Face API: ${process.env.HUGGING_FACE_TOKEN ? '✅ (final fallback)' : '❌'}`);
       console.log(`   Email Service: ${process.env.EMAIL_FROM ? '✅' : '❌'}`);
       console.log(`   Stripe Payments: ${process.env.STRIPE_SECRET_KEY ? '✅' : '❌'}`);
       

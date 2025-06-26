@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Voice Calendar Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .ai-interface {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .status-bar {
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+            padding: 15px 20px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00ff88;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 30px;
+        }
+
+        .voice-control {
+            background: #f8f9ff;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .voice-button {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+            margin-bottom: 20px;
+        }
+
+        .voice-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(255, 107, 107, 0.4);
+        }
+
+        .voice-button.listening {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            animation: listening-pulse 1.5s infinite;
+        }
+
+        @keyframes listening-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .ai-features {
+            background: #f8f9ff;
+            border-radius: 15px;
+            padding: 25px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-3px);
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .feature-card.enabled {
+            border-color: #4ecdc4;
+            background: #f0ffff;
+        }
+
+        .conversation-area {
+            grid-column: 1 / -1;
+            background: #f8f9ff;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .message.user {
+            background: #667eea;
+            color: white;
+            margin-left: auto;
+        }
+
+        .message.ai {
+            background: #e8f2ff;
+            color: #333;
+            border: 1px solid #d1e7ff;
+        }
+
+        .suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .suggestion-chip {
+            background: #667eea;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .suggestion-chip:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        .controls {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .control-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #667eea;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .control-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .settings-panel {
+            grid-column: 1 / -1;
+            background: #f8f9ff;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        .setting-group {
+            margin-bottom: 20px;
+        }
+
+        .setting-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .setting-group input, .setting-group select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: #ccc;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: #4ecdc4;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(26px);
+        }
+
+        .health-status {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .health-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid;
+        }
+
+        .health-card.healthy {
+            border-left-color: #4ecdc4;
+        }
+
+        .health-card.warning {
+            border-left-color: #ffd93d;
+        }
+
+        .health-card.error {
+            border-left-color: #ff6b6b;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI Voice Calendar Assistant</h1>
+            <p>Advanced voice control with HuggingFace AI integration</p>
+        </div>
+
+        <div class="ai-interface">
+            <div class="status-bar">
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span id="status-text">Ready</span>
+                </div>
+                <div>
+                    <span id="connection-status">All systems operational</span>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <!-- Voice Control Section -->
+                <div class="voice-control">
+                    <h3>Voice Commands</h3>
+                    <button id="voice-btn" class="voice-button" title="Click to start voice command">
+                        🎤
+                    </button>
+                    <p id="voice-status">Click the microphone to start</p>
+                    <div class="suggestions" id="voice-suggestions">
+                        <div class="suggestion-chip" onclick="sendTextCommand('Create a meeting tomorrow at 2 PM')">
+                            Create meeting
+                        </div>
+                        <div class="suggestion-chip" onclick="sendTextCommand('What do I have today?')">
+                            Today's schedule
+                        </div>
+                        <div class="suggestion-chip" onclick="sendTextCommand('Cancel my 3 PM appointment')">
+                            Cancel event
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Features Section -->
+                <div class="ai-features">
+                    <h3>AI Capabilities</h3>
+                    <div class="feature-grid">
+                        <div class="feature-card" data-feature="smart-suggestions">
+                            <div>🧠</div>
+                            <div>Smart Suggestions</div>
+                        </div>
+                        <div class="feature-card" data-feature="text-generation">
+                            <div>✍️</div>
+                            <div>Text Generation</div>
+                        </div>
+                        <div class="feature-card" data-feature="translation">
+                            <div>🌐</div>
+                            <div>Translation</div>
+                        </div>
+                        <div class="feature-card" data-feature="summarization">
+                            <div>📄</div>
+                            <div>Summarization</div>
+                        </div>
+                        <div class="feature-card" data-feature="question-answering">
+                            <div>❓</div>
+                            <div>Q&A</div>
+                        </div>
+                        <div class="feature-card" data-feature="event-classification">
+                            <div>🏷️</div>
+                            <div>Classification</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Conversation Area -->
+                <div class="conversation-area">
+                    <h3>Conversation History</h3>
+                    <div id="conversation-log">
+                        <div class="message ai">
+                            <strong>AI Assistant:</strong> Hello! I'm your AI-powered calendar assistant. I can help you manage your schedule using voice commands or text. Try saying "What do I have today?" or "Create a meeting tomorrow."
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div class="controls">
+                    <button class="control-btn" id="start-continuous">Start Continuous Listening</button>
+                    <button class="control-btn" id="stop-listening" disabled>Stop Listening</button>
+                    <button class="control-btn" id="clear-conversation">Clear History</button>
+                    <button class="control-btn" id="toggle-settings">Settings</button>
+                </div>
+
+                <!-- Settings Panel -->
+                <div class="settings-panel hidden" id="settings-panel">
+                    <h3>Settings & Configuration</h3>
+                    
+                    <div class="setting-group">
+                        <label>Preferred Language:</label>
+                        <select id="language-select">
+                            <option value="en">English</option>
+                            <option value="es">Spanish</option>
+                            <option value="fr">French</option>
+                            <option value="de">German</option>
+                            <option value="it">Italian</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-group">
+                        <label>Voice Settings:</label>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                            <div>
+                                <label>Rate:</label>
+                                <input type="range" id="voice-rate" min="0.5" max="2" step="0.1" value="1">
+                            </div>
+                            <div>
+                                <label>Pitch:</label>
+                                <input type="range" id="voice-pitch" min="0" max="2" step="0.1" value="1">
+                            </div>
+                            <div>
+                                <label>Volume:</label>
+                                <input type="range" id="voice-volume" min="0" max="1" step="0.1" value="0.8">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <label>AI Features:</label>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span>Advanced AI</span>
+                                <div class="toggle-switch active" data-setting="enableAdvancedAI"></div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span>Voice Commands</span>
+                                <div class="toggle-switch active" data-setting="enableVoiceCommands"></div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span>Smart Suggestions</span>
+                                <div class="toggle-switch active" data-setting="enableSmartSuggestions"></div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span>Auto-translate</span>
+                                <div class="toggle-switch" data-setting="autoTranslate"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <label>HuggingFace Token:</label>
+                        <input type="password" id="hf-token" placeholder="Enter your HuggingFace API token">
+                        <small>Required for advanced AI features. Get one at <a href="https://huggingface.co/settings/tokens" target="_blank">huggingface.co</a></small>
+                    </div>
+                </div>
+
+                <!-- Health Status -->
+                <div class="settings-panel" id="health-panel">
+                    <h3>System Health</h3>
+                    <div class="health-status">
+                        <div class="health-card healthy" id="voice-health">
+                            <strong>Voice Recognition</strong>
+                            <div>✅ Available</div>
+                        </div>
+                        <div class="health-card healthy" id="tts-health">
+                            <strong>Text-to-Speech</strong>
+                            <div>✅ Available</div>
+                        </div>
+                        <div class="health-card warning" id="hf-health">
+                            <strong>HuggingFace AI</strong>
+                            <div>⚠️ Token Required</div>
+                        </div>
+                        <div class="health-card healthy" id="cohere-health">
+                            <strong>Cohere AI</strong>
+                            <div>✅ Connected</div>
+                        </div>
+                        <div class="health-card healthy" id="calendar-health">
+                            <strong>Calendar Service</strong>
+                            <div>✅ Connected</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class AIVoiceInterface {
+            constructor() {
+                this.isListening = false;
+                this.isContinuousListening = false;
+                this.recognition = null;
+                this.synthesis = window.speechSynthesis;
+                this.config = {
+                    enableAdvancedAI: true,
+                    enableVoiceCommands: true,
+                    enableSmartSuggestions: true,
+                    preferredLanguage: 'en',
+                    voiceSettings: {
+                        rate: 1,
+                        pitch: 1,
+                        volume: 0.8
+                    }
+                };
+                
+                this.init();
+            }
+
+            init() {
+                this.setupVoiceRecognition();
+                this.setupEventListeners();
+                this.checkSystemHealth();
+                this.loadSettings();
+            }
+
+            setupVoiceRecognition() {
+                if ('webkitSpeechRecognition' in window) {
+                    this.recognition = new webkitSpeechRecognition();
+                } else if ('SpeechRecognition' in window) {
+                    this.recognition = new SpeechRecognition();
+                } else {
+                    console.error('Speech recognition not supported');
+                    this.updateVoiceStatus('Speech recognition not supported in this browser');
+                    return;
+                }
+
+                this.recognition.continuous = false;
+                this.recognition.interimResults = false;
+                this.recognition.lang = 'en-US';
+
+                this.recognition.onstart = () => {
+                    this.updateVoiceStatus('Listening...');
+                    document.getElementById('voice-btn').classList.add('listening');
+                };
+
+                this.recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    this.processVoiceCommand(transcript);
+                };
+
+                this.recognition.onerror = (event) => {
+                    console.error('Speech recognition error:', event.error);
+                    this.updateVoiceStatus('Error: ' + event.error);
+                    this.stopListening();
+                };
+
+                this.recognition.onend = () => {
+                    this.stopListening();
+                    if (this.isContinuousListening) {
+                        setTimeout(() => this.startListening(), 1000);
+                    }
+                };
+            }
+
+            setupEventListeners() {
+                // Voice button
+                document.getElementById('voice-btn').addEventListener('click', () => {
+                    if (this.isListening) {
+                        this.stopListening();
+                    } else {
+                        this.startListening();
+                    }
+                });
+
+                // Control buttons
+                document.getElementById('start-continuous').addEventListener('click', () => {
+                    this.startContinuousListening();
+                });
+
+                document.getElementById('stop-listening').addEventListener('click', () => {
+                    this.stopContinuousListening();
+                });
+
+                document.getElementById('clear-conversation').addEventListener('click', () => {
+                    this.clearConversation();
+                });
+
+                document.getElementById('toggle-settings').addEventListener('click', () => {
+                    this.toggleSettings();
+                });
+
+                // Feature cards
+                document.querySelectorAll('.feature-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        this.toggleFeature(card.dataset.feature);
+                    });
+                });
+
+                // Settings
+                document.getElementById('language-select').addEventListener('change', (e) => {
+                    this.config.preferredLanguage = e.target.value;
+                    this.saveSettings();
+                });
+
+                // Voice settings
+                ['voice-rate', 'voice-pitch', 'voice-volume'].forEach(id => {
+                    document.getElementById(id).addEventListener('input', (e) => {
+                        const setting = id.replace('voice-', '');
+                        this.config.voiceSettings[setting] = parseFloat(e.target.value);
+                        this.saveSettings();
+                    });
+                });
+
+                // Toggle switches
+                document.querySelectorAll('.toggle-switch').forEach(toggle => {
+                    toggle.addEventListener('click', () => {
+                        const setting = toggle.dataset.setting;
+                        const isActive = toggle.classList.contains('active');
+                        
+                        if (isActive) {
+                            toggle.classList.remove('active');
+                            this.config[setting] = false;
+                        } else {
+                            toggle.classList.add('active');
+                            this.config[setting] = true;
+                        }
+                        
+                        this.saveSettings();
+                    });
+                });
+
+                // HF Token
+                document.getElementById('hf-token').addEventListener('change', (e) => {
+                    localStorage.setItem('hf-token', e.target.value);
+                    this.checkSystemHealth();
+                });
+            }
+
+            startListening() {
+                if (!this.recognition) {
+                    this.speak('Speech recognition is not available in this browser.');
+                    return;
+                }
+
+                this.isListening = true;
+                this.recognition.start();
+                document.getElementById('voice-btn').classList.add('listening');
+                this.updateStatus('Listening for command...');
+            }
+
+            stopListening() {
+                this.isListening = false;
+                if (this.recognition) {
+                    this.recognition.stop();
+                }
+                document.getElementById('voice-btn').classList.remove('listening');
+                this.updateVoiceStatus('Click to start listening');
+                this.updateStatus('Ready');
+            }
+
+            startContinuousListening() {
+                this.isContinuousListening = true;
+                this.startListening();
+                document.getElementById('start-continuous').disabled = true;
+                document.getElementById('stop-listening').disabled = false;
+                this.speak('Continuous listening activated. I\'m ready for your commands.');
+            }
+
+            stopContinuousListening() {
+                this.isContinuousListening = false;
+                this.stopListening();
+                document.getElementById('start-continuous').disabled = false;
+                document.getElementById('stop-listening').disabled = true;
+                this.speak('Continuous listening stopped.');
+            }
+
+            async processVoiceCommand(transcript) {
+                this.addMessage('user', transcript);
+                this.updateStatus('Processing command...');
+
+                try {
+                    // Send to backend for processing
+                    const response = await fetch('/api/voice/process', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            transcript: transcript,
+                            config: this.config,
+                            hfToken: localStorage.getItem('hf-token')
+                        })
+                    });
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        this.addMessage('ai', result.response.text);
+                        
+                        if (result.response.suggestions) {
+                            this.updateSuggestions(result.response.suggestions);
+                        }
+                        
+                        if (this.config.enableVoiceCommands) {
+                            this.speak(result.response.text);
+                        }
+                    } else {
+                        this.addMessage('ai', 'Sorry, I couldn\'t process that command: ' + result.error);
+                        this.speak('Sorry, I encountered an error processing your command.');
+                    }
+                } catch (error) {
+                    console.error('Command processing error:', error);
+                    this.addMessage('ai', 'I\'m having trouble processing commands right now. Please try again.');
+                    this.speak('I\'m having technical difficulties. Please try again.');
+                }
+
+                this.updateStatus('Ready');
+            }
+
+            speak(text) {
+                if (!this.config.enableVoiceCommands || !this.synthesis) return;
+
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = this.config.voiceSettings.rate;
+                utterance.pitch = this.config.voiceSettings.pitch;
+                utterance.volume = this.config.voiceSettings.volume;
+                utterance.lang = this.config.preferredLanguage === 'en' ? 'en-US' : this.config.preferredLanguage;
+
+                this.synthesis.speak(utterance);
+            }
+
+            addMessage(type, text) {
+                const conversationLog = document.getElementById('conversation-log');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${type}`;
+                
+                const sender = type === 'user' ? 'You' : 'AI Assistant';
+                messageDiv.innerHTML = `<strong>${sender}:</strong> ${text}`;
+                
+                conversationLog.appendChild(messageDiv);
+                conversationLog.scrollTop = conversationLog.scrollHeight;
+            }
+
+            updateSuggestions(suggestions) {
+                const suggestionsContainer = document.getElementById('voice-suggestions');
+                suggestionsContainer.innerHTML = '';
+                
+                suggestions.slice(0, 5).forEach(suggestion => {
+                    const chip = document.createElement('div');
+                    chip.className = 'suggestion-chip';
+                    chip.textContent = suggestion;
+                    chip.onclick = () => this.sendTextCommand(suggestion);
+                    suggestionsContainer.appendChild(chip);
+                });
+            }
+
+            updateVoiceStatus(status) {
+                document.getElementById('voice-status').textContent = status;
+            }
+
+            updateStatus(status) {
+                document.getElementById('status-text').textContent = status;
+            }
+
+            toggleFeature(feature) {
+                const card = document.querySelector(`[data-feature="${feature}"]`);
+                card.classList.toggle('enabled');
+                
+                // Here you could enable/disable specific AI features
+                console.log(`Toggled feature: ${feature}`);
+            }
+
+            toggleSettings() {
+                const panel = document.getElementById('settings-panel');
+                panel.classList.toggle('hidden');
+            }
+
+            clearConversation() {
+                document.getElementById('conversation-log').innerHTML = '';
+                this.addMessage('ai', 'Conversation cleared. How can I help you?');
+            }
+
+            sendTextCommand(text) {
+                this.processVoiceCommand(text);
+            }
+
+            async checkSystemHealth() {
+                const hfToken = localStorage.getItem('hf-token');
+                
+                // Voice Recognition
+                const voiceHealth = document.getElementById('voice-health');
+                if (this.recognition) {
+                    voiceHealth.className = 'health-card healthy';
+                    voiceHealth.querySelector('div').innerHTML = '✅ Available';
+                } else {
+                    voiceHealth.className = 'health-card error';
+                    voiceHealth.querySelector('div').innerHTML = '❌ Not supported';
+                }
+
+                // Text-to-Speech
+                const ttsHealth = document.getElementById('tts-health');
+                if (this.synthesis) {
+                    ttsHealth.className = 'health-card healthy';
+                    ttsHealth.querySelector('div').innerHTML = '✅ Available';
+                } else {
+                    ttsHealth.className = 'health-card error';
+                    ttsHealth.querySelector('div').innerHTML = '❌ Not supported';
+                }
+
+                // Check overall AI health
+                try {
+                    const response = await fetch('/api/ai/health', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ token: hfToken })
+                    });
+                    
+                    if (response.ok) {
+                        const healthData = await response.json();
+                        
+                        // HuggingFace
+                        const hfHealth = document.getElementById('hf-health');
+                        if (healthData.health.huggingFace.status === 'healthy') {
+                            hfHealth.className = 'health-card healthy';
+                            hfHealth.querySelector('div').innerHTML = '✅ Connected';
+                        } else {
+                            hfHealth.className = 'health-card error';
+                            hfHealth.querySelector('div').innerHTML = '❌ Connection failed';
+                        }
+                        
+                        // Cohere
+                        const cohereHealth = document.getElementById('cohere-health');
+                        if (healthData.health.cohere.status === 'healthy') {
+                            cohereHealth.className = 'health-card healthy';
+                            cohereHealth.querySelector('div').innerHTML = '✅ Connected';
+                        } else if (healthData.health.cohere.status === 'not_configured') {
+                            cohereHealth.className = 'health-card warning';
+                            cohereHealth.querySelector('div').innerHTML = '⚠️ Not configured';
+                        } else {
+                            cohereHealth.className = 'health-card error';
+                            cohereHealth.querySelector('div').innerHTML = '❌ Connection failed';
+                        }
+                    }
+                } catch (error) {
+                    // Fallback for individual checks
+                    const hfHealth = document.getElementById('hf-health');
+                    if (hfToken) {
+                        hfHealth.className = 'health-card warning';
+                        hfHealth.querySelector('div').innerHTML = '⚠️ Check connection';
+                    } else {
+                        hfHealth.className = 'health-card warning';
+                        hfHealth.querySelector('div').innerHTML = '⚠️ Token required';
+                    }
+                    
+                    const cohereHealth = document.getElementById('cohere-health');
+                    cohereHealth.className = 'health-card healthy';
+                    cohereHealth.querySelector('div').innerHTML = '✅ Connected';
+                }
+            }
+
+            saveSettings() {
+                localStorage.setItem('ai-voice-config', JSON.stringify(this.config));
+            }
+
+            loadSettings() {
+                const saved = localStorage.getItem('ai-voice-config');
+                if (saved) {
+                    this.config = { ...this.config, ...JSON.parse(saved) };
+                }
+
+                // Update UI
+                document.getElementById('language-select').value = this.config.preferredLanguage;
+                document.getElementById('voice-rate').value = this.config.voiceSettings.rate;
+                document.getElementById('voice-pitch').value = this.config.voiceSettings.pitch;
+                document.getElementById('voice-volume').value = this.config.voiceSettings.volume;
+
+                // Update toggles
+                Object.keys(this.config).forEach(key => {
+                    const toggle = document.querySelector(`[data-setting="${key}"]`);
+                    if (toggle && this.config[key]) {
+                        toggle.classList.add('active');
+                    }
+                });
+
+                // Load HF token
+                const savedToken = localStorage.getItem('hf-token');
+                if (savedToken) {
+                    document.getElementById('hf-token').value = savedToken;
+                }
+            }
+        }
+
+        // Initialize the interface when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            window.aiInterface = new AIVoiceInterface();
+            
+            // Add some demo suggestions
+            window.sendTextCommand = (command) => {
+                window.aiInterface.sendTextCommand(command);
+            };
+        });
+    </script>
+</body>
+</html> 

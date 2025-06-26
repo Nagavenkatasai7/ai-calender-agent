@@ -1137,6 +1137,190 @@
             display: none;
         }
 
+        /* Hema Chat Styles */
+        .hema-chat-container {
+            position: relative;
+            margin: 0 20px;
+        }
+
+        .hema-chat-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .hema-chat-btn:hover {
+            background: linear-gradient(45deg, #45a049, #4CAF50);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .hema-chat-panel {
+            position: absolute;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            height: 500px;
+            background: rgba(28, 28, 30, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 2px solid rgba(76, 175, 80, 0.3);
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .chat-header {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            padding: 15px;
+            border-radius: 13px 13px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .close-chat-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .close-chat-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background: rgba(20, 20, 22, 0.8);
+            scrollbar-width: thin;
+            scrollbar-color: rgba(76, 175, 80, 0.5) transparent;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: rgba(76, 175, 80, 0.5);
+            border-radius: 3px;
+        }
+
+        .chat-message {
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 12px;
+            line-height: 1.4;
+            animation: fadeInMessage 0.3s ease;
+        }
+
+        @keyframes fadeInMessage {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-message {
+            background: rgba(0, 122, 255, 0.2);
+            color: #ffffff;
+            margin-left: 20px;
+            border-bottom-right-radius: 4px;
+            border: 1px solid rgba(0, 122, 255, 0.3);
+        }
+
+        .hema-message {
+            background: rgba(76, 175, 80, 0.2);
+            color: #ffffff;
+            margin-right: 20px;
+            border-bottom-left-radius: 4px;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .chat-input-container {
+            display: flex;
+            padding: 15px;
+            background: rgba(28, 28, 30, 0.9);
+            border-radius: 0 0 13px 13px;
+            gap: 10px;
+            border-top: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        #chatInput {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid rgba(76, 175, 80, 0.3);
+            border-radius: 20px;
+            outline: none;
+            font-size: 14px;
+            background: rgba(44, 44, 46, 0.8);
+            color: #ffffff;
+            backdrop-filter: blur(10px);
+        }
+
+        #chatInput:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+        }
+
+        #chatInput::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .send-chat-btn, .voice-chat-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .send-chat-btn:hover, .voice-chat-btn:hover {
+            background: #45a049;
+            transform: translateY(-1px);
+        }
+
+        .voice-chat-btn {
+            width: 45px;
+            padding: 12px;
+        }
+
+        .voice-chat-btn.listening {
+            background: #f44336;
+            animation: pulse 1s infinite;
+        }
+
         /* Mobile Responsive Design */
         @media (max-width: 768px) {
             .header {
@@ -1780,31 +1964,142 @@
         }
 
         /* Mobile adjustments for background modal */
-        @media (max-width: 768px) {
-            .background-modal {
-                width: 95%;
-                max-height: 85%;
-            }
+                        @media (max-width: 768px) {
+                    .background-modal {
+                        width: 95%;
+                        max-height: 85%;
+                    }
 
-            .background-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 8px;
-            }
+                    .background-grid {
+                        grid-template-columns: repeat(2, 1fr);
+                        gap: 8px;
+                    }
 
-            .bg-preview {
-                height: 60px;
-            }
+                    .bg-preview {
+                        height: 60px;
+                    }
 
-            .modal-body {
-                padding: 16px;
-            }
-        }
+                    .modal-body {
+                        padding: 16px;
+                    }
 
-        /* Ensure header stays on top when a picture background is applied */
-        body.has-background .header {
-            z-index: 1000;
-            position: relative;
-        }
+                    .voice-control-container {
+                        bottom: 10px;
+                    }
+
+                    .voice-button {
+                        width: 70px;
+                        height: 70px;
+                    }
+
+                    .voice-feedback {
+                        font-size: 12px;
+                        padding: 8px 12px;
+                        bottom: 80px;
+                    }
+                }
+
+                        /* Ensure header stays on top when a picture background is applied */
+                body.has-background .header {
+                    z-index: 1000;
+                    position: relative;
+                }
+
+                /* Voice Commands Modal Styles */
+                .voice-commands-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                    gap: 20px;
+                    margin-bottom: 20px;
+                }
+
+                .command-category h3 {
+                    color: #007aff;
+                    margin-bottom: 10px;
+                    font-size: 16px;
+                }
+
+                .command-category ul {
+                    list-style: none;
+                    padding: 0;
+                }
+
+                .command-category li {
+                    background: rgba(0, 122, 255, 0.1);
+                    padding: 8px 12px;
+                    margin: 5px 0;
+                    border-radius: 6px;
+                    font-family: monospace;
+                    font-size: 13px;
+                }
+
+                .voice-tips {
+                    background: rgba(255, 193, 7, 0.1);
+                    padding: 15px;
+                    border-radius: 8px;
+                    border-left: 4px solid #ffc107;
+                }
+
+                .voice-tips h3 {
+                    color: #ffc107;
+                    margin-top: 0;
+                }
+
+                .voice-tips ul {
+                    margin: 0;
+                    padding-left: 20px;
+                }
+
+                .voice-tips li {
+                    margin: 8px 0;
+                }
+
+                /* Jarvis Voice Assistant Styles */
+                .jarvis-feedback {
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: rgba(0, 122, 255, 0.95);
+                    color: white;
+                    padding: 12px 20px;
+                    border-radius: 25px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    backdrop-filter: blur(10px);
+                    border: 2px solid rgba(255, 255, 255, 0.3);
+                    box-shadow: 0 8px 30px rgba(0, 122, 255, 0.4);
+                    z-index: 10000;
+                    animation: jarvisGlow 2s infinite;
+                }
+
+                .jarvis-feedback.listening {
+                    background: rgba(255, 59, 48, 0.95);
+                    box-shadow: 0 8px 30px rgba(255, 59, 48, 0.6);
+                    animation: jarvisPulse 1.5s infinite;
+                }
+
+                .jarvis-feedback.processing {
+                    background: rgba(255, 149, 0, 0.95);
+                    box-shadow: 0 8px 30px rgba(255, 149, 0, 0.6);
+                    animation: jarvisThink 1s infinite;
+                }
+
+                @keyframes jarvisGlow {
+                    0%, 100% { opacity: 0.8; transform: scale(1); }
+                    50% { opacity: 1; transform: scale(1.02); }
+                }
+
+                @keyframes jarvisPulse {
+                    0%, 100% { opacity: 0.9; transform: scale(1); }
+                    50% { opacity: 1; transform: scale(1.05); }
+                }
+
+                @keyframes jarvisThink {
+                    0% { transform: scale(1) rotate(0deg); }
+                    33% { transform: scale(1.02) rotate(120deg); }
+                    66% { transform: scale(1.04) rotate(240deg); }
+                    100% { transform: scale(1) rotate(360deg); }
+                }
     </style>
 </head>
 <body>
@@ -1832,6 +2127,10 @@
                                 </div>
                             </div>
                             <div style="padding: 8px 0;">
+                                <div class="profile-menu-item" onclick="window.location.href='/ai-voice'" style="padding: 12px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s ease;" onmouseover="this.style.background='rgba(0, 122, 255, 0.1)'" onmouseout="this.style.background='transparent'">
+                                    <span style="font-size: 16px;">🤖</span>
+                                    <span style="color: #007aff; font-size: 14px;">AI Voice Assistant</span>
+                                </div>
                                 <div class="profile-menu-item" onclick="window.location.href='/settings'" style="padding: 12px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s ease;" onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.background='transparent'">
                                     <span style="font-size: 16px;">⚙️</span>
                                     <span style="color: #ffffff; font-size: 14px;">Settings</span>
@@ -1847,6 +2146,29 @@
             </div>
             
             <div class="app-title">🤖 AI Reminder Agent</div>
+            
+            <!-- Hema Chat Interface -->
+            <div class="hema-chat-container">
+                <button id="hemaChatToggle" class="hema-chat-btn">
+                    🤖 Chat with Hema
+                </button>
+                <div id="hemaChatPanel" class="hema-chat-panel">
+                    <div class="chat-header">
+                        <span>🤖 Hema AI Assistant</span>
+                        <button id="closeChatBtn" class="close-chat-btn">×</button>
+                    </div>
+                    <div id="chatMessages" class="chat-messages">
+                        <div class="chat-message hema-message">
+                            <strong>Hema:</strong> Hi! I'm your AI calendar assistant. You can type here or use voice commands by saying "Hema" followed by your request.
+                        </div>
+                    </div>
+                    <div class="chat-input-container">
+                        <input type="text" id="chatInput" placeholder="Type your message or say 'Hema' for voice..." />
+                        <button id="sendChatBtn" class="send-chat-btn">Send</button>
+                        <button id="voiceChatBtn" class="voice-chat-btn" title="Voice Command">🎤</button>
+                    </div>
+                </div>
+            </div>
             
             <div class="voice-input-container">
                 <input 
@@ -1961,6 +2283,11 @@
 
             <!-- Main Calendar Area -->
             <div class="calendar-container">
+                <!-- Hidden voice feedback for "Hey Jarvis" activation -->
+                <div class="jarvis-feedback" id="jarvisFeedback" style="display: none;">
+                    <span id="jarvisFeedbackText">Listening...</span>
+                </div>
+
                 <div class="calendar-header">
                     <div class="calendar-nav">
                         <button class="nav-btn" id="prevMonth">‹</button>
@@ -2251,6 +2578,8 @@
             </div>
         </div>
     </div>
+
+
 
     <script>
         let currentUserEmail = null;
@@ -3013,11 +3342,19 @@
             try {
                 recognition = new SpeechRecognition();
                 
-                // Enhanced settings for better accuracy
+                // Enhanced settings for better accuracy and low-frequency voice detection
                 recognition.lang = 'en-US';
                 recognition.interimResults = true;
-                recognition.maxAlternatives = 3; // Get multiple alternatives
+                recognition.maxAlternatives = 5; // More alternatives for better low-voice recognition
                 recognition.continuous = false;
+                
+                // Enhanced audio sensitivity for low-frequency voices
+                if ('audioCapture' in recognition) {
+                    recognition.audioCapture = true;
+                }
+                
+                // Improve sensitivity for quiet speakers
+                recognition.sensitivity = 0.3; // Lower threshold for voice detection
 
                 // Set up grammar if supported
                 if (SpeechGrammarList) {
@@ -3172,10 +3509,23 @@
                 const stream = await navigator.mediaDevices.getUserMedia({
                     audio: {
                         echoCancellation: true,
-                        noiseSuppression: true,
+                        noiseSuppression: false, // Disable for low voices
                         autoGainControl: true,
                         channelCount: 1,
-                        sampleRate: 48000
+                        sampleRate: 48000,
+                        // Enhanced settings for low-frequency voice capture
+                        googEchoCancellation: false,
+                        googAutoGainControl: true,
+                        googNoiseSuppression: false, // Critical for low voices
+                        googHighpassFilter: false, // Don't filter low frequencies
+                        googTypingNoiseDetection: false,
+                        googAudioMirroring: false,
+                        // Increase sensitivity
+                        volume: 1.0,
+                        advanced: [
+                            {name: 'googAutoGainControl2', value: true},
+                            {name: 'googDAEchoCancellation', value: false}
+                        ]
                     }
                 });
                 
@@ -5483,6 +5833,1239 @@
         window.debugWeekView = debugWeekView;
         window.debugEventPersistence = debugEventPersistence;
         window.forceSaveAllEvents = forceSaveAllEvents;
+
+        // =====================================================
+        // AI VOICE AGENT INTEGRATION
+        // =====================================================
+
+        // Voice Control UI and functionality
+        let isVoiceEnabled = false;
+        let calendarAIAgent = null;
+
+        // Initialize Voice Agent
+        async function initializeVoiceAgent() {
+            try {
+                console.log('🤖 Initializing AI Voice Agent...');
+                
+                // Check if speech recognition is supported
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                if (!SpeechRecognition) {
+                    console.warn('⚠️ Speech Recognition not supported in this browser');
+                    showMessage('Voice commands not supported in this browser', 'warning');
+                    return;
+                }
+
+                // Create calendar API adapter for the AI agent
+                const calendarAPI = {
+                    createEvent: async (eventData) => {
+                        console.log('🎯 AI Agent creating event:', eventData);
+                        
+                        const newEvent = {
+                            id: `voice-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                            title: eventData.title,
+                            description: eventData.description || '',
+                            location: eventData.location || '',
+                            startTime: eventData.startTime,
+                            endTime: eventData.endTime,
+                            isPrivate: false,
+                            timeZone: 'America/New_York',
+                            alertMinutes: [15],
+                            created_via: 'voice'
+                        };
+
+                        // Add to calendar
+                        calendarEvents.push(newEvent);
+                        saveEventToLocalStorage(newEvent);
+                        generateCalendar();
+                        loadUpcomingEvents();
+
+                        return newEvent;
+                    },
+
+                    deleteEvent: async (eventId) => {
+                        console.log('🗑️ AI Agent deleting event:', eventId);
+                        
+                        const index = calendarEvents.findIndex(e => e.id === eventId);
+                        if (index !== -1) {
+                            const deletedEvent = calendarEvents[index];
+                            calendarEvents.splice(index, 1);
+                            
+                            // Remove from localStorage
+                            if (currentUserEmail) {
+                                const userStorageKey = `ai-reminder-events-${currentUserEmail}`;
+                                const storedEvents = JSON.parse(localStorage.getItem(userStorageKey) || '[]');
+                                const filteredEvents = storedEvents.filter(e => e.id !== eventId);
+                                localStorage.setItem(userStorageKey, JSON.stringify(filteredEvents));
+                            }
+                            
+                            generateCalendar();
+                            loadUpcomingEvents();
+                            return true;
+                        }
+                        return false;
+                    },
+
+                    searchEvents: async (query) => {
+                        console.log('🔍 AI Agent searching events:', query);
+                        
+                        const lowerQuery = query.toLowerCase();
+                        return calendarEvents.filter(event => 
+                            event.title.toLowerCase().includes(lowerQuery) ||
+                            (event.description && event.description.toLowerCase().includes(lowerQuery)) ||
+                            (event.location && event.location.toLowerCase().includes(lowerQuery))
+                        );
+                    },
+
+                    getEventsForDate: async (date) => {
+                        console.log('📅 AI Agent getting events for date:', date);
+                        
+                        const targetDate = new Date(date);
+                        return calendarEvents.filter(event => {
+                            const eventDate = new Date(event.startTime);
+                            return eventDate.getDate() === targetDate.getDate() &&
+                                   eventDate.getMonth() === targetDate.getMonth() &&
+                                   eventDate.getFullYear() === targetDate.getFullYear();
+                        });
+                    },
+
+                    getTodaysEvents: async () => {
+                        const today = new Date();
+                        return calendarEvents.filter(event => {
+                            const eventDate = new Date(event.startTime);
+                            return eventDate.getDate() === today.getDate() &&
+                                   eventDate.getMonth() === today.getMonth() &&
+                                   eventDate.getFullYear() === today.getFullYear();
+                        });
+                    },
+
+                    getEventsForWeek: async () => {
+                        const now = new Date();
+                        const weekStart = new Date(now);
+                        weekStart.setDate(now.getDate() - now.getDay());
+                        const weekEnd = new Date(weekStart);
+                        weekEnd.setDate(weekStart.getDate() + 7);
+                        
+                        return calendarEvents.filter(event => {
+                            const eventDate = new Date(event.startTime);
+                            return eventDate >= weekStart && eventDate < weekEnd;
+                        });
+                    },
+
+                    navigateTo: async (target) => {
+                        console.log('🧭 AI Agent navigating to:', target);
+                        
+                        switch (target) {
+                            case 'today':
+                                goToToday();
+                                break;
+                            case 'tomorrow':
+                                currentDate = new Date();
+                                currentDate.setDate(currentDate.getDate() + 1);
+                                generateCalendar();
+                                break;
+                            case 'week':
+                                switchView('week');
+                                break;
+                            case 'month':
+                                switchView('month');
+                                break;
+                            case 'day':
+                                switchView('day');
+                                break;
+                        }
+                    }
+                };
+
+                // Import and initialize the AI agent (simulated for now)
+                calendarAIAgent = {
+                    isSupported: () => true,
+                    processVoiceCommand: processSimpleVoiceCommand,
+                    startWakeWordDetection: () => console.log('🎯 Wake word detection started'),
+                    stopWakeWordDetection: () => console.log('🎯 Wake word detection stopped'),
+                    greet: async () => {
+                        if ('speechSynthesis' in window) {
+                            const utterance = new SpeechSynthesisUtterance("Hello! I'm your calendar assistant. How can I help you today?");
+                            speechSynthesis.speak(utterance);
+                        }
+                    }
+                };
+
+                // Set the calendar API
+                if (calendarAIAgent.setCalendarAPI) {
+                    calendarAIAgent.setCalendarAPI(calendarAPI);
+                }
+
+                isVoiceEnabled = true;
+                updateVoiceButton('ready');
+                console.log('✅ AI Voice Agent initialized successfully');
+
+            } catch (error) {
+                console.error('❌ Failed to initialize AI Voice Agent:', error);
+                showMessage('Failed to initialize voice agent', 'error');
+            }
+        }
+
+        // Enhanced voice command handler with OpenAI integration
+        async function processSimpleVoiceCommand() {
+            if (!isVoiceEnabled) {
+                showMessage('Voice commands not available', 'error');
+                return;
+            }
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                showMessage('Speech recognition not supported in this browser', 'error');
+                speakResponse('Speech recognition is not supported in this browser. Please try using Chrome or Safari.');
+                return;
+            }
+
+            const recognition = new SpeechRecognition();
+            
+            recognition.continuous = false;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+            recognition.maxAlternatives = 3;
+
+            try {
+                showVoiceFeedback('🎤 Listening... Speak naturally!');
+                updateVoiceButton('listening');
+                
+                const transcript = await new Promise((resolve, reject) => {
+                    let finalTranscript = '';
+                    let timeoutId;
+
+                    recognition.onresult = (event) => {
+                        let interimTranscript = '';
+                        
+                        for (let i = event.resultIndex; i < event.results.length; i++) {
+                            const transcript = event.results[i][0].transcript;
+                            if (event.results[i].isFinal) {
+                                finalTranscript += transcript;
+                            } else {
+                                interimTranscript += transcript;
+                            }
+                        }
+
+                        // Show interim results
+                        if (interimTranscript) {
+                            showVoiceFeedback(`Hearing: "${interimTranscript}"`);
+                        }
+
+                        // Auto-complete after 2 seconds of silence
+                        if (finalTranscript || interimTranscript) {
+                            clearTimeout(timeoutId);
+                            timeoutId = setTimeout(() => {
+                                recognition.stop();
+                                resolve(finalTranscript || interimTranscript);
+                            }, 2000);
+                        }
+                    };
+
+                    recognition.onerror = (event) => {
+                        clearTimeout(timeoutId);
+                        if (event.error === 'no-speech') {
+                            reject(new Error('No speech detected. Please try again.'));
+                        } else if (event.error === 'network') {
+                            reject(new Error('Network error. Please check your connection.'));
+                        } else if (event.error === 'not-allowed') {
+                            reject(new Error('Microphone access denied. Please allow microphone permissions.'));
+                        } else {
+                            reject(new Error(`Speech recognition error: ${event.error}`));
+                        }
+                    };
+
+                    recognition.onend = () => {
+                        clearTimeout(timeoutId);
+                        if (!finalTranscript) {
+                            reject(new Error('No speech was captured. Please try again.'));
+                        }
+                    };
+
+                    recognition.start();
+                });
+
+                console.log('🎤 Voice command received:', transcript);
+                showVoiceFeedback('🧠 Processing with AI...');
+                updateVoiceButton('processing');
+
+                // Process the voice command with AI
+                await executeVoiceCommandWithAI(transcript);
+
+            } catch (error) {
+                console.error('Voice command error:', error);
+                showMessage('Voice command failed: ' + error.message, 'error');
+                speakResponse(`Sorry, I encountered an issue: ${error.message}. Please try again.`);
+            } finally {
+                updateVoiceButton('ready');
+                hideVoiceFeedback();
+            }
+        }
+
+        // Execute voice command with OpenAI AI processing
+        async function executeVoiceCommandWithAI(transcript, fromChat = false) {
+            const command = transcript.toLowerCase().trim();
+            console.log('🧠 Processing command with AI:', command);
+
+            try {
+                // First, try to understand the intent using AI
+                const aiResponse = await analyzeCommandWithAI(transcript);
+                
+                if (aiResponse && aiResponse.intent) {
+                    switch (aiResponse.intent) {
+                        case 'create_event':
+                            await handleCreateEventCommandAI(aiResponse, transcript);
+                            break;
+                        case 'query_events':
+                            await handleQueryCommandAI(aiResponse);
+                            break;
+                        case 'delete_event':
+                            await handleDeleteCommandAI(aiResponse);
+                            break;
+                        case 'navigate':
+                            await handleNavigationCommandAI(aiResponse);
+                            break;
+                        case 'help':
+                            await handleHelpCommand();
+                            break;
+                        default:
+                            // Fallback to basic pattern matching
+                            await executeBasicVoiceCommand(command, transcript);
+                    }
+                } else {
+                    // Fallback to basic processing
+                    await executeBasicVoiceCommand(command, transcript);
+                }
+
+            } catch (error) {
+                console.error('AI command execution error:', error);
+                // Fallback to basic processing
+                await executeBasicVoiceCommand(command, transcript);
+            }
+        }
+
+        // Analyze command with OpenAI
+        async function analyzeCommandWithAI(transcript) {
+            try {
+                const response = await fetch('/api/ai/analyze-command', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        transcript: transcript,
+                        context: {
+                            currentDate: new Date().toISOString(),
+                            eventsCount: calendarEvents.length,
+                            recentEvents: calendarEvents.slice(-3).map(e => ({
+                                title: e.title,
+                                startTime: e.startTime
+                            }))
+                        }
+                    })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('🤖 AI Analysis Result:', result);
+                    return result;
+                } else {
+                    console.warn('AI analysis failed, using fallback');
+                    return null;
+                }
+            } catch (error) {
+                console.error('AI analysis error:', error);
+                return null;
+            }
+        }
+
+        // Fallback to basic pattern matching
+        async function executeBasicVoiceCommand(command, transcript) {
+            console.log('🔧 Using basic command processing');
+
+            // Event creation commands
+            if (command.includes('schedule') || command.includes('create') || command.includes('add') || 
+                command.includes('book') || command.includes('plan') || command.includes('set up')) {
+                await handleCreateEventCommand(command, transcript);
+            }
+            // Event query commands
+            else if (command.includes('what') || command.includes('show') || command.includes('list') || 
+                     command.includes('my schedule') || command.includes('today') || command.includes('tomorrow')) {
+                await handleQueryCommand(command);
+            }
+            // Event deletion commands
+            else if (command.includes('delete') || command.includes('cancel') || command.includes('remove')) {
+                await handleDeleteCommand(command);
+            }
+            // Navigation commands
+            else if (command.includes('go to') || command.includes('show me') || command.includes('navigate')) {
+                await handleNavigationCommand(command);
+            }
+            // Help command
+            else if (command.includes('help') || command.includes('what can you do') || command.includes('commands')) {
+                await showJarvisHelp();
+            }
+            // Greeting
+            else if (command.includes('hello') || command.includes('hi') || command.includes('hey')) {
+                speakResponse('Hello! I\'m your calendar assistant. How can I help you manage your schedule today?');
+            }
+            // Unknown command - ask for clarification
+            else {
+                speakResponse('I\'m not sure what you want me to do. Could you please rephrase that? You can say things like "schedule a meeting", "what\'s on my calendar today", or "help" to see what I can do.');
+                showVoiceHelp();
+            }
+        }
+
+        // Handle event creation commands
+        async function handleCreateEventCommand(command, originalTranscript) {
+            console.log('📅 Creating event from command:', command);
+
+            // Extract event details using simple patterns
+            const eventData = parseEventFromText(command);
+
+            if (!eventData.title) {
+                speakResponse('I need a title for the event. Please try again with something like "schedule a meeting".');
+                return;
+            }
+
+            try {
+                const newEvent = {
+                    id: `voice-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                    title: eventData.title,
+                    description: originalTranscript,
+                    location: eventData.location || '',
+                    startTime: eventData.startTime,
+                    endTime: eventData.endTime,
+                    isPrivate: false,
+                    timeZone: 'America/New_York',
+                    alertMinutes: [15],
+                    created_via: 'voice'
+                };
+
+                calendarEvents.push(newEvent);
+                saveEventToLocalStorage(newEvent);
+                generateCalendar();
+                loadUpcomingEvents();
+
+                const timeStr = eventData.startTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const dateStr = eventData.startTime.toLocaleDateString();
+                
+                speakResponse(`I've scheduled "${eventData.title}" for ${dateStr} at ${timeStr}.`);
+                showMessage(`Event created: ${eventData.title}`, 'success');
+
+            } catch (error) {
+                console.error('Event creation error:', error);
+                speakResponse('I couldn\'t create that event. Please try again.');
+            }
+        }
+
+        // Handle query commands
+        async function handleQueryCommand(command) {
+            console.log('📋 Querying events:', command);
+
+            let events = [];
+            let responseText = '';
+
+            if (command.includes('today')) {
+                const today = new Date();
+                events = calendarEvents.filter(event => {
+                    const eventDate = new Date(event.startTime);
+                    return eventDate.getDate() === today.getDate() &&
+                           eventDate.getMonth() === today.getMonth() &&
+                           eventDate.getFullYear() === today.getFullYear();
+                });
+                responseText = events.length === 0 ? 
+                    "You have no events scheduled for today." :
+                    `You have ${events.length} event${events.length > 1 ? 's' : ''} today: ` + 
+                    events.map(e => `${e.title} at ${new Date(e.startTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`).join(', ');
+            }
+            else if (command.includes('tomorrow')) {
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                events = calendarEvents.filter(event => {
+                    const eventDate = new Date(event.startTime);
+                    return eventDate.getDate() === tomorrow.getDate() &&
+                           eventDate.getMonth() === tomorrow.getMonth() &&
+                           eventDate.getFullYear() === tomorrow.getFullYear();
+                });
+                responseText = events.length === 0 ? 
+                    "You have no events scheduled for tomorrow." :
+                    `You have ${events.length} event${events.length > 1 ? 's' : ''} tomorrow: ` + 
+                    events.map(e => `${e.title} at ${new Date(e.startTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`).join(', ');
+            }
+            else {
+                // Show all upcoming events
+                const now = new Date();
+                events = calendarEvents
+                    .filter(event => new Date(event.startTime) > now)
+                    .sort((a, b) => new Date(a.startTime) - new Date(b.startTime))
+                    .slice(0, 5);
+                responseText = events.length === 0 ? 
+                    "You have no upcoming events." :
+                    `Your next ${events.length} event${events.length > 1 ? 's are' : ' is'}: ` + 
+                    events.map(e => `${e.title} on ${new Date(e.startTime).toLocaleDateString()}`).join(', ');
+            }
+
+            speakResponse(responseText);
+            showMessage('Calendar queried successfully', 'success');
+        }
+
+        // Handle delete commands
+        async function handleDeleteCommand(command) {
+            console.log('🗑️ Deleting event:', command);
+
+            // Try to extract event name from command
+            const patterns = [
+                /(?:delete|cancel|remove)\s+(?:my\s+)?(.+?)(?:\s+today|\s+tomorrow|$)/i,
+                /(?:delete|cancel|remove)\s+(.+)/i
+            ];
+
+            let eventName = '';
+            for (const pattern of patterns) {
+                const match = command.match(pattern);
+                if (match && match[1]) {
+                    eventName = match[1].trim();
+                    break;
+                }
+            }
+
+            if (!eventName) {
+                speakResponse('Please specify which event you want to delete.');
+                return;
+            }
+
+            // Find matching events
+            const matchingEvents = calendarEvents.filter(event => 
+                event.title.toLowerCase().includes(eventName.toLowerCase())
+            );
+
+            if (matchingEvents.length === 0) {
+                speakResponse(`I couldn't find any events matching "${eventName}".`);
+                return;
+            }
+
+            if (matchingEvents.length === 1) {
+                const event = matchingEvents[0];
+                const index = calendarEvents.findIndex(e => e.id === event.id);
+                if (index !== -1) {
+                    calendarEvents.splice(index, 1);
+                    
+                    // Remove from localStorage
+                    if (currentUserEmail) {
+                        const userStorageKey = `ai-reminder-events-${currentUserEmail}`;
+                        const storedEvents = JSON.parse(localStorage.getItem(userStorageKey) || '[]');
+                        const filteredEvents = storedEvents.filter(e => e.id !== event.id);
+                        localStorage.setItem(userStorageKey, JSON.stringify(filteredEvents));
+                    }
+                    
+                    generateCalendar();
+                    loadUpcomingEvents();
+                    speakResponse(`I've deleted "${event.title}" from your calendar.`);
+                    showMessage('Event deleted successfully', 'success');
+                }
+            } else {
+                speakResponse(`I found ${matchingEvents.length} events matching "${eventName}". Please be more specific.`);
+            }
+        }
+
+        // Handle navigation commands
+        async function handleNavigationCommand(command) {
+            console.log('🧭 Navigation command:', command);
+
+            if (command.includes('today')) {
+                goToToday();
+                speakResponse('Navigated to today.');
+            }
+            else if (command.includes('tomorrow')) {
+                currentDate = new Date();
+                currentDate.setDate(currentDate.getDate() + 1);
+                generateCalendar();
+                speakResponse('Navigated to tomorrow.');
+            }
+            else if (command.includes('week')) {
+                switchView('week');
+                speakResponse('Switched to week view.');
+            }
+            else if (command.includes('month')) {
+                switchView('month');
+                speakResponse('Switched to month view.');
+            }
+            else if (command.includes('day')) {
+                switchView('day');
+                speakResponse('Switched to day view.');
+            }
+            else {
+                speakResponse('I didn\'t understand where you want to navigate. Try saying "go to today" or "show me week view".');
+            }
+        }
+
+        // Handle help command
+        async function handleHelpCommand() {
+            const helpText = `I can help you manage your calendar with voice commands. You can say things like: 
+                schedule a meeting at 3 PM, 
+                what's on my calendar today, 
+                delete my dentist appointment, 
+                or go to tomorrow. 
+                What would you like to do?`;
+            
+            speakResponse(helpText);
+            showVoiceHelp();
+        }
+
+        // Parse event details from text
+        function parseEventFromText(text) {
+            const now = new Date();
+            
+            // Extract title
+            let title = text.replace(/^(schedule|create|add|book)\s+/i, '').trim();
+            
+            // Remove time and date parts from title
+            title = title.replace(/\s+(at|on|tomorrow|today|next|this)\s+.*/i, '').trim();
+            title = title.replace(/^(a|an|the)\s+/i, '');
+            
+            // Extract time
+            const timeMatch = text.match(/at\s+(\d{1,2}):?(\d{2})?\s*(am|pm)?/i);
+            let startTime = new Date(now);
+            startTime.setHours(startTime.getHours() + 1, 0, 0, 0); // Default to next hour
+            
+            if (timeMatch) {
+                const hour = parseInt(timeMatch[1]);
+                const minute = parseInt(timeMatch[2] || '0');
+                const period = timeMatch[3]?.toLowerCase();
+                
+                let hour24 = hour;
+                if (period === 'pm' && hour !== 12) hour24 += 12;
+                if (period === 'am' && hour === 12) hour24 = 0;
+                
+                startTime.setHours(hour24, minute, 0, 0);
+            }
+            
+            // Extract date
+            if (text.includes('tomorrow')) {
+                startTime.setDate(now.getDate() + 1);
+            } else if (text.includes('today')) {
+                startTime.setDate(now.getDate());
+            }
+            
+            // Default end time (1 hour later)
+            const endTime = new Date(startTime);
+            endTime.setHours(startTime.getHours() + 1);
+            
+            // Extract location
+            const locationMatch = text.match(/(?:at|in)\s+([^,\n]+?)(?:\s+at\s+\d|$)/i);
+            const location = locationMatch ? locationMatch[1].trim() : '';
+
+            return {
+                title: title || 'New Event',
+                startTime,
+                endTime,
+                location
+            };
+        }
+
+        // Enhanced text-to-speech response
+        async function speakResponse(text) {
+            console.log('🔊 Speaking:', text);
+            
+            return new Promise((resolve) => {
+                if ('speechSynthesis' in window) {
+                    // Stop any current speech
+                    speechSynthesis.cancel();
+                    
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.rate = 0.9;
+                    utterance.pitch = 1.1;
+                    utterance.volume = 1.0;
+                    
+                    // Wait for voices to load
+                    function setVoice() {
+                        const voices = speechSynthesis.getVoices();
+                        console.log('🎙️ Available voices:', voices.length);
+                        
+                        // Prefer high-quality voices
+                        const preferredVoice = voices.find(voice => 
+                            voice.name.includes('Samantha') || 
+                            voice.name.includes('Alex') ||
+                            voice.name.includes('Google') ||
+                            voice.name.includes('Natural') ||
+                            (voice.lang.startsWith('en') && voice.localService)
+                        ) || voices.find(voice => voice.lang.startsWith('en'));
+                        
+                        if (preferredVoice) {
+                            utterance.voice = preferredVoice;
+                            console.log('🎤 Using voice:', preferredVoice.name);
+                        }
+                        
+                        utterance.onstart = () => {
+                            console.log('🗣️ Speech started');
+                            showVoiceFeedback(`🗣️ AI: "${text}"`);
+                        };
+                        
+                        utterance.onend = () => {
+                            console.log('✅ Speech completed');
+                            setTimeout(() => hideVoiceFeedback(), 2000);
+                            resolve();
+                        };
+                        
+                        utterance.onerror = (event) => {
+                            console.error('❌ Speech error:', event.error);
+                            hideVoiceFeedback();
+                            resolve();
+                        };
+                        
+                        speechSynthesis.speak(utterance);
+                    }
+                    
+                    // Handle voices loading
+                    if (speechSynthesis.getVoices().length > 0) {
+                        setVoice();
+                    } else {
+                        speechSynthesis.addEventListener('voiceschanged', setVoice, { once: true });
+                        // Fallback timeout
+                        setTimeout(setVoice, 1000);
+                    }
+                } else {
+                    console.warn('⚠️ Speech synthesis not supported');
+                    showMessage('Speech synthesis not supported in this browser', 'warning');
+                    resolve();
+                }
+            });
+        }
+
+        // AI-enhanced command handlers
+        async function handleCreateEventCommandAI(aiResponse, transcript) {
+            console.log('🤖 AI-enhanced event creation:', aiResponse);
+            
+            let eventData;
+            if (aiResponse.eventDetails) {
+                eventData = aiResponse.eventDetails;
+            } else {
+                eventData = parseEventFromText(transcript);
+            }
+
+            if (aiResponse.needsConfirmation) {
+                const confirmText = `I'll create "${eventData.title}" ${aiResponse.summary || 'for the specified time'}. Is this correct?`;
+                speakResponse(confirmText);
+                
+                // In a real implementation, you'd wait for user confirmation
+                // For now, we'll proceed with creation
+                await createCalendarEvent(eventData);
+                speakResponse('Event created successfully!');
+            } else {
+                await createCalendarEvent(eventData);
+                speakResponse(aiResponse.response || `I've created "${eventData.title}" for you.`);
+            }
+        }
+
+        async function handleQueryCommandAI(aiResponse) {
+            console.log('🤖 AI-enhanced query:', aiResponse);
+            
+            if (aiResponse.queryType === 'specific_time') {
+                // Handle specific time queries
+                const events = calendarEvents.filter(event => {
+                    const eventTime = new Date(event.startTime);
+                    return aiResponse.timeFilter(eventTime);
+                });
+                
+                const responseText = events.length === 0 ? 
+                    aiResponse.emptyResponse || "No events found for that time." :
+                    aiResponse.response || `Found ${events.length} event${events.length > 1 ? 's' : ''}: ` +
+                    events.map(e => e.title).join(', ');
+                
+                speakResponse(responseText);
+            } else {
+                // Fall back to basic query handling
+                await handleQueryCommand(aiResponse.originalCommand || '');
+            }
+        }
+
+        async function handleDeleteCommandAI(aiResponse) {
+            console.log('🤖 AI-enhanced deletion:', aiResponse);
+            
+            if (aiResponse.eventToDelete) {
+                const matchingEvents = calendarEvents.filter(event => 
+                    event.title.toLowerCase().includes(aiResponse.eventToDelete.toLowerCase())
+                );
+
+                if (matchingEvents.length === 1) {
+                    const event = matchingEvents[0];
+                    const index = calendarEvents.findIndex(e => e.id === event.id);
+                    if (index !== -1) {
+                        calendarEvents.splice(index, 1);
+                        
+                        // Remove from localStorage
+                        if (currentUserEmail) {
+                            const userStorageKey = `ai-reminder-events-${currentUserEmail}`;
+                            const storedEvents = JSON.parse(localStorage.getItem(userStorageKey) || '[]');
+                            const filteredEvents = storedEvents.filter(e => e.id !== event.id);
+                            localStorage.setItem(userStorageKey, JSON.stringify(filteredEvents));
+                        }
+                        
+                        generateCalendar();
+                        loadUpcomingEvents();
+                        speakResponse(aiResponse.response || `I've deleted "${event.title}" from your calendar.`);
+                        showMessage('Event deleted successfully', 'success');
+                    }
+                } else if (matchingEvents.length === 0) {
+                    speakResponse(aiResponse.errorResponse || `I couldn't find any events matching "${aiResponse.eventToDelete}".`);
+                } else {
+                    speakResponse(`I found ${matchingEvents.length} events matching "${aiResponse.eventToDelete}". Please be more specific.`);
+                }
+            } else {
+                await handleDeleteCommand(aiResponse.originalCommand || '');
+            }
+        }
+
+        async function handleNavigationCommandAI(aiResponse) {
+            console.log('🤖 AI-enhanced navigation:', aiResponse);
+            
+            if (aiResponse.navigationType) {
+                switch (aiResponse.navigationType) {
+                    case 'today':
+                        goToToday();
+                        speakResponse(aiResponse.response || 'Navigated to today.');
+                        break;
+                    case 'tomorrow':
+                        currentDate = new Date();
+                        currentDate.setDate(currentDate.getDate() + 1);
+                        generateCalendar();
+                        speakResponse(aiResponse.response || 'Navigated to tomorrow.');
+                        break;
+                    case 'view_change':
+                        if (aiResponse.viewType) {
+                            switchView(aiResponse.viewType);
+                            speakResponse(aiResponse.response || `Switched to ${aiResponse.viewType} view.`);
+                        }
+                        break;
+                    default:
+                        await handleNavigationCommand(aiResponse.originalCommand || '');
+                }
+            } else {
+                await handleNavigationCommand(aiResponse.originalCommand || '');
+            }
+        }
+
+        // Voice UI functions
+        function updateVoiceButton(state) {
+            const voiceButton = document.getElementById('voiceButton');
+            if (!voiceButton) return;
+
+            voiceButton.className = `voice-button ${state}`;
+            
+            switch (state) {
+                case 'listening':
+                    voiceButton.style.background = '#ff3b30';
+                    voiceButton.title = 'Listening... Speak now!';
+                    break;
+                case 'processing':
+                    voiceButton.style.background = '#ff9500';
+                    voiceButton.title = 'Processing your command...';
+                    break;
+                case 'ready':
+                default:
+                    voiceButton.style.background = '#007aff';
+                    voiceButton.title = 'Click to use voice commands';
+                    break;
+            }
+        }
+
+        function showVoiceFeedback(message) {
+            // Redirect to Jarvis feedback system
+            showJarvisFeedback(message);
+        }
+
+        function hideVoiceFeedback() {
+            // Redirect to Jarvis feedback system
+            hideJarvisFeedback();
+        }
+
+        // Hema help function
+        async function showJarvisHelp() {
+            const helpText = `I'm Hema, your AI calendar assistant. Just say "Hema" followed by commands like: 
+            schedule a meeting tomorrow at 3 PM, 
+            what's on my calendar today, 
+            delete my dentist appointment, 
+            or go to next week. 
+            I can help you manage your entire calendar with natural speech.`;
+            
+            showJarvisFeedback('🤖 Available commands');
+            await speakResponse(helpText);
+            setTimeout(() => hideJarvisFeedback(), 5000);
+        }
+
+        // Setup Hema wake word detection
+        function setupJarvisWakeWord() {
+            console.log('🤖 Initializing Hema AI Assistant...');
+            console.log('👂 Listening for "Hema" wake word...');
+
+            // Start continuous listening for wake word
+            startWakeWordDetection();
+
+            // Initialize Hema greeting
+            setTimeout(() => {
+                showJarvisFeedback('🤖 Hema is ready');
+                speakResponseAndAddToChat('Hema assistant initialized. Just say "Hema" to activate me.');
+                setTimeout(() => hideJarvisFeedback(), 3000);
+            }, 1000);
+        }
+
+        // Continuous wake word detection
+        let wakeWordRecognition = null;
+        let isListeningForWakeWord = false;
+
+        function startWakeWordDetection() {
+            if (!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
+                console.warn('⚠️ Speech recognition not supported');
+                return;
+            }
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            wakeWordRecognition = new SpeechRecognition();
+            
+            wakeWordRecognition.continuous = true;
+            wakeWordRecognition.interimResults = true;
+            wakeWordRecognition.lang = 'en-US';
+            wakeWordRecognition.maxAlternatives = 1;
+
+            wakeWordRecognition.onstart = () => {
+                isListeningForWakeWord = true;
+                console.log('👂 Listening for "Hema"...');
+            };
+
+            wakeWordRecognition.onresult = (event) => {
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript.toLowerCase().trim();
+                    
+                    // Check for wake words - just "Hema"
+                    if (transcript.includes('hema')) {
+                        
+                        console.log('🎯 Wake word detected:', transcript);
+                        wakeWordRecognition.stop();
+                        activateJarvis();
+                        break;
+                    }
+                }
+            };
+
+            wakeWordRecognition.onerror = (event) => {
+                console.log('Wake word detection error:', event.error);
+                if (event.error !== 'no-speech') {
+                    setTimeout(() => {
+                        if (!isListeningForWakeWord) {
+                            startWakeWordDetection();
+                        }
+                    }, 2000);
+                }
+            };
+
+            wakeWordRecognition.onend = () => {
+                isListeningForWakeWord = false;
+                // Restart wake word detection after a brief pause
+                setTimeout(() => {
+                    if (!isListeningForWakeWord) {
+                        startWakeWordDetection();
+                    }
+                }, 1000);
+            };
+
+            wakeWordRecognition.start();
+        }
+
+        // Activate Hema when wake word is detected
+        async function activateJarvis() {
+            console.log('🤖 Hema activated!');
+            
+            showJarvisFeedback('🤖 Yes, how can I help?');
+            await speakResponseAndAddToChat('Yes, how can I help you?');
+            
+            // Give more time before listening for command
+            setTimeout(async () => {
+                await processJarvisCommand();
+            }, 2000);
+        }
+
+        // Process Hema voice commands
+        async function processJarvisCommand() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+            
+            recognition.continuous = false;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+            recognition.maxAlternatives = 3;
+
+            try {
+                showJarvisFeedback('🎤 Listening for your command...', 'listening');
+                
+                const transcript = await new Promise((resolve, reject) => {
+                    let finalTranscript = '';
+                    let timeoutId;
+                    let silenceTimeout;
+
+                    recognition.onresult = (event) => {
+                        let interimTranscript = '';
+                        
+                        for (let i = event.resultIndex; i < event.results.length; i++) {
+                            const transcript = event.results[i][0].transcript;
+                            if (event.results[i].isFinal) {
+                                finalTranscript += transcript;
+                            } else {
+                                interimTranscript += transcript;
+                            }
+                        }
+
+                        // Show what Hema is hearing
+                        if (interimTranscript) {
+                            showJarvisFeedback(`🎤 "${interimTranscript}"`, 'listening');
+                        }
+
+                        // Clear previous timeouts
+                        clearTimeout(timeoutId);
+                        clearTimeout(silenceTimeout);
+
+                        // If we have final transcript, wait a bit more for additional words
+                        if (finalTranscript) {
+                            silenceTimeout = setTimeout(() => {
+                                recognition.stop();
+                                resolve(finalTranscript);
+                            }, 2000); // Wait 2 seconds after final transcript
+                        } else if (interimTranscript) {
+                            // If we have interim results, give more time
+                            timeoutId = setTimeout(() => {
+                                recognition.stop();
+                                resolve(interimTranscript);
+                            }, 5000); // Wait 5 seconds for interim results
+                        }
+                    };
+
+                    recognition.onerror = (event) => {
+                        clearTimeout(timeoutId);
+                        clearTimeout(silenceTimeout);
+                        reject(new Error(`Speech recognition error: ${event.error}`));
+                    };
+
+                    recognition.onend = () => {
+                        clearTimeout(timeoutId);
+                        clearTimeout(silenceTimeout);
+                        if (!finalTranscript) {
+                            reject(new Error('No command received'));
+                        }
+                    };
+
+                    // Start with a timeout for the entire recognition session
+                    const maxTimeout = setTimeout(() => {
+                        recognition.stop();
+                        if (finalTranscript) {
+                            resolve(finalTranscript);
+                        } else {
+                            reject(new Error('Recognition timeout'));
+                        }
+                    }, 15000); // Max 15 seconds for the entire session
+
+                    recognition.start();
+                    
+                    // Clear max timeout when recognition ends
+                    recognition.onend = () => {
+                        clearTimeout(maxTimeout);
+                    };
+                });
+
+                console.log('🤖 Hema heard:', transcript);
+                showJarvisFeedback('🧠 Processing your request...', 'processing');
+
+                // Process the command with AI
+                await executeVoiceCommandWithAI(transcript);
+
+            } catch (error) {
+                console.error('Hema command error:', error);
+                showJarvisFeedback('❌ Sorry, I didn\'t catch that');
+                await speakResponseAndAddToChat('Sorry, I didn\'t understand that. Please say "Hema" to try again.');
+                setTimeout(() => hideJarvisFeedback(), 3000);
+            } finally {
+                // Restart wake word detection after processing
+                setTimeout(() => {
+                    if (!isListeningForWakeWord) {
+                        startWakeWordDetection();
+                    }
+                }, 3000);
+            }
+        }
+
+        // Jarvis feedback functions
+        function showJarvisFeedback(message, state = 'default') {
+            const feedback = document.getElementById('jarvisFeedback');
+            const feedbackText = document.getElementById('jarvisFeedbackText');
+            
+            if (feedback && feedbackText) {
+                feedbackText.textContent = message;
+                feedback.className = 'jarvis-feedback';
+                
+                if (state === 'listening') {
+                    feedback.classList.add('listening');
+                } else if (state === 'processing') {
+                    feedback.classList.add('processing');
+                }
+                
+                feedback.style.display = 'block';
+            }
+        }
+
+        function hideJarvisFeedback() {
+            const feedback = document.getElementById('jarvisFeedback');
+            if (feedback) {
+                feedback.style.display = 'none';
+                feedback.className = 'jarvis-feedback';
+            }
+        }
+
+        // Chat Interface Functions
+        function setupChatInterface() {
+            const chatToggle = document.getElementById('hemaChatToggle');
+            const chatPanel = document.getElementById('hemaChatPanel');
+            const closeChatBtn = document.getElementById('closeChatBtn');
+            const sendChatBtn = document.getElementById('sendChatBtn');
+            const voiceChatBtn = document.getElementById('voiceChatBtn');
+            const chatInput = document.getElementById('chatInput');
+
+            // Toggle chat panel
+            chatToggle.addEventListener('click', () => {
+                chatPanel.style.display = chatPanel.style.display === 'flex' ? 'none' : 'flex';
+            });
+
+            // Close chat panel
+            closeChatBtn.addEventListener('click', () => {
+                chatPanel.style.display = 'none';
+            });
+
+            // Send text message
+            sendChatBtn.addEventListener('click', () => {
+                sendChatMessage();
+            });
+
+            // Send message on Enter key
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendChatMessage();
+                }
+            });
+
+            // Voice message
+            voiceChatBtn.addEventListener('click', () => {
+                startVoiceChat();
+            });
+
+            // Close chat when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!chatToggle.contains(e.target) && !chatPanel.contains(e.target)) {
+                    chatPanel.style.display = 'none';
+                }
+            });
+        }
+
+        function addChatMessage(message, isUser = false) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${isUser ? 'user-message' : 'hema-message'}`;
+            
+            const timestamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            messageDiv.innerHTML = `<strong>${isUser ? 'You' : 'Hema'}:</strong> ${message} <small style="color: #888; font-size: 11px;">${timestamp}</small>`;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        async function sendChatMessage() {
+            const chatInput = document.getElementById('chatInput');
+            const message = chatInput.value.trim();
+            
+            if (!message) return;
+
+            // Add user message to chat
+            addChatMessage(message, true);
+            chatInput.value = '';
+
+            // Show processing message
+            addChatMessage('Processing your request...', false);
+
+                         try {
+                // Process the message with AI and handle response
+                await executeVoiceCommandWithAI(message, true);
+            } catch (error) {
+                console.error('Chat message error:', error);
+                // Remove processing message and add error message
+                const chatMessages = document.getElementById('chatMessages');
+                const lastMessage = chatMessages.lastElementChild;
+                if (lastMessage && lastMessage.textContent.includes('Processing')) {
+                    lastMessage.remove();
+                }
+                addChatMessage('Sorry, I encountered an error processing your request. Please try again.', false);
+            }
+        }
+
+        async function startVoiceChat() {
+            const voiceChatBtn = document.getElementById('voiceChatBtn');
+            voiceChatBtn.classList.add('listening');
+            
+            try {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                if (!SpeechRecognition) {
+                    throw new Error('Speech recognition not supported');
+                }
+
+                const recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+
+                const transcript = await new Promise((resolve, reject) => {
+                    recognition.onresult = (event) => {
+                        const transcript = event.results[0][0].transcript;
+                        resolve(transcript);
+                    };
+
+                    recognition.onerror = (event) => {
+                        reject(new Error(`Speech recognition error: ${event.error}`));
+                    };
+
+                    recognition.onend = () => {
+                        voiceChatBtn.classList.remove('listening');
+                    };
+
+                    recognition.start();
+                });
+
+                // Add the voice message to chat as user message
+                addChatMessage(`🎤 ${transcript}`, true);
+                
+                // Process the voice command
+                await executeVoiceCommandWithAI(transcript, true);
+
+            } catch (error) {
+                console.error('Voice chat error:', error);
+                addChatMessage('Sorry, I couldn\'t process your voice command. Please try again.', false);
+            } finally {
+                voiceChatBtn.classList.remove('listening');
+            }
+        }
+
+        // Override the speech response to also add to chat
+        async function speakResponseAndAddToChat(text) {
+            addChatMessage(text, false);
+            await speakResponse(text);
+        }
+
+        // Initialize Hema when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            setupChatInterface();
+            setTimeout(() => {
+                setupJarvisWakeWord();
+            }, 2000);
+        });
+
+        // Make Hema functions globally accessible
+        window.showJarvisHelp = showJarvisHelp;
+        window.activateJarvis = activateJarvis;
     </script>
 </body>
 </html>
