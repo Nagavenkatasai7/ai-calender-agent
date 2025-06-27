@@ -1,0 +1,44 @@
+[build]
+builder = "nixpacks"
+buildCommand = "npm run build"
+
+[deploy]
+startCommand = "npm start"
+healthcheckPath = "/health"
+healthcheckTimeout = 300
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 10
+
+[env]
+NODE_ENV = "production"
+PORT = "$PORT"
+
+# Service configuration
+[[services]]
+name = "ai-reminder-app"
+
+[services.source]
+repo = "nagavenkatasai7/ai-calender-agent"
+branch = "main"
+
+# Auto-deploy on push
+[services.deploy]
+branch = "main"
+autoMerge = true
+
+# Resource limits for free tier
+[services.resources]
+memory = "512Mi"
+cpu = "0.5"
+
+# Environment variables (you'll set these in Railway dashboard)
+# GOOGLE_CLIENT_ID = ""
+# GOOGLE_CLIENT_SECRET = ""
+# GOOGLE_REDIRECT_URI = "https://your-app.railway.app/auth/callback"
+# OPENAI_API_KEY = ""
+# COHERE_API_KEY = ""
+# DEEPSEEK_API_KEY = ""
+# STRIPE_PUBLISHABLE_KEY = ""
+# STRIPE_SECRET_KEY = ""
+# SESSION_SECRET = ""
+# JWT_SECRET = "" 

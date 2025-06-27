@@ -6,13 +6,13 @@
   "scripts": {
     "prestart": "npm run build",
     "start": "node dist/app.js",
-    "dev": "ts-node src/app.ts",
+    "dev": "nodemon src/app.ts",
     "build": "tsc",
-    "watch": "tsc -w",
-    "vercel-build": "npm run build",
-    "deploy:vercel": "vercel --prod",
-    "deploy:railway": "railway deploy",
-    "deploy:heroku": "git push heroku main"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy:railway": "railway up",
+    "deploy:render": "npm run build && npm start",
+    "deploy:heroku": "git push heroku main",
+    "deploy:vercel": "vercel --prod"
   },
   "keywords": [
     "ai",

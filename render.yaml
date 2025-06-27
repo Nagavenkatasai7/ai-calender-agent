@@ -1,0 +1,72 @@
+services:
+  - type: web
+    name: ai-reminder-app
+    runtime: node
+    repo: https://github.com/nagavenkatasai7/ai-calender-agent.git
+    branch: main
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    
+    # Auto-deploy on push
+    autoDeploy: true
+    
+    # Environment variables
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        fromService:
+          type: web
+          name: ai-reminder-app
+          property: port
+      
+      # Set these in Render dashboard
+      # - key: GOOGLE_CLIENT_ID
+      #   sync: false
+      # - key: GOOGLE_CLIENT_SECRET
+      #   sync: false
+      # - key: GOOGLE_REDIRECT_URI
+      #   value: https://ai-reminder-app.onrender.com/auth/callback
+      # - key: OPENAI_API_KEY
+      #   sync: false
+      # - key: COHERE_API_KEY
+      #   sync: false
+      # - key: DEEPSEEK_API_KEY
+      #   sync: false
+      # - key: STRIPE_PUBLISHABLE_KEY
+      #   sync: false
+      # - key: STRIPE_SECRET_KEY
+      #   sync: false
+      # - key: SESSION_SECRET
+      #   sync: false
+      # - key: JWT_SECRET
+      #   sync: false
+    
+    # Resource allocation
+    plan: free  # Free tier
+    region: oregon  # Choose closest region
+    
+    # Health check configuration
+    healthCheckPath: /health
+    healthCheckTimeout: 30s
+    healthCheckInterval: 30s
+    
+    # Build settings
+    buildFilter:
+      paths:
+        - src/**
+        - public/**
+        - package.json
+        - tsconfig.json
+        - "*.ts"
+      ignoredPaths:
+        - "*.md"
+        - .git/**
+
+# Optional: PostgreSQL database (free tier available)
+# databases:
+#   - name: ai-reminder-db
+#     databaseName: ai_reminder
+#     user: ai_reminder_user
+#     plan: free 

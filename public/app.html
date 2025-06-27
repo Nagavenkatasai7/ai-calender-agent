@@ -77,68 +77,7 @@
             order: 2;
         }
 
-        .voice-input-container {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            width: 420px;
-            flex-shrink: 0;
-            order: 3;
-        }
 
-        .voice-input {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            padding: 14px 18px;
-            font-size: 16px;
-            color: #ffffff;
-            outline: none;
-            transition: all 0.3s ease;
-            height: 48px;
-            box-sizing: border-box;
-            resize: none;
-        }
-
-        .voice-input:focus {
-            border-color: rgba(0, 122, 255, 0.8);
-            background: rgba(255, 255, 255, 0.15);
-            box-shadow: 0 0 20px rgba(0, 122, 255, 0.2);
-        }
-
-        .voice-input::placeholder {
-            color: #8e8e93;
-        }
-
-        .voice-btn {
-            background: rgba(0, 122, 255, 0.9);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: none;
-            border-radius: 12px;
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 18px;
-            flex-shrink: 0;
-        }
-
-        .voice-btn:hover {
-            background: rgba(0, 122, 255, 1);
-            transform: scale(1.05);
-        }
-
-        .voice-btn.listening {
-            background: rgba(255, 59, 48, 0.9);
-            animation: pulse 1.5s infinite;
-        }
 
 
 
@@ -146,6 +85,105 @@
             0% { transform: scale(1); }
             50% { transform: scale(1.1); }
             100% { transform: scale(1); }
+        }
+
+        /* Centered Voice Assistant Button */
+        .voice-assistant-container {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+
+        .voice-assistant-btn {
+            background: linear-gradient(135deg, #007aff 0%, #0056cc 100%);
+            border: none;
+            border-radius: 50px;
+            width: 140px;
+            height: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0, 122, 255, 0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .voice-assistant-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(0, 122, 255, 0.4);
+            background: linear-gradient(135deg, #0056cc 0%, #003d99 100%);
+        }
+
+        .voice-assistant-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .voice-assistant-btn.listening {
+            background: linear-gradient(135deg, #ff3b30 0%, #d70015 100%);
+            animation: pulse 1.5s infinite;
+            box-shadow: 0 8px 25px rgba(255, 59, 48, 0.4);
+        }
+
+        .voice-assistant-btn.processing {
+            background: linear-gradient(135deg, #ff9500 0%, #ff6b00 100%);
+            box-shadow: 0 8px 25px rgba(255, 149, 0, 0.4);
+        }
+
+        .voice-assistant-btn.error {
+            background: linear-gradient(135deg, #ff3b30 0%, #d70015 100%);
+            box-shadow: 0 8px 25px rgba(255, 59, 48, 0.4);
+        }
+
+        .mic-icon {
+            font-size: 20px;
+            margin-bottom: 2px;
+            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+        }
+
+        .voice-status-text {
+            font-size: 11px;
+            font-weight: 600;
+            color: #ffffff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            max-width: 130px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: center;
+        }
+
+        /* Pulse animation for listening state */
+        .voice-assistant-btn.listening::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border: 2px solid rgba(255, 59, 48, 0.6);
+            border-radius: 50px;
+            animation: pulse-ring 1.5s infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.3);
+                opacity: 0;
+            }
         }
 
         .auth-section {
@@ -229,10 +267,10 @@
             padding: 12px;
         }
 
-        /* Left Sidebar - Immersive */
+        /* Left Sidebar - Hidden */
         .left-sidebar {
             width: 280px;
-            display: flex;
+            display: none; /* Hide the left sidebar completely */
             flex-direction: column;
             gap: 16px;
             flex-shrink: 0;
@@ -515,9 +553,9 @@
             flex-direction: column;
             min-width: 0;
             min-height: 500px;
-            height: calc(100vh - 120px);
+            height: calc(100vh - 24px); /* Adjusted for no header, just padding */
             position: relative;
-            overflow: hidden;
+            overflow: visible; /* Allow profile dropdown to show */
         }
 
         /* Calendar header - Ultra transparent for immersion */
@@ -623,10 +661,10 @@
         .calendar-grid {
             flex: 1;
             padding: 20px;
-            overflow: hidden;
+            overflow: visible; /* Allow profile dropdown to show */
             display: flex;
             flex-direction: column;
-            height: calc(100vh - 200px); /* Fixed height calculation */
+            height: calc(100vh - 140px); /* Adjusted for no top header */
         }
 
         .month-view {
@@ -638,7 +676,7 @@
             backdrop-filter: blur(5px) saturate(1.1);
             -webkit-backdrop-filter: blur(5px) saturate(1.1);
             border-radius: 12px;
-            overflow: hidden;
+            overflow: visible; /* Allow profile dropdown to show */
             height: 100%;
             min-height: 500px;
             border: 1px solid rgba(99, 99, 102, 0.1);
@@ -823,7 +861,7 @@
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             border-radius: 12px;
-            overflow: hidden;
+            overflow: visible; /* Allow profile dropdown to show */
             height: 100%;
         }
 
@@ -836,7 +874,7 @@
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             border-radius: 12px;
-            overflow: hidden;
+            overflow: visible; /* Allow profile dropdown to show */
             height: 100%;
         }
 
@@ -1137,199 +1175,35 @@
             display: none;
         }
 
-        /* Hema Chat Styles */
-        .hema-chat-container {
-            position: relative;
-            margin: 0 20px;
-        }
 
-        .hema-chat-btn {
-            background: linear-gradient(45deg, #4CAF50, #45a049);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .hema-chat-btn:hover {
-            background: linear-gradient(45deg, #45a049, #4CAF50);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        .hema-chat-panel {
-            position: absolute;
-            top: 60px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 400px;
-            height: 500px;
-            background: rgba(28, 28, 30, 0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 2px solid rgba(76, 175, 80, 0.3);
-            border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-            display: none;
-            flex-direction: column;
-            z-index: 1000;
-        }
-
-        .chat-header {
-            background: linear-gradient(45deg, #4CAF50, #45a049);
-            color: white;
-            padding: 15px;
-            border-radius: 13px 13px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: bold;
-        }
-
-        .close-chat-btn {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            padding: 0;
-            width: 25px;
-            height: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            transition: background 0.2s ease;
-        }
-
-        .close-chat-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .chat-messages {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-            background: rgba(20, 20, 22, 0.8);
-            scrollbar-width: thin;
-            scrollbar-color: rgba(76, 175, 80, 0.5) transparent;
-        }
-
-        .chat-messages::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .chat-messages::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .chat-messages::-webkit-scrollbar-thumb {
-            background: rgba(76, 175, 80, 0.5);
-            border-radius: 3px;
-        }
-
-        .chat-message {
-            margin-bottom: 15px;
-            padding: 12px;
-            border-radius: 12px;
-            line-height: 1.4;
-            animation: fadeInMessage 0.3s ease;
-        }
-
-        @keyframes fadeInMessage {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .user-message {
-            background: rgba(0, 122, 255, 0.2);
-            color: #ffffff;
-            margin-left: 20px;
-            border-bottom-right-radius: 4px;
-            border: 1px solid rgba(0, 122, 255, 0.3);
-        }
-
-        .hema-message {
-            background: rgba(76, 175, 80, 0.2);
-            color: #ffffff;
-            margin-right: 20px;
-            border-bottom-left-radius: 4px;
-            border: 1px solid rgba(76, 175, 80, 0.3);
-        }
-
-        .chat-input-container {
-            display: flex;
-            padding: 15px;
-            background: rgba(28, 28, 30, 0.9);
-            border-radius: 0 0 13px 13px;
-            gap: 10px;
-            border-top: 1px solid rgba(76, 175, 80, 0.3);
-        }
-
-        #chatInput {
-            flex: 1;
-            padding: 12px;
-            border: 2px solid rgba(76, 175, 80, 0.3);
-            border-radius: 20px;
-            outline: none;
-            font-size: 14px;
-            background: rgba(44, 44, 46, 0.8);
-            color: #ffffff;
-            backdrop-filter: blur(10px);
-        }
-
-        #chatInput:focus {
-            border-color: #4CAF50;
-            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
-        }
-
-        #chatInput::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .send-chat-btn, .voice-chat-btn {
-            background: #4CAF50;
-            color: white;
-            border: none;
-            padding: 12px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .send-chat-btn:hover, .voice-chat-btn:hover {
-            background: #45a049;
-            transform: translateY(-1px);
-        }
-
-        .voice-chat-btn {
-            width: 45px;
-            padding: 12px;
-        }
-
-        .voice-chat-btn.listening {
-            background: #f44336;
-            animation: pulse 1s infinite;
-        }
 
         /* Mobile Responsive Design */
         @media (max-width: 768px) {
             .header {
                 padding: 12px 16px;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
                 gap: 12px;
                 min-height: auto;
+            }
+
+            /* Mobile voice assistant button adjustments */
+            .voice-assistant-container {
+                bottom: 20px;
+            }
+
+            .voice-assistant-btn {
+                width: 120px;
+                height: 55px;
+            }
+
+            .mic-icon {
+                font-size: 18px;
+            }
+
+            .voice-status-text {
+                font-size: 10px;
             }
 
             .app-title {
@@ -1348,23 +1222,7 @@
                 flex: none;
             }
 
-            .voice-input-container {
-                width: 100%;
-                order: 3;
-                gap: 6px;
-            }
 
-            .voice-input {
-                font-size: 14px;
-                padding: 12px 16px;
-                height: 44px;
-            }
-
-            .voice-btn {
-                width: 44px;
-                height: 44px;
-                font-size: 16px;
-            }
 
             .main-content {
                 flex-direction: column;
@@ -2104,86 +1962,7 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Header with voice input -->
-        <div class="header">
-            <div class="auth-section">
-                <div class="subscription-status" id="subscriptionStatus" onclick="showSubscriptionModal()" style="display: none;">
-                    <span id="subscriptionText">Free Trial</span>
-                </div>
-                <div id="loginSection" style="display: none;">
-                    <button class="auth-btn" onclick="window.location.href='/auth/google'">Connect Google</button>
-                </div>
-                <div id="userInfo" class="user-info">
-                    <div class="profile-dropdown" style="position: relative; display: inline-block;">
-                        <div class="profile-icon" onclick="toggleProfileMenu()" id="profileIcon" style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #4285f4, #34a853); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 1.1rem; cursor: pointer; transition: all 0.3s ease; border: 2px solid rgba(255, 255, 255, 0.3); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0, 0, 0, 0.3)'; this.style.borderColor='rgba(255, 255, 255, 0.5)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0, 0, 0, 0.2)'; this.style.borderColor='rgba(255, 255, 255, 0.3)'">
-                            👤
-                        </div>
-                        <div class="profile-menu" id="profileMenu" style="position: absolute; top: 100%; left: 0; margin-top: 8px; background: #2c2c2e; border-radius: 12px; border: 1px solid #3a3a3c; min-width: 280px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s ease; z-index: 999999;">
-                            <div style="padding: 16px; border-bottom: 1px solid #3a3a3c;">
-                                <div style="font-weight: 600; color: #ffffff; margin-bottom: 4px;" id="profileName">User Name</div>
-                                <div style="font-size: 14px; color: #8e8e93;" id="profileEmail">user@example.com</div>
-                                <div style="margin-top: 8px;">
-                                    <span style="display: inline-block; padding: 4px 8px; background: rgba(52, 199, 89, 0.2); color: #34c759; border-radius: 6px; font-size: 12px; font-weight: 500;" id="profileTier">Free</span>
-                                </div>
-                            </div>
-                            <div style="padding: 8px 0;">
-                                <div class="profile-menu-item" onclick="window.location.href='/ai-voice'" style="padding: 12px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s ease;" onmouseover="this.style.background='rgba(0, 122, 255, 0.1)'" onmouseout="this.style.background='transparent'">
-                                    <span style="font-size: 16px;">🤖</span>
-                                    <span style="color: #007aff; font-size: 14px;">AI Voice Assistant</span>
-                                </div>
-                                <div class="profile-menu-item" onclick="window.location.href='/settings'" style="padding: 12px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s ease;" onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.background='transparent'">
-                                    <span style="font-size: 16px;">⚙️</span>
-                                    <span style="color: #ffffff; font-size: 14px;">Settings</span>
-                                </div>
-                                <div class="profile-menu-item" onclick="logout()" style="padding: 12px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s ease;" onmouseover="this.style.background='rgba(255, 59, 48, 0.1)'" onmouseout="this.style.background='transparent'">
-                                    <span style="font-size: 16px;">🚪</span>
-                                    <span style="color: #ff3b30; font-size: 14px;">Logout</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="app-title">🤖 AI Reminder Agent</div>
-            
-            <!-- Hema Chat Interface -->
-            <div class="hema-chat-container">
-                <button id="hemaChatToggle" class="hema-chat-btn">
-                    🤖 Chat with Hema
-                </button>
-                <div id="hemaChatPanel" class="hema-chat-panel">
-                    <div class="chat-header">
-                        <span>🤖 Hema AI Assistant</span>
-                        <button id="closeChatBtn" class="close-chat-btn">×</button>
-                    </div>
-                    <div id="chatMessages" class="chat-messages">
-                        <div class="chat-message hema-message">
-                            <strong>Hema:</strong> Hi! I'm your AI calendar assistant. You can type here or use voice commands by saying "Hema" followed by your request.
-                        </div>
-                    </div>
-                    <div class="chat-input-container">
-                        <input type="text" id="chatInput" placeholder="Type your message or say 'Hema' for voice..." />
-                        <button id="sendChatBtn" class="send-chat-btn">Send</button>
-                        <button id="voiceChatBtn" class="voice-chat-btn" title="Voice Command">🎤</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="voice-input-container">
-                <input 
-                    type="text" 
-                    id="voiceInput" 
-                    class="voice-input" 
-                    placeholder="Say something like 'Remind me to call mom tomorrow at 3pm'..."
-                >
-                <button id="voiceBtn" class="voice-btn">
-                    <span id="voiceIcon">🎤</span>
-                </button>
 
-                <div id="voiceStatus" class="voice-status" style="display: none;"></div>
-            </div>
-        </div>
 
         <!-- Browser warning -->
         <div id="browserWarning" class="browser-warning">
@@ -2304,6 +2083,46 @@
                 </div>
                 <button class="background-btn" id="backgroundBtn" onclick="openBackgroundSelector()">🎨 Background</button>
                         <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleEventsSidebar()">📋 Events</button>
+                        
+                        <!-- Profile Dropdown in Calendar Header -->
+                        <div class="calendar-profile-section" style="display: flex; align-items: center; gap: 12px;">
+                            <div class="subscription-status" id="subscriptionStatus" onclick="showSubscriptionModal()" style="display: none;">
+                                <span id="subscriptionText">Free Trial</span>
+                            </div>
+                            <div id="loginSection" style="display: none;">
+                                <button class="auth-btn" onclick="window.location.href='/auth/google'">Connect Google</button>
+                            </div>
+                            <div id="userInfo" class="user-info">
+                                <div class="profile-dropdown" style="position: relative; display: inline-block;">
+                                    <div class="profile-icon" onclick="toggleProfileMenu()" id="profileIcon" style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #4285f4, #34a853); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 1.1rem; cursor: pointer; transition: all 0.3s ease; border: 2px solid rgba(255, 255, 255, 0.3); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0, 0, 0, 0.3)'; this.style.borderColor='rgba(255, 255, 255, 0.5)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0, 0, 0, 0.2)'; this.style.borderColor='rgba(255, 255, 255, 0.3)'">
+                                        👤
+                                    </div>
+                                    <div class="profile-menu" id="profileMenu" style="position: absolute; top: 100%; right: 0; margin-top: 8px; background: #2c2c2e; border-radius: 12px; border: 1px solid #3a3a3c; min-width: 280px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s ease; z-index: 9999999999;">
+                                        <div style="padding: 16px; border-bottom: 1px solid #3a3a3c;">
+                                            <div style="font-weight: 600; color: #ffffff; margin-bottom: 4px;" id="profileName">User Name</div>
+                                            <div style="font-size: 14px; color: #8e8e93;" id="profileEmail">user@example.com</div>
+                                            <div style="margin-top: 8px;">
+                                                <span style="display: inline-block; padding: 4px 8px; background: rgba(52, 199, 89, 0.2); color: #34c759; border-radius: 6px; font-size: 12px; font-weight: 500;" id="profileTier">Free</span>
+                                            </div>
+                                        </div>
+                                        <div style="padding: 8px 0;">
+                                            <div class="profile-menu-item" onclick="window.location.href='/ai-voice'" style="padding: 12px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s ease;" onmouseover="this.style.background='rgba(0, 122, 255, 0.1)'" onmouseout="this.style.background='transparent'">
+                                                <span style="font-size: 16px;">🤖</span>
+                                                <span style="color: #007aff; font-size: 14px;">AI Voice Assistant</span>
+                                            </div>
+                                            <div class="profile-menu-item" onclick="window.location.href='/settings'" style="padding: 12px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s ease;" onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.background='transparent'">
+                                                <span style="font-size: 16px;">⚙️</span>
+                                                <span style="color: #ffffff; font-size: 14px;">Settings</span>
+                                            </div>
+                                            <div class="profile-menu-item" onclick="logout()" style="padding: 12px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s ease;" onmouseover="this.style.background='rgba(255, 59, 48, 0.1)'" onmouseout="this.style.background='transparent'">
+                                                <span style="font-size: 16px;">🚪</span>
+                                                <span style="color: #ff3b30; font-size: 14px;">Logout</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -2317,6 +2136,14 @@
                     <div class="day-view" id="dayView">
                         <!-- Day calendar will be generated here -->
                     </div>
+                </div>
+
+                <!-- Centered Voice Assistant Button -->
+                <div class="voice-assistant-container">
+                    <button id="voiceAssistantBtn" class="voice-assistant-btn" title="Click to talk to Hema AI">
+                        <div class="mic-icon">🎤</div>
+                        <div class="voice-status-text" id="voiceStatusText">Ask Hema</div>
+                    </button>
                 </div>
             </div>
 
@@ -3374,119 +3201,11 @@
                     hasGrammar: !!recognition.grammars
                 }); // Debug
                 // Set up event handlers
-                recognition.onstart = function() {
-                    console.log('🎤 Speech recognition started'); // Debug
-                    isListening = true;
-                    updateVoiceUI();
-                    showVoiceStatus('Listening... Speak now!', true);
-                };
+                // Old recognition handlers disabled - using enhanced speech recognition instead
 
-                recognition.onresult = function(event) {
-                    console.log('🎯 Speech recognition result received:', event); // Debug
-                    let finalTranscript = '';
-                    let interimTranscript = '';
-                    let bestAlternative = '';
-                    let highestConfidence = 0;
 
-                    for (let i = event.resultIndex; i < event.results.length; i++) {
-                        const result = event.results[i];
-                        console.log(`📝 Result ${i}:`, result); // Debug
-                        
-                        if (result.isFinal) {
-                            // Choose the best alternative based on confidence
-                            for (let j = 0; j < result.length; j++) {
-                                const alternative = result[j];
-                                console.log(`💭 Alternative ${j}:`, alternative.transcript, 'Confidence:', alternative.confidence); // Debug
-                                
-                                if (alternative.confidence > highestConfidence) {
-                                    highestConfidence = alternative.confidence;
-                                    bestAlternative = alternative.transcript;
-                                }
-                            }
-                            finalTranscript += bestAlternative || result[0].transcript;
-                        } else {
-                            // For interim results, use the first alternative
-                            interimTranscript += result[0].transcript;
-                        }
-                    }
 
-                    const input = document.getElementById('voiceInput');
-                    if (finalTranscript) {
-                        const cleanedTranscript = finalTranscript.trim();
-                        console.log('✅ Final transcript selected:', cleanedTranscript, 'Confidence:', highestConfidence); // Debug
-                        input.value = cleanedTranscript;
-                        showVoiceStatus('Processing...', false);
-                        createReminderFromText(cleanedTranscript);
-                    } else if (interimTranscript) {
-                        input.value = interimTranscript.trim();
-                        showVoiceStatus(`Hearing: "${interimTranscript.trim()}"`, true);
-                    }
-                };
 
-                recognition.onerror = function(event) {
-                    console.error('🎤 Speech recognition error:', event.error); // Debug
-                    isListening = false;
-                    updateVoiceUI();
-                    hideVoiceStatus();
-                    
-                    let errorMessage = '';
-                    let shouldRestart = false;
-                    
-                    switch(event.error) {
-                        case 'no-speech':
-                            errorMessage = 'No speech detected. Please speak clearly and try again.';
-                            shouldRestart = true;
-                            break;
-                        case 'audio-capture':
-                            errorMessage = 'Microphone not accessible. Please check your microphone connection.';
-                            break;
-                        case 'not-allowed':
-                            errorMessage = 'Microphone permission denied. Please allow microphone access in your browser.';
-                            break;
-                        case 'network':
-                            errorMessage = 'Network error. Please check your internet connection.';
-                            shouldRestart = true;
-                            break;
-                        case 'language-not-supported':
-                            errorMessage = 'Language not supported. Switching to English (US).';
-                            recognition.lang = 'en-US';
-                            shouldRestart = true;
-                            break;
-                        case 'service-not-allowed':
-                            errorMessage = 'Speech recognition service not allowed. Please try a different browser.';
-                            break;
-                        case 'bad-grammar':
-                            errorMessage = 'Grammar error. Please speak more clearly.';
-                            shouldRestart = true;
-                            break;
-                        default:
-                            errorMessage = `Speech recognition error: ${event.error}. Please try again.`;
-                            shouldRestart = true;
-                    }
-                    
-                    showMessage(errorMessage, 'error');
-                    
-                    // Auto-restart for recoverable errors after 2 seconds
-                    if (shouldRestart) {
-                        setTimeout(() => {
-                            if (!isListening) {
-                                console.log('🔄 Auto-restarting speech recognition...'); // Debug
-                                try {
-                                    recognition.start();
-                                } catch (error) {
-                                    console.error('❌ Failed to restart recognition:', error); // Debug
-                                }
-                            }
-                        }, 2000);
-                    }
-                };
-
-                recognition.onend = function() {
-                    console.log('🎤 Speech recognition ended'); // Debug
-                    isListening = false;
-                    updateVoiceUI();
-                    setTimeout(() => hideVoiceStatus(), 2000);
-                };
                 
             } catch (error) {
                 console.error('❌ Error creating speech recognition:', error); // Debug
@@ -3554,6 +3273,215 @@
                 
                 showMessage(errorMessage, 'error');
                 return false;
+            }
+        }
+
+        // Activate voice assistant with new centered button
+        async function activateVoiceAssistant() {
+            console.log('🤖 Voice assistant button clicked!');
+            
+            if (!recognition) {
+                console.error('❌ Speech recognition not supported');
+                updateAssistantButton('error', 'Not Supported');
+                showMessage('Speech recognition not supported in this browser. Please use Chrome, Safari, or Edge.', 'error');
+                return;
+            }
+
+            if (!currentUserEmail) {
+                console.warn('❌ No user email found');
+                currentUserEmail = 'test@example.com';
+            }
+
+            if (isListening) {
+                console.log('🛑 Stopping voice recognition');
+                recognition.stop();
+                return;
+            }
+
+            console.log('🎯 Starting voice assistant');
+            
+            // Initialize microphone
+            const micReady = await initializeMicrophone();
+            if (!micReady) {
+                updateAssistantButton('error', 'Mic Error');
+                return;
+            }
+            
+            try {
+                // Start enhanced speech recognition with pause detection
+                await startEnhancedSpeechRecognition();
+            } catch (error) {
+                console.error('❌ Error starting recognition:', error);
+                updateAssistantButton('error', 'Error');
+                if (error.name === 'InvalidStateError') {
+                    showMessage('Voice recognition is already running. Please wait.', 'warning');
+                } else {
+                    showMessage('Could not start voice recognition: ' + error.message, 'error');
+                }
+            }
+        }
+
+        // Enhanced speech recognition with intelligent pause detection
+        async function startEnhancedSpeechRecognition() {
+            return new Promise((resolve, reject) => {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                const speechRecognition = new SpeechRecognition();
+                
+                // Configure for natural speech with pauses
+                speechRecognition.continuous = true;
+                speechRecognition.interimResults = true;
+                speechRecognition.lang = 'en-US';
+                speechRecognition.maxAlternatives = 3;
+                
+                let finalTranscript = '';
+                let lastSpeechTime = Date.now();
+                let silenceTimer = null;
+                let isProcessing = false;
+                
+                updateAssistantButton('listening', 'Listening...');
+                
+                speechRecognition.onstart = () => {
+                    console.log('🎤 Enhanced speech recognition started');
+                    isListening = true;
+                    lastSpeechTime = Date.now();
+                };
+                
+                speechRecognition.onresult = (event) => {
+                    let interimTranscript = '';
+                    let hasNewFinalTranscript = false;
+                    
+                    // Process all results
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        const result = event.results[i];
+                        const transcript = result[0].transcript;
+                        
+                        if (result.isFinal) {
+                            finalTranscript += transcript + ' ';
+                            hasNewFinalTranscript = true;
+                            console.log('📝 Final transcript added:', transcript);
+                        } else {
+                            interimTranscript += transcript;
+                        }
+                    }
+                    
+                                         // Update UI with current speech
+                     if (interimTranscript.trim()) {
+                         const fullTranscript = (finalTranscript + interimTranscript).trim();
+                         const displayText = fullTranscript.length > 50 ? fullTranscript.substring(0, 47) + '...' : fullTranscript;
+                         updateAssistantButton('listening', `"${displayText}"`);
+                         lastSpeechTime = Date.now();
+                     }
+                    
+                    // Reset silence timer when we get new speech
+                    if (hasNewFinalTranscript || interimTranscript.trim()) {
+                        clearTimeout(silenceTimer);
+                        
+                        // Set a timer to detect end of speech (3 seconds of silence after final speech)
+                        silenceTimer = setTimeout(() => {
+                            if (!isProcessing && finalTranscript.trim()) {
+                                isProcessing = true;
+                                speechRecognition.stop();
+                                console.log('🎯 Speech completed due to silence. Final transcript:', finalTranscript.trim());
+                                processCommand(finalTranscript.trim());
+                                resolve();
+                            }
+                        }, 3000); // 3 seconds of silence
+                    }
+                };
+                
+                speechRecognition.onerror = (event) => {
+                    console.error('🎤 Speech recognition error:', event.error);
+                    isListening = false;
+                    clearTimeout(silenceTimer);
+                    
+                    if (event.error === 'no-speech') {
+                        updateAssistantButton('ready');
+                        showMessage('No speech detected. Please try again.', 'warning');
+                    } else if (event.error === 'not-allowed') {
+                        updateAssistantButton('error', 'Permission Denied');
+                        showMessage('Microphone permission denied. Please allow microphone access.', 'error');
+                    } else {
+                        updateAssistantButton('error', 'Error');
+                        showMessage(`Speech recognition error: ${event.error}`, 'error');
+                    }
+                    reject(new Error(event.error));
+                };
+                
+                speechRecognition.onend = () => {
+                    console.log('🎤 Speech recognition ended');
+                    isListening = false;
+                    clearTimeout(silenceTimer);
+                    
+                    if (!isProcessing) {
+                        updateAssistantButton('ready');
+                        if (finalTranscript.trim()) {
+                            console.log('🎯 Processing final transcript:', finalTranscript.trim());
+                            processCommand(finalTranscript.trim());
+                        }
+                        resolve();
+                    }
+                };
+                
+                // Process the recognized command
+                async function processCommand(transcript) {
+                    if (!transcript.trim()) {
+                        updateAssistantButton('ready');
+                        return;
+                    }
+                    
+                    updateAssistantButton('processing', 'Processing...');
+                    console.log('🧠 Processing command:', transcript);
+                    
+                    try {
+                        await executeVoiceCommandWithAI(transcript);
+                    } catch (error) {
+                        console.error('❌ Error processing command:', error);
+                        showMessage('Error processing your command. Please try again.', 'error');
+                    } finally {
+                        updateAssistantButton('ready');
+                    }
+                }
+                
+                // Start recognition
+                speechRecognition.start();
+            });
+        }
+
+        // Update voice assistant button state
+        function updateAssistantButton(state, text) {
+            const assistantBtn = document.getElementById('voiceAssistantBtn');
+            const statusText = document.getElementById('voiceStatusText');
+            
+            if (!assistantBtn || !statusText) return;
+            
+            // Remove all state classes
+            assistantBtn.classList.remove('listening', 'processing', 'error');
+            statusText.style.textTransform = 'uppercase'; // Reset to uppercase by default
+            
+            switch (state) {
+                case 'listening':
+                    assistantBtn.classList.add('listening');
+                    if (text && text.includes('"')) {
+                        // Show speech transcript without uppercase transformation
+                        statusText.style.textTransform = 'none';
+                        statusText.textContent = text;
+                    } else {
+                        statusText.textContent = 'Listening...';
+                    }
+                    break;
+                case 'processing':
+                    assistantBtn.classList.add('processing');
+                    statusText.textContent = 'Processing...';
+                    break;
+                case 'error':
+                    assistantBtn.classList.add('error');
+                    statusText.textContent = text || 'Error';
+                    setTimeout(() => updateAssistantButton('ready'), 3000);
+                    break;
+                case 'ready':
+                default:
+                    statusText.textContent = 'Ask Hema';
+                    break;
             }
         }
 
@@ -3764,12 +3692,7 @@
                 if (result.success) {
                     const successMessage = result.message || `✅ Reminder created: "${result.reminder?.title || 'Event'}"`;
                     showMessage(successMessage, result.warning ? 'warning' : 'success');
-                    
-                    // Clear input
-                    const voiceInput = document.getElementById('voiceInput');
-                    if (voiceInput) {
-                        voiceInput.value = '';
-                    }
+                    updateAssistantButton('ready');
                     
                     // Add event to calendar immediately
                     if (result.reminder) {
@@ -3809,6 +3732,7 @@
                 }
             } finally {
                 showLoading(false);
+                updateAssistantButton('ready');
             }
         }
 
@@ -5472,28 +5396,28 @@
         function setupEventListeners() {
             console.log('🔧 Setting up event listeners...'); // Debug
             
-            const voiceBtn = document.getElementById('voiceBtn');
-            console.log('🔍 Voice button element found:', !!voiceBtn); // Debug
+            const voiceAssistantBtn = document.getElementById('voiceAssistantBtn');
+            console.log('🔍 Voice assistant button element found:', !!voiceAssistantBtn); // Debug
             
-            if (voiceBtn) {
-                voiceBtn.addEventListener('click', toggleVoiceRecognition);
-                console.log('✅ Voice button event listener added'); // Debug
+            if (voiceAssistantBtn) {
+                voiceAssistantBtn.addEventListener('click', activateVoiceAssistant);
+                console.log('✅ Voice assistant button event listener added'); // Debug
                 
                 // Test the button immediately
                 setTimeout(() => {
                     testMicrophoneSetup();
                 }, 100);
             } else {
-                console.error('❌ Voice button not found!'); // Debug
+                console.error('❌ Voice assistant button not found!'); // Debug
                 setTimeout(() => {
                     // Try to find the button again after DOM is fully loaded
-                    const retryBtn = document.getElementById('voiceBtn');
+                    const retryBtn = document.getElementById('voiceAssistantBtn');
                     if (retryBtn) {
-                        console.log('✅ Voice button found on retry'); // Debug
-                        retryBtn.addEventListener('click', toggleVoiceRecognition);
+                        console.log('✅ Voice assistant button found on retry'); // Debug
+                        retryBtn.addEventListener('click', activateVoiceAssistant);
                         testMicrophoneSetup();
                     } else {
-                        console.error('❌ Voice button still not found after retry'); // Debug
+                        console.error('❌ Voice assistant button still not found after retry'); // Debug
                     }
                 }, 1000);
             }
@@ -5506,21 +5430,7 @@
             document.getElementById('weekViewBtn').addEventListener('click', () => switchView('week'));
             document.getElementById('monthViewBtn').addEventListener('click', () => switchView('month'));
             
-            // Voice input enter key
-            const voiceInput = document.getElementById('voiceInput');
-            if (voiceInput) {
-                voiceInput.addEventListener('keypress', function(e) {
-                    console.log('⌨️ Key pressed:', e.key); // Debug
-                if (e.key === 'Enter' && this.value.trim()) {
-                        console.log('✅ Enter pressed with text:', this.value.trim()); // Debug
-                        e.preventDefault(); // Prevent form submission
-                    createReminderFromText(this.value.trim());
-                }
-            });
-                console.log('✅ Enter key listener added to voice input'); // Debug
-            } else {
-                console.error('❌ Voice input element not found!'); // Debug
-            }
+
         }
 
         // Profile dropdown functions
@@ -5589,51 +5499,9 @@
             }
         });
 
-        // Add page visibility listener to check auth when user returns
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) {
-                console.log('👀 Page became visible - checking authentication...');
-                fetch('/api/user/profile', {
-                    method: 'GET',
-                    credentials: 'include',
-                    headers: {
-                        'Cache-Control': 'no-cache, no-store, must-revalidate'
-                    }
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        console.log('❌ Auth check failed on page visibility - redirecting');
-                        window.location.replace('/');
-                    }
-                })
-                .catch(error => {
-                    console.error('❌ Auth check error on page visibility:', error);
-                    window.location.replace('/');
-                });
-            }
-        });
+        // Removed aggressive page visibility auth check to prevent continuous refreshing
 
-        // Prevent back button access by checking auth on popstate
-        window.addEventListener('popstate', (event) => {
-            console.log('🔙 Back button pressed - checking authentication...');
-            fetch('/api/user/profile', {
-                method: 'GET',
-                credentials: 'include',
-                headers: {
-                    'Cache-Control': 'no-cache, no-store, must-revalidate'
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    console.log('❌ Auth check failed on back button - redirecting');
-                    window.location.replace('/');
-                }
-            })
-            .catch(error => {
-                console.error('❌ Auth check error on back button:', error);
-                window.location.replace('/');
-            });
-        });
+        // Removed aggressive back button auth check to prevent continuous refreshing
 
         // Ensure profile is visible after auth
         function showAuthenticatedState() {
@@ -5690,8 +5558,8 @@
             });
         }
 
-        // Run session validation every 10 seconds
-        setInterval(validateUserSession, 10000);
+        // Run session validation every 5 minutes to reduce server load
+        setInterval(validateUserSession, 300000);
 
         // Debug function to check current calendar state
         function debugCalendarState() {
@@ -6102,7 +5970,7 @@
         }
 
         // Execute voice command with OpenAI AI processing
-        async function executeVoiceCommandWithAI(transcript, fromChat = false) {
+        async function executeVoiceCommandWithAI(transcript) {
             const command = transcript.toLowerCase().trim();
             console.log('🧠 Processing command with AI:', command);
 
@@ -6464,74 +6332,7 @@
             };
         }
 
-        // Enhanced text-to-speech response
-        async function speakResponse(text) {
-            console.log('🔊 Speaking:', text);
-            
-            return new Promise((resolve) => {
-                if ('speechSynthesis' in window) {
-                    // Stop any current speech
-                    speechSynthesis.cancel();
-                    
-                    const utterance = new SpeechSynthesisUtterance(text);
-                    utterance.rate = 0.9;
-                    utterance.pitch = 1.1;
-                    utterance.volume = 1.0;
-                    
-                    // Wait for voices to load
-                    function setVoice() {
-                        const voices = speechSynthesis.getVoices();
-                        console.log('🎙️ Available voices:', voices.length);
-                        
-                        // Prefer high-quality voices
-                        const preferredVoice = voices.find(voice => 
-                            voice.name.includes('Samantha') || 
-                            voice.name.includes('Alex') ||
-                            voice.name.includes('Google') ||
-                            voice.name.includes('Natural') ||
-                            (voice.lang.startsWith('en') && voice.localService)
-                        ) || voices.find(voice => voice.lang.startsWith('en'));
-                        
-                        if (preferredVoice) {
-                            utterance.voice = preferredVoice;
-                            console.log('🎤 Using voice:', preferredVoice.name);
-                        }
-                        
-                        utterance.onstart = () => {
-                            console.log('🗣️ Speech started');
-                            showVoiceFeedback(`🗣️ AI: "${text}"`);
-                        };
-                        
-                        utterance.onend = () => {
-                            console.log('✅ Speech completed');
-                            setTimeout(() => hideVoiceFeedback(), 2000);
-                            resolve();
-                        };
-                        
-                        utterance.onerror = (event) => {
-                            console.error('❌ Speech error:', event.error);
-                            hideVoiceFeedback();
-                            resolve();
-                        };
-                        
-                        speechSynthesis.speak(utterance);
-                    }
-                    
-                    // Handle voices loading
-                    if (speechSynthesis.getVoices().length > 0) {
-                        setVoice();
-                    } else {
-                        speechSynthesis.addEventListener('voiceschanged', setVoice, { once: true });
-                        // Fallback timeout
-                        setTimeout(setVoice, 1000);
-                    }
-                } else {
-                    console.warn('⚠️ Speech synthesis not supported');
-                    showMessage('Speech synthesis not supported in this browser', 'warning');
-                    resolve();
-                }
-            });
-        }
+
 
         // AI-enhanced command handlers
         async function handleCreateEventCommandAI(aiResponse, transcript) {
@@ -6544,18 +6345,8 @@
                 eventData = parseEventFromText(transcript);
             }
 
-            if (aiResponse.needsConfirmation) {
-                const confirmText = `I'll create "${eventData.title}" ${aiResponse.summary || 'for the specified time'}. Is this correct?`;
-                speakResponse(confirmText);
-                
-                // In a real implementation, you'd wait for user confirmation
-                // For now, we'll proceed with creation
                 await createCalendarEvent(eventData);
-                speakResponse('Event created successfully!');
-            } else {
-                await createCalendarEvent(eventData);
-                speakResponse(aiResponse.response || `I've created "${eventData.title}" for you.`);
-            }
+            showMessage(`✅ Event created: "${eventData.title}"`, 'success');
         }
 
         async function handleQueryCommandAI(aiResponse) {
@@ -6569,11 +6360,10 @@
                 });
                 
                 const responseText = events.length === 0 ? 
-                    aiResponse.emptyResponse || "No events found for that time." :
-                    aiResponse.response || `Found ${events.length} event${events.length > 1 ? 's' : ''}: ` +
-                    events.map(e => e.title).join(', ');
+                    "No events found for that time." :
+                    `Found ${events.length} event${events.length > 1 ? 's' : ''}: ` + events.map(e => e.title).join(', ');
                 
-                speakResponse(responseText);
+                showMessage(responseText, 'info');
             } else {
                 // Fall back to basic query handling
                 await handleQueryCommand(aiResponse.originalCommand || '');
@@ -6604,13 +6394,12 @@
                         
                         generateCalendar();
                         loadUpcomingEvents();
-                        speakResponse(aiResponse.response || `I've deleted "${event.title}" from your calendar.`);
-                        showMessage('Event deleted successfully', 'success');
+                        showMessage(`✅ Deleted "${event.title}" from your calendar`, 'success');
                     }
                 } else if (matchingEvents.length === 0) {
-                    speakResponse(aiResponse.errorResponse || `I couldn't find any events matching "${aiResponse.eventToDelete}".`);
+                    showMessage(`❌ Couldn't find any events matching "${aiResponse.eventToDelete}"`, 'warning');
                 } else {
-                    speakResponse(`I found ${matchingEvents.length} events matching "${aiResponse.eventToDelete}". Please be more specific.`);
+                    showMessage(`Found ${matchingEvents.length} events matching "${aiResponse.eventToDelete}". Please be more specific.`, 'warning');
                 }
             } else {
                 await handleDeleteCommand(aiResponse.originalCommand || '');
@@ -6624,18 +6413,18 @@
                 switch (aiResponse.navigationType) {
                     case 'today':
                         goToToday();
-                        speakResponse(aiResponse.response || 'Navigated to today.');
+                        showMessage('📅 Navigated to today', 'success');
                         break;
                     case 'tomorrow':
                         currentDate = new Date();
                         currentDate.setDate(currentDate.getDate() + 1);
                         generateCalendar();
-                        speakResponse(aiResponse.response || 'Navigated to tomorrow.');
+                        showMessage('📅 Navigated to tomorrow', 'success');
                         break;
                     case 'view_change':
                         if (aiResponse.viewType) {
                             switchView(aiResponse.viewType);
-                            speakResponse(aiResponse.response || `Switched to ${aiResponse.viewType} view.`);
+                            showMessage(`📅 Switched to ${aiResponse.viewType} view`, 'success');
                         }
                         break;
                     default:
@@ -6680,217 +6469,9 @@
             hideJarvisFeedback();
         }
 
-        // Hema help function
-        async function showJarvisHelp() {
-            const helpText = `I'm Hema, your AI calendar assistant. Just say "Hema" followed by commands like: 
-            schedule a meeting tomorrow at 3 PM, 
-            what's on my calendar today, 
-            delete my dentist appointment, 
-            or go to next week. 
-            I can help you manage your entire calendar with natural speech.`;
-            
-            showJarvisFeedback('🤖 Available commands');
-            await speakResponse(helpText);
-            setTimeout(() => hideJarvisFeedback(), 5000);
-        }
 
-        // Setup Hema wake word detection
-        function setupJarvisWakeWord() {
-            console.log('🤖 Initializing Hema AI Assistant...');
-            console.log('👂 Listening for "Hema" wake word...');
 
-            // Start continuous listening for wake word
-            startWakeWordDetection();
 
-            // Initialize Hema greeting
-            setTimeout(() => {
-                showJarvisFeedback('🤖 Hema is ready');
-                speakResponseAndAddToChat('Hema assistant initialized. Just say "Hema" to activate me.');
-                setTimeout(() => hideJarvisFeedback(), 3000);
-            }, 1000);
-        }
-
-        // Continuous wake word detection
-        let wakeWordRecognition = null;
-        let isListeningForWakeWord = false;
-
-        function startWakeWordDetection() {
-            if (!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
-                console.warn('⚠️ Speech recognition not supported');
-                return;
-            }
-
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            wakeWordRecognition = new SpeechRecognition();
-            
-            wakeWordRecognition.continuous = true;
-            wakeWordRecognition.interimResults = true;
-            wakeWordRecognition.lang = 'en-US';
-            wakeWordRecognition.maxAlternatives = 1;
-
-            wakeWordRecognition.onstart = () => {
-                isListeningForWakeWord = true;
-                console.log('👂 Listening for "Hema"...');
-            };
-
-            wakeWordRecognition.onresult = (event) => {
-                for (let i = event.resultIndex; i < event.results.length; i++) {
-                    const transcript = event.results[i][0].transcript.toLowerCase().trim();
-                    
-                    // Check for wake words - just "Hema"
-                    if (transcript.includes('hema')) {
-                        
-                        console.log('🎯 Wake word detected:', transcript);
-                        wakeWordRecognition.stop();
-                        activateJarvis();
-                        break;
-                    }
-                }
-            };
-
-            wakeWordRecognition.onerror = (event) => {
-                console.log('Wake word detection error:', event.error);
-                if (event.error !== 'no-speech') {
-                    setTimeout(() => {
-                        if (!isListeningForWakeWord) {
-                            startWakeWordDetection();
-                        }
-                    }, 2000);
-                }
-            };
-
-            wakeWordRecognition.onend = () => {
-                isListeningForWakeWord = false;
-                // Restart wake word detection after a brief pause
-                setTimeout(() => {
-                    if (!isListeningForWakeWord) {
-                        startWakeWordDetection();
-                    }
-                }, 1000);
-            };
-
-            wakeWordRecognition.start();
-        }
-
-        // Activate Hema when wake word is detected
-        async function activateJarvis() {
-            console.log('🤖 Hema activated!');
-            
-            showJarvisFeedback('🤖 Yes, how can I help?');
-            await speakResponseAndAddToChat('Yes, how can I help you?');
-            
-            // Give more time before listening for command
-            setTimeout(async () => {
-                await processJarvisCommand();
-            }, 2000);
-        }
-
-        // Process Hema voice commands
-        async function processJarvisCommand() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            const recognition = new SpeechRecognition();
-            
-            recognition.continuous = false;
-            recognition.interimResults = true;
-            recognition.lang = 'en-US';
-            recognition.maxAlternatives = 3;
-
-            try {
-                showJarvisFeedback('🎤 Listening for your command...', 'listening');
-                
-                const transcript = await new Promise((resolve, reject) => {
-                    let finalTranscript = '';
-                    let timeoutId;
-                    let silenceTimeout;
-
-                    recognition.onresult = (event) => {
-                        let interimTranscript = '';
-                        
-                        for (let i = event.resultIndex; i < event.results.length; i++) {
-                            const transcript = event.results[i][0].transcript;
-                            if (event.results[i].isFinal) {
-                                finalTranscript += transcript;
-                            } else {
-                                interimTranscript += transcript;
-                            }
-                        }
-
-                        // Show what Hema is hearing
-                        if (interimTranscript) {
-                            showJarvisFeedback(`🎤 "${interimTranscript}"`, 'listening');
-                        }
-
-                        // Clear previous timeouts
-                        clearTimeout(timeoutId);
-                        clearTimeout(silenceTimeout);
-
-                        // If we have final transcript, wait a bit more for additional words
-                        if (finalTranscript) {
-                            silenceTimeout = setTimeout(() => {
-                                recognition.stop();
-                                resolve(finalTranscript);
-                            }, 2000); // Wait 2 seconds after final transcript
-                        } else if (interimTranscript) {
-                            // If we have interim results, give more time
-                            timeoutId = setTimeout(() => {
-                                recognition.stop();
-                                resolve(interimTranscript);
-                            }, 5000); // Wait 5 seconds for interim results
-                        }
-                    };
-
-                    recognition.onerror = (event) => {
-                        clearTimeout(timeoutId);
-                        clearTimeout(silenceTimeout);
-                        reject(new Error(`Speech recognition error: ${event.error}`));
-                    };
-
-                    recognition.onend = () => {
-                        clearTimeout(timeoutId);
-                        clearTimeout(silenceTimeout);
-                        if (!finalTranscript) {
-                            reject(new Error('No command received'));
-                        }
-                    };
-
-                    // Start with a timeout for the entire recognition session
-                    const maxTimeout = setTimeout(() => {
-                        recognition.stop();
-                        if (finalTranscript) {
-                            resolve(finalTranscript);
-                        } else {
-                            reject(new Error('Recognition timeout'));
-                        }
-                    }, 15000); // Max 15 seconds for the entire session
-
-                    recognition.start();
-                    
-                    // Clear max timeout when recognition ends
-                    recognition.onend = () => {
-                        clearTimeout(maxTimeout);
-                    };
-                });
-
-                console.log('🤖 Hema heard:', transcript);
-                showJarvisFeedback('🧠 Processing your request...', 'processing');
-
-                // Process the command with AI
-                await executeVoiceCommandWithAI(transcript);
-
-            } catch (error) {
-                console.error('Hema command error:', error);
-                showJarvisFeedback('❌ Sorry, I didn\'t catch that');
-                await speakResponseAndAddToChat('Sorry, I didn\'t understand that. Please say "Hema" to try again.');
-                setTimeout(() => hideJarvisFeedback(), 3000);
-            } finally {
-                // Restart wake word detection after processing
-                setTimeout(() => {
-                    if (!isListeningForWakeWord) {
-                        startWakeWordDetection();
-                    }
-                }, 3000);
-            }
-        }
 
         // Jarvis feedback functions
         function showJarvisFeedback(message, state = 'default') {
@@ -6919,153 +6500,14 @@
             }
         }
 
-        // Chat Interface Functions
-        function setupChatInterface() {
-            const chatToggle = document.getElementById('hemaChatToggle');
-            const chatPanel = document.getElementById('hemaChatPanel');
-            const closeChatBtn = document.getElementById('closeChatBtn');
-            const sendChatBtn = document.getElementById('sendChatBtn');
-            const voiceChatBtn = document.getElementById('voiceChatBtn');
-            const chatInput = document.getElementById('chatInput');
 
-            // Toggle chat panel
-            chatToggle.addEventListener('click', () => {
-                chatPanel.style.display = chatPanel.style.display === 'flex' ? 'none' : 'flex';
-            });
 
-            // Close chat panel
-            closeChatBtn.addEventListener('click', () => {
-                chatPanel.style.display = 'none';
-            });
-
-            // Send text message
-            sendChatBtn.addEventListener('click', () => {
-                sendChatMessage();
-            });
-
-            // Send message on Enter key
-            chatInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    sendChatMessage();
-                }
-            });
-
-            // Voice message
-            voiceChatBtn.addEventListener('click', () => {
-                startVoiceChat();
-            });
-
-            // Close chat when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!chatToggle.contains(e.target) && !chatPanel.contains(e.target)) {
-                    chatPanel.style.display = 'none';
-                }
-            });
-        }
-
-        function addChatMessage(message, isUser = false) {
-            const chatMessages = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `chat-message ${isUser ? 'user-message' : 'hema-message'}`;
-            
-            const timestamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            messageDiv.innerHTML = `<strong>${isUser ? 'You' : 'Hema'}:</strong> ${message} <small style="color: #888; font-size: 11px;">${timestamp}</small>`;
-            
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        async function sendChatMessage() {
-            const chatInput = document.getElementById('chatInput');
-            const message = chatInput.value.trim();
-            
-            if (!message) return;
-
-            // Add user message to chat
-            addChatMessage(message, true);
-            chatInput.value = '';
-
-            // Show processing message
-            addChatMessage('Processing your request...', false);
-
-                         try {
-                // Process the message with AI and handle response
-                await executeVoiceCommandWithAI(message, true);
-            } catch (error) {
-                console.error('Chat message error:', error);
-                // Remove processing message and add error message
-                const chatMessages = document.getElementById('chatMessages');
-                const lastMessage = chatMessages.lastElementChild;
-                if (lastMessage && lastMessage.textContent.includes('Processing')) {
-                    lastMessage.remove();
-                }
-                addChatMessage('Sorry, I encountered an error processing your request. Please try again.', false);
-            }
-        }
-
-        async function startVoiceChat() {
-            const voiceChatBtn = document.getElementById('voiceChatBtn');
-            voiceChatBtn.classList.add('listening');
-            
-            try {
-                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-                if (!SpeechRecognition) {
-                    throw new Error('Speech recognition not supported');
-                }
-
-                const recognition = new SpeechRecognition();
-                recognition.continuous = false;
-                recognition.interimResults = false;
-                recognition.lang = 'en-US';
-
-                const transcript = await new Promise((resolve, reject) => {
-                    recognition.onresult = (event) => {
-                        const transcript = event.results[0][0].transcript;
-                        resolve(transcript);
-                    };
-
-                    recognition.onerror = (event) => {
-                        reject(new Error(`Speech recognition error: ${event.error}`));
-                    };
-
-                    recognition.onend = () => {
-                        voiceChatBtn.classList.remove('listening');
-                    };
-
-                    recognition.start();
-                });
-
-                // Add the voice message to chat as user message
-                addChatMessage(`🎤 ${transcript}`, true);
-                
-                // Process the voice command
-                await executeVoiceCommandWithAI(transcript, true);
-
-            } catch (error) {
-                console.error('Voice chat error:', error);
-                addChatMessage('Sorry, I couldn\'t process your voice command. Please try again.', false);
-            } finally {
-                voiceChatBtn.classList.remove('listening');
-            }
-        }
-
-        // Override the speech response to also add to chat
-        async function speakResponseAndAddToChat(text) {
-            addChatMessage(text, false);
-            await speakResponse(text);
-        }
-
-        // Initialize Hema when page loads
+        // Initialize app when page loads (removed wake word setup)
         document.addEventListener('DOMContentLoaded', () => {
-            setupChatInterface();
-            setTimeout(() => {
-                setupJarvisWakeWord();
-            }, 2000);
+            console.log('🚀 App initialized - voice assistant ready on button click');
         });
 
-        // Make Hema functions globally accessible
-        window.showJarvisHelp = showJarvisHelp;
-        window.activateJarvis = activateJarvis;
+
     </script>
 </body>
 </html>
